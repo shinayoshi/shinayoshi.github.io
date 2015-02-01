@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[shinayoshi's notes]]></title>
-  <link href="http://blog.shinayoshi.net/atom.xml" rel="self"/>
-  <link href="http://blog.shinayoshi.net/"/>
-  <updated>2015-02-01T00:37:52+09:00</updated>
-  <id>http://blog.shinayoshi.net/</id>
+  <link href="http://www.shinayoshi.net/atom.xml" rel="self"/>
+  <link href="http://www.shinayoshi.net/"/>
+  <updated>2015-02-01T12:29:58+09:00</updated>
+  <id>http://www.shinayoshi.net/</id>
   <author>
     <name><![CDATA[shinayoshi]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Yosemiteの動作確認ソフトウェア]]></title>
-    <link href="http://blog.shinayoshi.net/blog/2014/10/25/yosemite-software/"/>
+    <link href="http://www.shinayoshi.net/blog/2014/10/25/yosemite-software/"/>
     <updated>2014-10-25T18:57:26+09:00</updated>
-    <id>http://blog.shinayoshi.net/blog/2014/10/25/yosemite-software</id>
+    <id>http://www.shinayoshi.net/blog/2014/10/25/yosemite-software</id>
     <content type="html"><![CDATA[<h1>Yosemiteで動作が確認できたソフトウェア</h1>
 
 <p>2014年10月にOS Xの新バージョン「Yosemite」がリリースされました。この記事ではクリーンインストールしたYosemiteにて動作が確認できたソフトウェアを紹介します。ここで言う「動作が確認できた」というのはインストールして起動することができた程度のものとなります。各ソフトウェアの全機能の動作を確認しているわけではないことをご了承ください。</p>
@@ -75,9 +75,9 @@
   
   <entry>
     <title type="html"><![CDATA[初投稿]]></title>
-    <link href="http://blog.shinayoshi.net/blog/2014/09/30/first-post/"/>
+    <link href="http://www.shinayoshi.net/blog/2014/09/30/first-post/"/>
     <updated>2014-09-30T21:44:57+09:00</updated>
-    <id>http://blog.shinayoshi.net/blog/2014/09/30/first-post</id>
+    <id>http://www.shinayoshi.net/blog/2014/09/30/first-post</id>
     <content type="html"><![CDATA[<h1>GitHub Pagesでブログ始めました</h1>
 
 <p>はてなブログからGitHub Pagesに変更しました。変更した理由は以下のとおりです。正直なところは流行に乗ってみたかっただけですが。。。</p>

@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://blog.shinayoshi.net/sitemap.xml 
+Sitemap: http://www.shinayoshi.net/sitemap.xml 
