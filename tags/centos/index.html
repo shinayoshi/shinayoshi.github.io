@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.15" />
 
     <base href="http://www.shinayoshi.net/" />
     <title>shinayoshi&#39;s note</title>
@@ -73,6 +73,24 @@
             <div class="page-content col-md-9">
               <h1>Centos</h1>
               <div class="list-group">
+                
+                <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    centos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &ldquo;All&rdquo;, &ldquo;None&rdquo;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
+                  </p>
+                </a>
                 
                 <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</h2>
@@ -156,6 +174,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">お名前.com VPS(KVM)の初期設定(CentOS 7 1511) [ 2016-01-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">囲碁・将棋の思考エンジンの覚え書き [ 2015-10-31 ]</a>
@@ -175,7 +195,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">1</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">2</span>server</a>
     
   </div>
 </section>
@@ -192,7 +212,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (1)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
     

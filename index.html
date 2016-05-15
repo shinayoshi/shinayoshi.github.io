@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.15" />
 
     <base href="http://www.shinayoshi.net/" />
     <title>shinayoshi&#39;s note</title>
@@ -71,6 +71,109 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
+
+<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
+
+<p>Webサーバ(Apache)とPHPをインストールします。</p>
+
+<blockquote>
+<p># yum install httpd php php-mbstring</p>
+</blockquote>
+
+<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
+
+<p>Apacheを設定します。</p>
+
+<blockquote>
+<p># vi /etc/httpd/conf/httpd.conf<br />
+#ServerName www.example.com:80<br />
+↓変更<br />
+ServerName www.example.com:80</p>
+
+<p>#<br />
+# AllowOverride controls what directives may be placed in .htaccess files.<br />
+# It can be &ldquo;All&rdquo;, &ldquo;None&rdquo;, or any combination of the keywords:<br />
+#   Options FileInfo AuthConfig Limit<br />
+#<br />
+    AllowOverride None<br />
+    ↓変更<br />
+    AllowOverride All</p>
+
+<p>AddDefaultCharset UTF-8<br />
+↓変更<br />
+#AddDefaultCharset UTF-8</p>
+</blockquote>
+
+<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
+
+<p>Apacheを起動します。</p>
+
+<blockquote>
+<p>$ sudo systemctl start httpd<br />
+$ sudo systemctl enable httpd</p>
+</blockquote>
+
+<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
+
+<p>FirewallでWeb通信を許可します。</p>
+
+<blockquote>
+<p>$ sudo firewall-cmd --permanent --zone=public --add-service=http<br />
+$ sudo firewall-cmd --reload<br />
+$ sudo firewall-cmd --list-all-zones</p>
+</blockquote>
+
+<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
+
+<p>外部からWebサイトにアクセスできるか確認します。</p>
+
+<blockquote>
+<p>$ sudo vi /var/www/html/index.php</p>
+</blockquote>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;title&gt;net-tools&lt;/title&gt;
+    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
+    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
+正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
+
+<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
+
+<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが、本記事では割愛させていただきます。</p>
+
+                </div>
+              </article>
               
               <article>
                 <div class="title">
@@ -242,12 +345,12 @@ $ sudo firewall-cmd --get-services</p>
 
 <h3 id="firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622">Firewalldの初期設定</h3>
 
-<p>デフォルトゾーンをdropに変更します。</p>
+<!---
+デフォルトゾーンをdropに変更します。
 
-<blockquote>
-<p>$ sudo firewall-cmd --set-default-zone=drop<br />
-$ sudo firewall-cmd --get-default-zone</p>
-</blockquote>
+> $ sudo firewall-cmd \-\-set-default-zone=drop  
+> $ sudo firewall-cmd \-\-get-default-zone  -
+-->
 
 <p>eth0のゾーンをpublicに変更します。</p>
 
@@ -266,7 +369,7 @@ $ sudo firewall-cmd --reload</p>
 <p>設定の確認</p>
 
 <blockquote>
-<p>$ sudo firewall-cmd --zone=public &ndash;list-all</p>
+<p>$ sudo firewall-cmd --zone=public --list-all</p>
 </blockquote>
 
 <h2 id="selinuxの無効化:130a6ce433fd353093f8e4a56dec5622">SELinuxの無効化</h2>
@@ -506,6 +609,8 @@ $ sudo systemctl disable sshd</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">お名前.com VPS(KVM)の初期設定(CentOS 7 1511) [ 2016-01-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">囲碁・将棋の思考エンジンの覚え書き [ 2015-10-31 ]</a>
@@ -525,7 +630,7 @@ $ sudo systemctl disable sshd</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">1</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">2</span>server</a>
     
   </div>
 </section>
@@ -542,7 +647,7 @@ $ sudo systemctl disable sshd</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (1)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
     

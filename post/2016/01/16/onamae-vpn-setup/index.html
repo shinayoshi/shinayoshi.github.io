@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.15" />
 
     <base href="http://www.shinayoshi.net/" />
     <title>shinayoshi&#39;s note</title>
@@ -279,12 +279,12 @@ $ sudo firewall-cmd --get-services</p>
 
 <h3 id="firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622">Firewalldの初期設定</h3>
 
-<p>デフォルトゾーンをdropに変更します。</p>
+<!---
+デフォルトゾーンをdropに変更します。
 
-<blockquote>
-<p>$ sudo firewall-cmd --set-default-zone=drop<br />
-$ sudo firewall-cmd --get-default-zone</p>
-</blockquote>
+> $ sudo firewall-cmd \-\-set-default-zone=drop  
+> $ sudo firewall-cmd \-\-get-default-zone  -
+-->
 
 <p>eth0のゾーンをpublicに変更します。</p>
 
@@ -303,7 +303,7 @@ $ sudo firewall-cmd --reload</p>
 <p>設定の確認</p>
 
 <blockquote>
-<p>$ sudo firewall-cmd --zone=public &ndash;list-all</p>
+<p>$ sudo firewall-cmd --zone=public --list-all</p>
 </blockquote>
 
 <h2 id="selinuxの無効化:130a6ce433fd353093f8e4a56dec5622">SELinuxの無効化</h2>
@@ -425,6 +425,8 @@ $ sudo systemctl disable sshd</p>
                   <li class="next"><a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/">囲碁・将棋の思考エンジンの覚え書き</a></li>
                   
                   
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></li>
+                  
                 </ul>
               </div>
             </div>
@@ -482,6 +484,8 @@ $ sudo systemctl disable sshd</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">お名前.com VPS(KVM)の初期設定(CentOS 7 1511) [ 2016-01-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">囲碁・将棋の思考エンジンの覚え書き [ 2015-10-31 ]</a>
@@ -501,7 +505,7 @@ $ sudo systemctl disable sshd</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">1</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">2</span>server</a>
     
   </div>
 </section>
@@ -518,7 +522,7 @@ $ sudo systemctl disable sshd</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (1)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
     

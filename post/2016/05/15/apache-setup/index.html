@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/categories/diary/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/categories/diary/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,56 +71,151 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Diary</h1>
-              <div class="list-group">
-                
-                <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">
-                  <h2 class="list-group-item-heading">囲碁・将棋の思考エンジンの覚え書き</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
+              <article>
+                <div class="title">
+                  <h1>ApacheでWebサイトを公開する</h1>
+                  <p>
+                    <span class="label label-primary">Sun May 15, 2016</span> in
                     
                     
-                    diary
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    igo
-                    
-                     , 
-                    shogi
+                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
                     
                   </p>
-                  <p class="list-group-item-text">
-                    囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。 実際に使用したことはないため、使用方法や強さはわかりません。あしからず。 囲碁の思考エンジン Pachi Fuego GNU Go 将棋の思考エンジン Bonanza Apery GPSshogi 将棋GUIソフト 将棋所
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2015/09/06/first-post/" class="list-group-item">
-                  <h2 class="list-group-item-heading">hugo始めました</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun Sep 6, 2015</span> in
-                    
-                    
-                    diary
-                     using tags
-                    
-                    
-                    blog
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Hugoでブログ始めました。 本ブログでは私が得た技術的な知識・経験を投稿していく予定です。 今後ともよろしくお願いします。
-                  </p>
-                </a>
-                
-              </div>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</a></li>
+<li><a href="#apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</a></li>
+<li><a href="#apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</a></li>
+<li><a href="#firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</a></li>
+<li><a href="#動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</a></li>
+<li><a href="#その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
+
+<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
+
+<p>Webサーバ(Apache)とPHPをインストールします。</p>
+
+<blockquote>
+<p># yum install httpd php php-mbstring</p>
+</blockquote>
+
+<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
+
+<p>Apacheを設定します。</p>
+
+<blockquote>
+<p># vi /etc/httpd/conf/httpd.conf<br />
+#ServerName www.example.com:80<br />
+↓変更<br />
+ServerName www.example.com:80</p>
+
+<p>#<br />
+# AllowOverride controls what directives may be placed in .htaccess files.<br />
+# It can be &ldquo;All&rdquo;, &ldquo;None&rdquo;, or any combination of the keywords:<br />
+#   Options FileInfo AuthConfig Limit<br />
+#<br />
+    AllowOverride None<br />
+    ↓変更<br />
+    AllowOverride All</p>
+
+<p>AddDefaultCharset UTF-8<br />
+↓変更<br />
+#AddDefaultCharset UTF-8</p>
+</blockquote>
+
+<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
+
+<p>Apacheを起動します。</p>
+
+<blockquote>
+<p>$ sudo systemctl start httpd<br />
+$ sudo systemctl enable httpd</p>
+</blockquote>
+
+<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
+
+<p>FirewallでWeb通信を許可します。</p>
+
+<blockquote>
+<p>$ sudo firewall-cmd --permanent --zone=public --add-service=http<br />
+$ sudo firewall-cmd --reload<br />
+$ sudo firewall-cmd --list-all-zones</p>
+</blockquote>
+
+<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
+
+<p>外部からWebサイトにアクセスできるか確認します。</p>
+
+<blockquote>
+<p>$ sudo vi /var/www/html/index.php</p>
+</blockquote>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;title&gt;net-tools&lt;/title&gt;
+    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
+    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
+正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
+
+<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
+
+<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが、本記事では割愛させていただきます。</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
               <div class="pagination">
                 <ul class="pager">
-  
-  <li>Page 1 of 1</li>
-  
-</ul>
-
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></li>
+                  
+                  
+                </ul>
               </div>
             </div>
             <div class="sidebar col-md-3">

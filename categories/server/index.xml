@@ -7,8 +7,100 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2015 shinayoshi</copyright>
-    <lastBuildDate>Sat, 16 Jan 2016 22:30:25 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 15 May 2016 22:14:46 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>ApacheでWebサイトを公開する</title>
+      <link>http://www.shinayoshi.net/post/2016/05/15/apache-setup/</link>
+      <pubDate>Sun, 15 May 2016 22:14:46 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/05/15/apache-setup/</guid>
+      <description>
+
+&lt;p&gt;ApacheでWebサイトを公開するまでの手順のメモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;ApacheとPHPのインストール&lt;/h2&gt;
+
+&lt;p&gt;Webサーバ(Apache)とPHPをインストールします。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;# yum install httpd php php-mbstring&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの設定&lt;/h2&gt;
+
+&lt;p&gt;Apacheを設定します。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;# vi /etc/httpd/conf/httpd.conf&lt;br /&gt;
+#ServerName www.example.com:80&lt;br /&gt;
+↓変更&lt;br /&gt;
+ServerName www.example.com:80&lt;/p&gt;
+
+&lt;p&gt;#&lt;br /&gt;
+# AllowOverride controls what directives may be placed in .htaccess files.&lt;br /&gt;
+# It can be &amp;ldquo;All&amp;rdquo;, &amp;ldquo;None&amp;rdquo;, or any combination of the keywords:&lt;br /&gt;
+#   Options FileInfo AuthConfig Limit&lt;br /&gt;
+#&lt;br /&gt;
+    AllowOverride None&lt;br /&gt;
+    ↓変更&lt;br /&gt;
+    AllowOverride All&lt;/p&gt;
+
+&lt;p&gt;AddDefaultCharset UTF-8&lt;br /&gt;
+↓変更&lt;br /&gt;
+#AddDefaultCharset UTF-8&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの起動&lt;/h2&gt;
+
+&lt;p&gt;Apacheを起動します。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo systemctl start httpd&lt;br /&gt;
+$ sudo systemctl enable httpd&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Firewallの設定&lt;/h2&gt;
+
+&lt;p&gt;FirewallでWeb通信を許可します。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo firewall-cmd --permanent --zone=public --add-service=http&lt;br /&gt;
+$ sudo firewall-cmd --reload&lt;br /&gt;
+$ sudo firewall-cmd --list-all-zones&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;動作確認&lt;/h2&gt;
+
+&lt;p&gt;外部からWebサイトにアクセスできるか確認します。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /var/www/html/index.php&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html lang=&amp;quot;ja&amp;quot;&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;meta charset=&amp;quot;utf-8&amp;quot; /&amp;gt;
+    &amp;lt;title&amp;gt;net-tools&amp;lt;/title&amp;gt;
+    &amp;lt;meta name=&amp;quot;description&amp;quot; content=&amp;quot;shinayoshi shinayoshi.net&amp;quot; /&amp;gt;
+    &amp;lt;meta name=&amp;quot;author&amp;quot; content=&amp;quot;shinayoshi&amp;quot; /&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;p&amp;gt;&amp;lt;?php echo $_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]; ?&amp;gt;&amp;lt;/p&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Webブラウザ等でWebサーバにアクセスできることを確認します。
+正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。&lt;/p&gt;
+
+&lt;h2 id=&#34;その他:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;その他&lt;/h2&gt;
+
+&lt;p&gt;実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが、本記事では割愛させていただきます。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</title>
@@ -170,12 +262,12 @@ $ sudo firewall-cmd --get-services&lt;/p&gt;
 
 &lt;h3 id=&#34;firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの初期設定&lt;/h3&gt;
 
-&lt;p&gt;デフォルトゾーンをdropに変更します。&lt;/p&gt;
+&lt;!---
+デフォルトゾーンをdropに変更します。
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --set-default-zone=drop&lt;br /&gt;
-$ sudo firewall-cmd --get-default-zone&lt;/p&gt;
-&lt;/blockquote&gt;
+&gt; $ sudo firewall-cmd \-\-set-default-zone=drop  
+&gt; $ sudo firewall-cmd \-\-get-default-zone  -
+--&gt;
 
 &lt;p&gt;eth0のゾーンをpublicに変更します。&lt;/p&gt;
 
@@ -194,7 +286,7 @@ $ sudo firewall-cmd --reload&lt;/p&gt;
 &lt;p&gt;設定の確認&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --zone=public &amp;ndash;list-all&lt;/p&gt;
+&lt;p&gt;$ sudo firewall-cmd --zone=public --list-all&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&#34;selinuxの無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;SELinuxの無効化&lt;/h2&gt;
