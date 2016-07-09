@@ -73,27 +73,141 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>about</h1>
+                  <h1>Rasbianのインストール</h1>
                   <p>
-                    <span class="label label-primary">Sun Sep 6, 2015</span>
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
                   </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6">使用したもの</a></li>
+<li><a href="#raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbianダウンロード</a></li>
+<li><a href="#raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian書き込み</a></li>
+<li><a href="#raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian起動</a></li>
+<li><a href="#raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian接続</a></li>
+<li><a href="#参考:b6f02b3d9579b63dd4fc7d440d3b8ed6">参考</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
                 </div>
                 <div class="contents">
                   
 
-<h2 id="profile:6083a88ee3411b0d17ce02d738f69d47">Profile</h2>
+<p>何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRasbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。</p>
 
-<dl>
-  <dt>Name</dt>
-  <dd>shinayoshi</dd>
-  <dt>Sex</dt>
-  <dd>Male</dd>
-  <dt>Location</dt>
-  <dd>Tokyo, Japan</dd>
-</dl>
+<h2 id="使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6">使用したもの</h2>
+
+<ol>
+<li>Raspberry Pi 3本体</li>
+<li>micro SDカード(32GB)</li>
+<li>USB ACアダプタ(Raspberry Pi 3の電源用)</li>
+<li>USBケーブル(Raspberry Pi 3の電源用)</li>
+<li>LANケーブル(Raspberry Pi 3の有線LAN接続用)</li>
+<li>Mac(作業用)</li>
+</ol>
+
+<h2 id="raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbianダウンロード</h2>
+
+<p>公式サイトからRaspbianをダウンロードする。
+2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。</p>
+
+<p><a href="https://www.raspberrypi.org/downloads/raspbian/">RASPBIAN</a></p>
+
+<h2 id="raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian書き込み</h2>
+
+<p>SDカードにRaspbianのイメージを書き込む。</p>
+
+<ol>
+<li>SDカードデバイスを確認する。
+&gt; $ diskutil list<br />
+&gt; /dev/disk1<br />
+&gt;    #:                       TYPE NAME                    SIZE       IDENTIFIER<br />
+&gt;    0:     FDisk_partition_scheme                        *32.2 GB    disk1<br />
+&gt;    1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1<br /></li>
+<li>SDカードデバイスをアンマウントする。
+&gt; $ diskutil umountDisk /dev/disk1<br />
+&gt; Unmount of all volumes on disk1 was successful<br /></li>
+<li>SDカードにRaspbianのイメージを書き込む。
+&gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1<br />
+&gt; Password:<br />
+&gt; 958+1 records in<br />
+&gt; 958+1 records out<br />
+&gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)<br /></li>
+<li>SDカードデバイスを取り出す。
+&gt; $ diskutil eject /dev/disk1<br />
+&gt; Disk /dev/disk1 ejected<br /></li>
+</ol>
+
+<h2 id="raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian起動</h2>
+
+<p>Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
+Raspberry Pi 3には有線LANも接続しておく。</p>
+
+<h2 id="raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian接続</h2>
+
+<ol>
+<li>Raspberry Pi 3のIPアドレスを確認する。
+&gt; $ arp -a<br />
+&gt; ? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]</li>
+<li>SSHでRaspberry Pi 3に接続する。
+&gt; $ ssh pi@192.168.1.10<br />
+&gt; pi@192.168.1.10&rsquo;s password:<br />
+&gt; ※piユーザのデフォルトパスワードは「raspberry」<br /></li>
+</ol>
+
+<h2 id="参考:b6f02b3d9579b63dd4fc7d440d3b8ed6">参考</h2>
+
+<p><a href="https://www.raspberrypi.org/documentation/installation/installing-images/mac.md">Installing operating system images on Mac OS</a></p>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
 
                 </div>
               </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></li>
+                  
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/">Rasbianの初期設定</a></li>
+                  
+                </ul>
+              </div>
             </div>
             <div class="sidebar col-md-3">
               <aside>
