@@ -62,7 +62,7 @@ $ ifconfig wlan0&lt;/p&gt;
 &lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpd.conf&lt;br /&gt;
+&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
 #Add the following line&lt;br /&gt;
 interface wlan0&lt;br /&gt;
 static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
