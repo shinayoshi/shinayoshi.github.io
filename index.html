@@ -74,6 +74,101 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/">Raspberry Pi 3でWiFi設定</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Jul 10, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/wifi">WiFi</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
+今回はWiFi設定を行う。</p>
+
+<h2 id="wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97">WiFiネットワークのスキャン</h2>
+
+<p>接続するWiFiネットワークを確認する。</p>
+
+<blockquote>
+<p>$ sudo iwlist wlan0 scan</p>
+</blockquote>
+
+<h2 id="アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97">アクセスポイントの設定</h2>
+
+<p>アクセスポイントを設定する。</p>
+
+<blockquote>
+<p>$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}<br />
+$ sudo sh -c &ldquo;wpa_passphrase &lsquo;アクセスポイント名(ESSID)&rsquo; &lsquo;アクセスポイントのパスワード&rsquo; &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&rdquo;<br />
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf<br />
+country=JP<br />
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev<br />
+update_config=1<br />
+network={<br />
+    ssid=&ldquo;アクセスポイント名(ESSID)&rdquo;<br />
+    #psk=&ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&rdquo;<br />
+    psk=暗号化されたパスワード<br />
+}</p>
+</blockquote>
+
+<h2 id="wifiの有効化:366b0c30f1d198568510d56bfae90a97">WiFiの有効化</h2>
+
+<p>WiFiを有効化する。</p>
+
+<blockquote>
+<p>$ sudo ifdown wlan0<br />
+$ sudo ifup wlan0<br />
+$ ifconfig wlan0</p>
+</blockquote>
+
+<h2 id="ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97">IPアドレスの固定化</h2>
+
+<p>IPアドレスを固定化する。</p>
+
+<blockquote>
+<p>$ sudo vi /etc/dhcpd.conf<br />
+#Add the following line<br />
+interface wlan0<br />
+static ip_address=192.168.100.<sup>10</sup>&frasl;<sub>24</sub><br />
+static routers=192.168.100.1<br />
+static domain_name_servers=192.168.100.1<br />
+#static domain_name=<br />
+#static domain_search=</p>
+</blockquote>
+
+<p>WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。</p>
+
+<blockquote>
+<p>$ sudo ifdown wlan0<br />
+$ sudo ifup wlan0<br />
+$ ifconfig wlan0</p>
+</blockquote>
+
+<h2 id="参考:366b0c30f1d198568510d56bfae90a97">参考</h2>
+
+<ul>
+<li><a href="https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md">Setting WiFi up via the command line - Raspberry Pi Documentation</a></li>
+<li><a href="http://move0tofu.hatenablog.jp/entry/2016/04/30/215517">Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&hellip;</a></li>
+</ul>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/">Rasbianの初期設定</a></h1>
                   <p>
                     <span class="label label-primary">Sat Jul 9, 2016</span> in
@@ -836,6 +931,8 @@ $ sudo systemctl disable sshd</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Rasbianの初期設定 [ 2016-07-09 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Rasbianのインストール [ 2016-07-09 ]</a>
@@ -843,8 +940,6 @@ $ sudo systemctl disable sshd</p>
       <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">お名前.com VPS(KVM)の初期設定(CentOS 7 1511) [ 2016-01-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">囲碁・将棋の思考エンジンの覚え書き [ 2015-10-31 ]</a>
       
     
   </div>
@@ -859,7 +954,7 @@ $ sudo systemctl disable sshd</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">4</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">5</span>server</a>
     
   </div>
 </section>
@@ -888,11 +983,15 @@ $ sudo systemctl disable sshd</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (2)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (3)</a>
     
     
     
     <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
     
     
   </div>

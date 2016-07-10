@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/tags/wifi/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/wifi/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,61 +71,38 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <article>
-                <div class="title">
-                  <h1>hugo始めました</h1>
-                  <p>
-                    <span class="label label-primary">Sun Sep 6, 2015</span> in
+              <h1>Wifi</h1>
+              <div class="list-group">
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Jul 10, 2016</span> in
                     
                     
-                    <a href="http://www.shinayoshi.net//categories/diary">diary</a>
+                    server
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/blog">blog</a>
+                    raspberrypi
+                    
+                     , 
+                    WiFi
                     
                   </p>
-                </div>
-                <div class="panel panel-info">
-                  <div class="panel-heading">
-                    <p class="panel-title">Table of Contents</p>
-                  </div>
-                  <div class="panel-body">
-                    
-                  </div>
-                </div>
-                <div class="contents">
-                  <p>Hugoでブログ始めました。</p>
-
-<p>本ブログでは私が得た技術的な知識・経験を投稿していく予定です。</p>
-
-<p>今後ともよろしくお願いします。</p>
-
-                  
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-   
-  var disqus_shortname = 'shinayoshi';
-
-   
-  (function() {
-  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-
-
-                </div>
-              </article>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &ldquo;wpa_passphrase &lsquo;アクセスポイント名(ESSID)&rsquo; &lsquo;アクセスポイントのパスワード&rsquo; &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&rdquo; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&ldquo;アクセスポイント名(ESSID)&rdquo; #psk=&ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&rdquo; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10&frasl;24 static routers=192.168.100.1 static
+                  </p>
+                </a>
+                
+              </div>
               <div class="pagination">
                 <ul class="pager">
-                  
-                  
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/">囲碁・将棋の思考エンジンの覚え書き</a></li>
-                  
-                </ul>
+  
+  <li>Page 1 of 1</li>
+  
+</ul>
+
               </div>
             </div>
             <div class="sidebar col-md-3">
