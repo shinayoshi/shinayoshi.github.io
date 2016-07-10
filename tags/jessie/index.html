@@ -75,7 +75,7 @@
               <div class="list-group">
                 
                 <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Rasbianの初期設定</h2>
+                  <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
                   <p class="list-group-item-text">
                     <span class="label label-primary">Sat Jul 9, 2016</span> in
                     
@@ -91,12 +91,12 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get dist-upgrade Updating and Upgrading Raspbian IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpd.conf #Add the following line interface eth0 static ip_address=192.168.40.10&frasl;24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - USB Power raspi-config関連 $ sudo raspi-config ディスク拡張 「1 Expand Filesystem」を選択する。 「Ok」を選択する。
+                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpd.conf #Add the following line interface eth0 static ip_address=192.168.40.10&frasl;24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org raspi-config関連 $ sudo raspi-config ディスク拡張 「1
                   </p>
                 </a>
                 
                 <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Rasbianのインストール</h2>
+                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
                   <p class="list-group-item-text">
                     <span class="label label-primary">Sat Jul 9, 2016</span> in
                     
@@ -112,7 +112,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRasbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3本体 micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 RASPBIAN Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 &gt; $ diskutil list &gt; /dev/disk1 &gt; #: TYPE NAME SIZE IDENTIFIER &gt; 0: FDisk_partition_scheme *32.2 GB disk1 &gt; 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 &gt; $ diskutil umountDisk /dev/disk1 &gt; Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 &gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 &gt; Password: &gt; 958+1 records in &gt; 958+1 records out &gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 &gt; $ diskutil eject /dev/disk1 &gt; Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 &gt; $ arp -a &gt; ?
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 &gt; $ diskutil list &gt; /dev/disk1 &gt; #: TYPE NAME SIZE IDENTIFIER &gt; 0: FDisk_partition_scheme *32.2 GB disk1 &gt; 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 &gt; $ diskutil umountDisk /dev/disk1 &gt; Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 &gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 &gt; Password: &gt; 958+1 records in &gt; 958+1 records out &gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 &gt; $ diskutil eject /dev/disk1 &gt; Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 &gt; $ arp -a &gt; ?
                   </p>
                 </a>
                 
@@ -182,9 +182,9 @@
       
       <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Rasbianの初期設定 [ 2016-07-09 ]</a>
+      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Rasbianのインストール [ 2016-07-09 ]</a>
+      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Raspbianのインストール [ 2016-07-09 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
       

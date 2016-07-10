@@ -98,7 +98,7 @@ $ sudo firewall-cmd --list-all-zones&lt;/p&gt;
 
 &lt;h2 id=&#34;その他:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;その他&lt;/h2&gt;
 
-&lt;p&gt;実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが、本記事では割愛させていただきます。&lt;/p&gt;
+&lt;p&gt;実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。&lt;/p&gt;
 </description>
     </item>
     

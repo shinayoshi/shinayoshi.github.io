@@ -92,7 +92,7 @@ $ ifconfig wlan0&lt;/p&gt;
     </item>
     
     <item>
-      <title>Rasbianの初期設定</title>
+      <title>Raspbianの初期設定</title>
       <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</link>
       <pubDate>Sat, 09 Jul 2016 21:43:58 +0900</pubDate>
       
@@ -109,10 +109,12 @@ $ ifconfig wlan0&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;$ sudo apt-get update&lt;br /&gt;
-$ sudo apt-get dist-upgrade&lt;/p&gt;
+$ sudo apt-get upgrade&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;ipアドレス固定化:29d369a29c800517b14390fe39a79e9d&#34;&gt;IPアドレス固定化&lt;/h2&gt;
 
@@ -129,7 +131,9 @@ static domain_name_servers=192.168.100.1&lt;br /&gt;
 #static domain_search=&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
 
@@ -141,7 +145,9 @@ static domain_name_servers=192.168.100.1&lt;br /&gt;
 max_usb_current=1&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - USB Power&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
 
@@ -213,19 +219,19 @@ max_usb_current=1&lt;/p&gt;
     </item>
     
     <item>
-      <title>Rasbianのインストール</title>
+      <title>Raspbianのインストール</title>
       <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</link>
       <pubDate>Sat, 09 Jul 2016 15:55:37 +0900</pubDate>
       
       <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</guid>
       <description>
 
-&lt;p&gt;何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRasbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。&lt;/p&gt;
+&lt;p&gt;何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。&lt;/p&gt;
 
 &lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Raspberry Pi 3本体&lt;/li&gt;
+&lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
 &lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
 &lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
 &lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
@@ -238,7 +244,9 @@ max_usb_current=1&lt;/p&gt;
 &lt;p&gt;公式サイトからRaspbianをダウンロードする。
 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://www.raspberrypi.org/downloads/raspbian/&#34;&gt;RASPBIAN&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/downloads/raspbian/&#34;&gt;Download Raspbian for Raspberry Pi&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian書き込み&lt;/h2&gt;
 
@@ -284,7 +292,9 @@ Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
 
 &lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/installation/installing-images/mac.md&#34;&gt;Installing operating system images on Mac OS&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/installation/installing-images/mac.md&#34;&gt;Installing operating system images on Mac OS - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>
