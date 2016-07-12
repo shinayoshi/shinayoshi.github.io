@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="http://www.shinayoshi.net/tags/jessie/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/jessie/index.xml" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <h1>Jessie</h1>
+              <div class="list-group">
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3にRaspberry Pi 7&amp;quot; Touch Screen LCDを接続</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jul 12, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3のディスプレイとして「Official 7&rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。 接続 以下のWebサイトを参考に接続する。 Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi 天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。 $ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity 日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。 $ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpd.conf #Add the following line interface eth0 static ip_address=192.168.40.10&frasl;24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org raspi-config関連 $ sudo raspi-config ディスク拡張 「1
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 &gt; $ diskutil list &gt; /dev/disk1 &gt; #: TYPE NAME SIZE IDENTIFIER &gt; 0: FDisk_partition_scheme *32.2 GB disk1 &gt; 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 &gt; $ diskutil umountDisk /dev/disk1 &gt; Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 &gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 &gt; Password: &gt; 958+1 records in &gt; 958+1 records out &gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 &gt; $ diskutil eject /dev/disk1 &gt; Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 &gt; $ arp -a &gt; ?
+                  </p>
+                </a>
+                
+              </div>
+              <div class="pagination">
+                <ul class="pager">
+  
+  <li>Page 1 of 1</li>
+  
+</ul>
+
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&amp;quot; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Raspbianのインストール [ 2016-07-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">6</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (4)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2015 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Raspberrypi on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/raspberrypi/</link>
+    <description>Recent content in Raspberrypi on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2015 shinayoshi</copyright>
+    <lastBuildDate>Tue, 12 Jul 2016 21:16:20 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspberry Pi 3にRaspberry Pi 7&amp;quot; Touch Screen LCDを接続</title>
+      <link>http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</link>
+      <pubDate>Tue, 12 Jul 2016 21:16:20 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</guid>
+      <description>
+
+&lt;p&gt;Raspberry Pi 3のディスプレイとして「Official 7&amp;rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。
+Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。&lt;/p&gt;
+
+&lt;h2 id=&#34;接続:2020837d634538f02be0a31ea2dca63e&#34;&gt;接続&lt;/h2&gt;
+
+&lt;p&gt;以下のWebサイトを参考に接続する。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://raspberry-pi.ksyic.com/page/page/pgp.id/4&#34;&gt;Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY:&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/blog/the-eagerly-awaited-raspberry-pi-display/&#34;&gt;The Eagerly Awaited Raspberry Pi Display - Raspberry Pi&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;天地逆転を直す:2020837d634538f02be0a31ea2dca63e&#34;&gt;天地逆転を直す&lt;/h2&gt;
+
+&lt;p&gt;購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
+#Add the following line&lt;br /&gt;
+lcd_rotate=2&lt;br /&gt;
+$ sudo reboot&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd&#34;&gt;Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;日本語環境の整備:2020837d634538f02be0a31ea2dca63e&#34;&gt;日本語環境の整備&lt;/h2&gt;
+
+&lt;p&gt;日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get install task-japanese task-japanese-desktop&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e&#34;&gt;スクリーンキーボードのインストール&lt;/h2&gt;
+
+&lt;p&gt;Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get install florence&lt;br /&gt;
+$ sudo apt-get install at-spi2-core&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;ログイン画面でもOn Screen Keyboardを使用できるように設定する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf&lt;br /&gt;
+show-indicators=~language;~a11y;~session;~power&lt;br /&gt;
+keyboard=florence &amp;ndash;focus&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://xmodulo.com/onscreen-virtual-keyboard-linux.html&#34;&gt;How to use on-screen virtual keyboard on Linux - Xmodulo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/forums/viewtopic.php?f=108&amp;amp;t=123189&#34;&gt;Raspberry Pi • View topic - Solution for Jessie and Florence virtual keyboard crash&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/forums/viewtopic.php?f=63&amp;amp;t=113526&#34;&gt;Raspberry Pi • View topic - Virtual Keyboard on Login Screen&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;リモートデスクトップ接続:2020837d634538f02be0a31ea2dca63e&#34;&gt;リモートデスクトップ接続&lt;/h2&gt;
+
+&lt;p&gt;xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get install xrdp&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ cat /etc/xrdp/xrdp.ini
+$ cat /etc/xrdp/sesman.ini&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspberry Pi 3でWiFi設定</title>
+      <link>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</link>
+      <pubDate>Sun, 10 Jul 2016 09:37:19 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</guid>
+      <description>
+
+&lt;p&gt;Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
+今回はWiFi設定を行う。&lt;/p&gt;
+
+&lt;h2 id=&#34;wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiネットワークのスキャン&lt;/h2&gt;
+
+&lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo iwlist wlan0 scan&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
+
+&lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}&lt;br /&gt;
+$ sudo sh -c &amp;ldquo;wpa_passphrase &amp;lsquo;アクセスポイント名(ESSID)&amp;rsquo; &amp;lsquo;アクセスポイントのパスワード&amp;rsquo; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;rdquo;&lt;br /&gt;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf&lt;br /&gt;
+country=JP&lt;br /&gt;
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev&lt;br /&gt;
+update_config=1&lt;br /&gt;
+network={&lt;br /&gt;
+    ssid=&amp;ldquo;アクセスポイント名(ESSID)&amp;rdquo;&lt;br /&gt;
+    #psk=&amp;ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;rdquo;&lt;br /&gt;
+    psk=暗号化されたパスワード&lt;br /&gt;
+}&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
+
+&lt;p&gt;WiFiを有効化する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
+$ sudo ifup wlan0&lt;br /&gt;
+$ ifconfig wlan0&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
+
+&lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
+#Add the following line&lt;br /&gt;
+interface wlan0&lt;br /&gt;
+static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
+static routers=192.168.100.1&lt;br /&gt;
+static domain_name_servers=192.168.100.1&lt;br /&gt;
+#static domain_name=&lt;br /&gt;
+#static domain_search=&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
+$ sudo ifup wlan0&lt;br /&gt;
+$ ifconfig wlan0&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspbianの初期設定</title>
+      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</link>
+      <pubDate>Sat, 09 Jul 2016 21:43:58 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</guid>
+      <description>
+
+&lt;p&gt;こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;前提:29d369a29c800517b14390fe39a79e9d&#34;&gt;前提&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。&lt;/p&gt;
+
+&lt;h2 id=&#34;パッケージ更新:29d369a29c800517b14390fe39a79e9d&#34;&gt;パッケージ更新&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
+$ sudo apt-get upgrade&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ipアドレス固定化:29d369a29c800517b14390fe39a79e9d&#34;&gt;IPアドレス固定化&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 3のIPアドレスを固定する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /etc/dhcpd.conf&lt;br /&gt;
+#Add the following line&lt;br /&gt;
+interface eth0&lt;br /&gt;
+static ip_address=192.168.40.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
+static routers=192.168.40.254&lt;br /&gt;
+static domain_name_servers=192.168.100.1&lt;br /&gt;
+#static domain_name=&lt;br /&gt;
+#static domain_search=&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
+
+&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
+#Add the following line&lt;br /&gt;
+max_usb_current=1&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo raspi-config&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;ディスク拡張:29d369a29c800517b14390fe39a79e9d&#34;&gt;ディスク拡張&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「1 Expand Filesystem」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
+&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
+&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
+&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;wifiの国設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;Wifiの国設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
+&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;ホスト名変更:29d369a29c800517b14390fe39a79e9d&#34;&gt;ホスト名変更&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「9 Advanced Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;raspi-config終了:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config終了&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
+&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspbianのインストール</title>
+      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</link>
+      <pubDate>Sat, 09 Jul 2016 15:55:37 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</guid>
+      <description>
+
+&lt;p&gt;何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
+&lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
+&lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
+&lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
+&lt;li&gt;LANケーブル(Raspberry Pi 3の有線LAN接続用)&lt;/li&gt;
+&lt;li&gt;Mac(作業用)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbianダウンロード&lt;/h2&gt;
+
+&lt;p&gt;公式サイトからRaspbianをダウンロードする。
+2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/downloads/raspbian/&#34;&gt;Download Raspbian for Raspberry Pi&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian書き込み&lt;/h2&gt;
+
+&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;SDカードデバイスを確認する。
+&amp;gt; $ diskutil list&lt;br /&gt;
+&amp;gt; /dev/disk1&lt;br /&gt;
+&amp;gt;    #:                       TYPE NAME                    SIZE       IDENTIFIER&lt;br /&gt;
+&amp;gt;    0:     FDisk_partition_scheme                        *32.2 GB    disk1&lt;br /&gt;
+&amp;gt;    1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;SDカードデバイスをアンマウントする。
+&amp;gt; $ diskutil umountDisk /dev/disk1&lt;br /&gt;
+&amp;gt; Unmount of all volumes on disk1 was successful&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;SDカードにRaspbianのイメージを書き込む。
+&amp;gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1&lt;br /&gt;
+&amp;gt; Password:&lt;br /&gt;
+&amp;gt; 958+1 records in&lt;br /&gt;
+&amp;gt; 958+1 records out&lt;br /&gt;
+&amp;gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;SDカードデバイスを取り出す。
+&amp;gt; $ diskutil eject /dev/disk1&lt;br /&gt;
+&amp;gt; Disk /dev/disk1 ejected&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian起動&lt;/h2&gt;
+
+&lt;p&gt;Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
+Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian接続&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Raspberry Pi 3のIPアドレスを確認する。
+&amp;gt; $ arp -a&lt;br /&gt;
+&amp;gt; ? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]&lt;/li&gt;
+&lt;li&gt;SSHでRaspberry Pi 3に接続する。
+&amp;gt; $ ssh pi@192.168.1.10&lt;br /&gt;
+&amp;gt; pi@192.168.1.10&amp;rsquo;s password:&lt;br /&gt;
+&amp;gt; ※piユーザのデフォルトパスワードは「raspberry」&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/installation/installing-images/mac.md&#34;&gt;Installing operating system images on Mac OS - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Wifi on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/wifi/</link>
+    <description>Recent content in Wifi on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2015 shinayoshi</copyright>
+    <lastBuildDate>Sun, 10 Jul 2016 09:37:19 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/wifi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspberry Pi 3でWiFi設定</title>
+      <link>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</link>
+      <pubDate>Sun, 10 Jul 2016 09:37:19 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</guid>
+      <description>
+
+&lt;p&gt;Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
+今回はWiFi設定を行う。&lt;/p&gt;
+
+&lt;h2 id=&#34;wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiネットワークのスキャン&lt;/h2&gt;
+
+&lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo iwlist wlan0 scan&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
+
+&lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}&lt;br /&gt;
+$ sudo sh -c &amp;ldquo;wpa_passphrase &amp;lsquo;アクセスポイント名(ESSID)&amp;rsquo; &amp;lsquo;アクセスポイントのパスワード&amp;rsquo; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;rdquo;&lt;br /&gt;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf&lt;br /&gt;
+country=JP&lt;br /&gt;
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev&lt;br /&gt;
+update_config=1&lt;br /&gt;
+network={&lt;br /&gt;
+    ssid=&amp;ldquo;アクセスポイント名(ESSID)&amp;rdquo;&lt;br /&gt;
+    #psk=&amp;ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;rdquo;&lt;br /&gt;
+    psk=暗号化されたパスワード&lt;br /&gt;
+}&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
+
+&lt;p&gt;WiFiを有効化する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
+$ sudo ifup wlan0&lt;br /&gt;
+$ ifconfig wlan0&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
+
+&lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
+#Add the following line&lt;br /&gt;
+interface wlan0&lt;br /&gt;
+static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
+static routers=192.168.100.1&lt;br /&gt;
+static domain_name_servers=192.168.100.1&lt;br /&gt;
+#static domain_name=&lt;br /&gt;
+#static domain_search=&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
+$ sudo ifup wlan0&lt;br /&gt;
+$ ifconfig wlan0&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
