@@ -18,7 +18,7 @@
       <guid>http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</guid>
       <description>
 
-&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screenに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。&lt;/p&gt;
+&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。&lt;/p&gt;
 
 &lt;h2 id=&#34;kivyのインストール:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのインストール&lt;/h2&gt;
 
@@ -45,7 +45,7 @@ $ source ~/.profile&lt;/p&gt;
 &lt;li&gt;&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;raspberry-pi-7-touch-screenの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screenの利用設定&lt;/h2&gt;
+&lt;h2 id=&#34;raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDの利用設定&lt;/h2&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;$ vi ~/.kivy/config.ini&lt;br /&gt;
@@ -95,7 +95,7 @@ $ python main.py&lt;/p&gt;
 &lt;p&gt;$ python paint.py&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screenをタッチすることで線が引けることを確認する。&lt;/p&gt;
+&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。&lt;/p&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>
