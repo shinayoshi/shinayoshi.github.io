@@ -22,14 +22,18 @@
 
 &lt;h2 id=&#34;kivyのインストール:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのインストール&lt;/h2&gt;
 
-&lt;p&gt;KivyのWebサイトを参考にKivyをインストールする。&lt;/p&gt;
+&lt;p&gt;Kivyに必要なパッケージをインストールする。&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;$ sudo apt-get update&lt;br /&gt;
 $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython&lt;/p&gt;
 
 &lt;p&gt;$ sudo reboot&lt;/p&gt;
+&lt;/blockquote&gt;
 
+&lt;p&gt;Kivyをインストールする。&lt;/p&gt;
+
+&lt;blockquote&gt;
 &lt;p&gt;$ git clone &lt;a href=&#34;https://github.com/kivy/kivy&#34;&gt;https://github.com/kivy/kivy&lt;/a&gt;&lt;br /&gt;
 $ cd kivy&lt;br /&gt;
 $ make&lt;br /&gt;
@@ -38,7 +42,7 @@ $ source ~/.profile&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
-&lt;li&gt;(Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation)[&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;https://kivy.org/docs/installation/installation-rpi.html&lt;/a&gt;]&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;raspberry-pi-7-touch-screenの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screenの利用設定&lt;/h2&gt;
@@ -73,6 +77,25 @@ $ python main.py&lt;/p&gt;
 &lt;p&gt;$ cd ~/kivy/examples/3Drendering&lt;br /&gt;
 $ python main.py&lt;/p&gt;
 &lt;/blockquote&gt;
+
+&lt;h2 id=&#34;kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのプログラムを作成・実行&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://a-zumi.net/python-kivy-simple-paint/&#34;&gt;【Python】Kivyを使ってシンプルなペイントツールを作成する方法&lt;/a&gt;を参考に、自前でペイントツールを作成し、実行する。&lt;/p&gt;
+
+&lt;p&gt;ソースコードを作成する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ vi paint.py&lt;br /&gt;
+&lt;script src=&#34;https://gist.github.com/kurozumi/31f250c38662a102afa5.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;実行する。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ python paint.py&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screenをタッチすることで線が引けることを確認する。&lt;/p&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

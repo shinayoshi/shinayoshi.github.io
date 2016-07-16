@@ -105,6 +105,7 @@
 <li><a href="#デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</a></li>
 <li><a href="#デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</a></li>
 </ul></li>
+<li><a href="#kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -117,14 +118,18 @@
 
 <h2 id="kivyのインストール:7e54fa4db923fa1d790b8a2df258af41">Kivyのインストール</h2>
 
-<p>KivyのWebサイトを参考にKivyをインストールする。</p>
+<p>Kivyに必要なパッケージをインストールする。</p>
 
 <blockquote>
 <p>$ sudo apt-get update<br />
 $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython</p>
 
 <p>$ sudo reboot</p>
+</blockquote>
 
+<p>Kivyをインストールする。</p>
+
+<blockquote>
 <p>$ git clone <a href="https://github.com/kivy/kivy">https://github.com/kivy/kivy</a><br />
 $ cd kivy<br />
 $ make<br />
@@ -133,7 +138,7 @@ $ source ~/.profile</p>
 </blockquote>
 
 <ul>
-<li>(Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation)[<a href="https://kivy.org/docs/installation/installation-rpi.html">https://kivy.org/docs/installation/installation-rpi.html</a>]</li>
+<li><a href="https://kivy.org/docs/installation/installation-rpi.html">Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation</a></li>
 </ul>
 
 <h2 id="raspberry-pi-7-touch-screenの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screenの利用設定</h2>
@@ -168,6 +173,25 @@ $ python main.py</p>
 <p>$ cd ~/kivy/examples/3Drendering<br />
 $ python main.py</p>
 </blockquote>
+
+<h2 id="kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</h2>
+
+<p><a href="http://a-zumi.net/python-kivy-simple-paint/">【Python】Kivyを使ってシンプルなペイントツールを作成する方法</a>を参考に、自前でペイントツールを作成し、実行する。</p>
+
+<p>ソースコードを作成する。</p>
+
+<blockquote>
+<p>$ vi paint.py<br />
+<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script></p>
+</blockquote>
+
+<p>実行する。</p>
+
+<blockquote>
+<p>$ python paint.py</p>
+</blockquote>
+
+<p>Raspberry Pi 7&rdquo; Touch Screenをタッチすることで線が引けることを確認する。</p>
 
 <p>以上</p>
 
