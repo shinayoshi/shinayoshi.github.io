@@ -7,8 +7,76 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Tue, 12 Jul 2016 21:16:20 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 16 Jul 2016 20:49:31 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>RaspbianにKivyをセットアップ</title>
+      <link>http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</link>
+      <pubDate>Sat, 16 Jul 2016 20:49:31 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</guid>
+      <description>
+
+&lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screenに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;kivyのインストール:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのインストール&lt;/h2&gt;
+
+&lt;p&gt;KivyのWebサイトを参考にKivyをインストールする。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython&lt;/p&gt;
+
+&lt;p&gt;$ sudo reboot&lt;/p&gt;
+
+&lt;p&gt;$ git clone &lt;a href=&#34;https://github.com/kivy/kivy&#34;&gt;https://github.com/kivy/kivy&lt;/a&gt;&lt;br /&gt;
+$ cd kivy&lt;br /&gt;
+$ make&lt;br /&gt;
+$ echo &amp;ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;rdquo; &amp;gt;&amp;gt; ~/.profile&lt;br /&gt;
+$ source ~/.profile&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;(Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation)[&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;https://kivy.org/docs/installation/installation-rpi.html&lt;/a&gt;]&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;raspberry-pi-7-touch-screenの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screenの利用設定&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ vi ~/.kivy/config.ini&lt;br /&gt;
+[input]&lt;br /&gt;
+mouse = mouse&lt;br /&gt;
+mtdev_%(name)s = probesysfs,provider=mtdev&lt;br /&gt;
+hid_%(name)s = probesysfs,provider=hidinput&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyデモを実行&lt;/h2&gt;
+
+&lt;p&gt;デモ実行に必要なパッケージをインストールする。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ sudo apt-get install xclip xsel&lt;br /&gt;
+$ sudo pip install pygments docutils&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ１(showcase)&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ cd ~/kivy/examples/demo/showcase&lt;br /&gt;
+$ python main.py&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ２(3Drendering)&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;$ cd ~/kivy/examples/3Drendering&lt;br /&gt;
+$ python main.py&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</title>

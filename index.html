@@ -74,6 +74,88 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/">RaspbianにKivyをセットアップ</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/kivy">kivy</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 7&rdquo; Touch Screenに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。</p>
+
+<h2 id="kivyのインストール:7e54fa4db923fa1d790b8a2df258af41">Kivyのインストール</h2>
+
+<p>KivyのWebサイトを参考にKivyをインストールする。</p>
+
+<blockquote>
+<p>$ sudo apt-get update<br />
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython</p>
+
+<p>$ sudo reboot</p>
+
+<p>$ git clone <a href="https://github.com/kivy/kivy">https://github.com/kivy/kivy</a><br />
+$ cd kivy<br />
+$ make<br />
+$ echo &ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&rdquo; &gt;&gt; ~/.profile<br />
+$ source ~/.profile</p>
+</blockquote>
+
+<ul>
+<li>(Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation)[<a href="https://kivy.org/docs/installation/installation-rpi.html">https://kivy.org/docs/installation/installation-rpi.html</a>]</li>
+</ul>
+
+<h2 id="raspberry-pi-7-touch-screenの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screenの利用設定</h2>
+
+<blockquote>
+<p>$ vi ~/.kivy/config.ini<br />
+[input]<br />
+mouse = mouse<br />
+mtdev_%(name)s = probesysfs,provider=mtdev<br />
+hid_%(name)s = probesysfs,provider=hidinput</p>
+</blockquote>
+
+<h2 id="kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41">Kivyデモを実行</h2>
+
+<p>デモ実行に必要なパッケージをインストールする。</p>
+
+<blockquote>
+<p>$ sudo apt-get install xclip xsel<br />
+$ sudo pip install pygments docutils</p>
+</blockquote>
+
+<h3 id="デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</h3>
+
+<blockquote>
+<p>$ cd ~/kivy/examples/demo/showcase<br />
+$ python main.py</p>
+</blockquote>
+
+<h3 id="デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</h3>
+
+<blockquote>
+<p>$ cd ~/kivy/examples/3Drendering<br />
+$ python main.py</p>
+</blockquote>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</a></h1>
                   <p>
                     <span class="label label-primary">Tue Jul 12, 2016</span> in
@@ -1044,6 +1126,8 @@ $ sudo systemctl disable sshd</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
@@ -1073,7 +1157,7 @@ $ sudo systemctl disable sshd</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">6</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
     
   </div>
 </section>
@@ -1102,7 +1186,11 @@ $ sudo systemctl disable sshd</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (4)</a>
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
     
     
     

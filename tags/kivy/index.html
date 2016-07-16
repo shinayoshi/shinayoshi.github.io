@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/shogi/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/tags/kivy/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/shogi/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/kivy/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,27 +71,27 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Shogi</h1>
+              <h1>Kivy</h1>
               <div class="list-group">
                 
-                <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">
-                  <h2 class="list-group-item-heading">囲碁・将棋の思考エンジンの覚え書き</h2>
+                <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">RaspbianにKivyをセットアップ</h2>
                   <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
                     
                     
-                    diary
+                    server
                      using tags
                     
                     
-                    igo
+                    raspberrypi
                     
                      , 
-                    shogi
+                    kivy
                     
                   </p>
                   <p class="list-group-item-text">
-                    囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。 実際に使用したことはないため、使用方法や強さはわかりません。あしからず。 囲碁の思考エンジン Pachi Fuego GNU Go 将棋の思考エンジン Bonanza Apery GPSshogi 将棋GUIソフト 将棋所
+                    Raspberry Pi 7&rdquo; Touch Screenに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。 Kivyのインストール KivyのWebサイトを参考にKivyをインストールする。 $ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot $ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&rdquo; &gt;&gt; ~/.profile $ source ~/.profile (Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation)[https://kivy.org/docs/installation/installation-rpi.html] Raspberry Pi 7&rdquo; Touch Screenの利用設定 $ vi ~/.kivy/config.ini [input]
                   </p>
                 </a>
                 
