@@ -115,62 +115,55 @@
 
 <p>Webサーバ(Apache)とPHPをインストールします。</p>
 
-<blockquote>
-<p># yum install httpd php php-mbstring</p>
-</blockquote>
+<pre><code># yum install httpd php php-mbstring
+</code></pre>
 
 <h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
 
 <p>Apacheを設定します。</p>
 
-<blockquote>
-<p># vi /etc/httpd/conf/httpd.conf<br />
-#ServerName www.example.com:80<br />
-↓変更<br />
-ServerName www.example.com:80</p>
+<pre><code># vi /etc/httpd/conf/httpd.conf
+#ServerName www.example.com:80
+↓変更
+ServerName www.example.com:80
 
-<p>#<br />
-# AllowOverride controls what directives may be placed in .htaccess files.<br />
-# It can be &ldquo;All&rdquo;, &ldquo;None&rdquo;, or any combination of the keywords:<br />
-#   Options FileInfo AuthConfig Limit<br />
-#<br />
-    AllowOverride None<br />
-    ↓変更<br />
-    AllowOverride All</p>
+#
+# AllowOverride controls what directives may be placed in .htaccess files.
+# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
+#   Options FileInfo AuthConfig Limit
+#
+    AllowOverride None
+    ↓変更
+    AllowOverride All
 
-<p>AddDefaultCharset UTF-8<br />
-↓変更<br />
-#AddDefaultCharset UTF-8</p>
-</blockquote>
+AddDefaultCharset UTF-8
+↓変更
+#AddDefaultCharset UTF-8
+</code></pre>
 
 <h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
 
 <p>Apacheを起動します。</p>
 
-<blockquote>
-<p>$ sudo systemctl start httpd<br />
-$ sudo systemctl enable httpd</p>
-</blockquote>
+<pre><code>$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+</code></pre>
 
 <h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
 
 <p>FirewallでWeb通信を許可します。</p>
 
-<blockquote>
-<p>$ sudo firewall-cmd --permanent --zone=public --add-service=http<br />
-$ sudo firewall-cmd --reload<br />
-$ sudo firewall-cmd --list-all-zones</p>
-</blockquote>
+<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
+$ sudo firewall-cmd \-\-reload
+$ sudo firewall-cmd \-\-list-all-zones
+</code></pre>
 
 <h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
 
 <p>外部からWebサイトにアクセスできるか確認します。</p>
 
-<blockquote>
-<p>$ sudo vi /var/www/html/index.php</p>
-</blockquote>
-
-<pre><code>&lt;!DOCTYPE html&gt;
+<pre><code>$ sudo vi /var/www/html/index.php
+&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;ja&quot;&gt;
   &lt;head&gt;
     &lt;meta charset=&quot;utf-8&quot; /&gt;
@@ -274,6 +267,8 @@ $ sudo firewall-cmd --list-all-zones</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -305,7 +300,7 @@ $ sudo firewall-cmd --list-all-zones</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -316,6 +311,10 @@ $ sudo firewall-cmd --list-all-zones</p>
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -338,7 +337,7 @@ $ sudo firewall-cmd --list-all-zones</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

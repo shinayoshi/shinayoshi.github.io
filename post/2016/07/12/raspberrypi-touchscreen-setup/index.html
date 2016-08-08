@@ -127,12 +127,11 @@ Raspberry Pi 3に接続して最低限使えるようにするまでをメモす
 
 <p>購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。</p>
 
-<blockquote>
-<p>$ sudo vi /boot/config.txt<br />
-#Add the following line<br />
-lcd_rotate=2<br />
-$ sudo reboot</p>
-</blockquote>
+<pre><code>$ sudo vi /boot/config.txt
+#Add the following line
+lcd_rotate=2
+$ sudo reboot
+</code></pre>
 
 <ul>
 <li><a href="http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd">Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity</a></li>
@@ -142,26 +141,23 @@ $ sudo reboot</p>
 
 <p>日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。</p>
 
-<blockquote>
-<p>$ sudo apt-get install task-japanese task-japanese-desktop</p>
-</blockquote>
+<pre><code>$ sudo apt-get install task-japanese task-japanese-desktop
+</code></pre>
 
 <h2 id="スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e">スクリーンキーボードのインストール</h2>
 
 <p>Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</p>
 
-<blockquote>
-<p>$ sudo apt-get install florence<br />
-$ sudo apt-get install at-spi2-core</p>
-</blockquote>
+<pre><code>$ sudo apt-get install florence
+$ sudo apt-get install at-spi2-core
+</code></pre>
 
 <p>ログイン画面でもOn Screen Keyboardを使用できるように設定する。</p>
 
-<blockquote>
-<p>$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf<br />
-show-indicators=~language;~a11y;~session;~power<br />
-keyboard=florence &ndash;focus</p>
-</blockquote>
+<pre><code>$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf
+show-indicators=~language;~a11y;~session;~power
+keyboard=florence --focus
+</code></pre>
 
 <ul>
 <li><a href="http://xmodulo.com/onscreen-virtual-keyboard-linux.html">How to use on-screen virtual keyboard on Linux - Xmodulo</a></li>
@@ -173,16 +169,14 @@ keyboard=florence &ndash;focus</p>
 
 <p>xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。</p>
 
-<blockquote>
-<p>$ sudo apt-get install xrdp</p>
-</blockquote>
+<pre><code>$ sudo apt-get install xrdp
+</code></pre>
 
 <p>Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。</p>
 
-<blockquote>
-<p>$ cat /etc/xrdp/xrdp.ini
-$ cat /etc/xrdp/sesman.ini</p>
-</blockquote>
+<pre><code>$ cat /etc/xrdp/xrdp.ini
+$ cat /etc/xrdp/sesman.ini
+</code></pre>
 
 <ul>
 <li><a href="http://www.tapun.net/raspi/raspberry-pi-xrdp">Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記</a></li>
@@ -273,6 +267,8 @@ $ cat /etc/xrdp/sesman.ini</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -304,7 +300,7 @@ $ cat /etc/xrdp/sesman.ini</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -315,6 +311,10 @@ $ cat /etc/xrdp/sesman.ini</p>
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -337,7 +337,7 @@ $ cat /etc/xrdp/sesman.ini</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

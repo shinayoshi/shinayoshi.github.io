@@ -25,60 +25,55 @@
 
 &lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo iwlist wlan0 scan&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo iwlist wlan0 scan
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
 
 &lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}&lt;br /&gt;
-$ sudo sh -c &amp;ldquo;wpa_passphrase &amp;lsquo;アクセスポイント名(ESSID)&amp;rsquo; &amp;lsquo;アクセスポイントのパスワード&amp;rsquo; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;rdquo;&lt;br /&gt;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf&lt;br /&gt;
-country=JP&lt;br /&gt;
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev&lt;br /&gt;
-update_config=1&lt;br /&gt;
-network={&lt;br /&gt;
-    ssid=&amp;ldquo;アクセスポイント名(ESSID)&amp;rdquo;&lt;br /&gt;
-    #psk=&amp;ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;rdquo;&lt;br /&gt;
-    psk=暗号化されたパスワード&lt;br /&gt;
-}&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
+$ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+country=JP
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot;
+    #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot;
+    psk=暗号化されたパスワード
+}
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
 
 &lt;p&gt;WiFiを有効化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
 
 &lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-interface wlan0&lt;br /&gt;
-static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
-static routers=192.168.100.1&lt;br /&gt;
-static domain_name_servers=192.168.100.1&lt;br /&gt;
-#static domain_name=&lt;br /&gt;
-#static domain_search=&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface wlan0
+static ip_address=192.168.100.10⁄24
+static routers=192.168.100.1
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
 

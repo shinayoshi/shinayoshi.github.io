@@ -120,22 +120,20 @@
 
 <p>Kivyに必要なパッケージをインストールする。</p>
 
-<blockquote>
-<p>$ sudo apt-get update<br />
-$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
 
-<p>$ sudo reboot</p>
-</blockquote>
+$ sudo reboot
+</code></pre>
 
 <p>Kivyをインストールする。</p>
 
-<blockquote>
-<p>$ git clone <a href="https://github.com/kivy/kivy">https://github.com/kivy/kivy</a><br />
-$ cd kivy<br />
-$ make<br />
-$ echo &ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&rdquo; &gt;&gt; ~/.profile<br />
-$ source ~/.profile</p>
-</blockquote>
+<pre><code>$ git clone https://github.com/kivy/kivy
+$ cd kivy
+$ make
+$ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile
+$ source ~/.profile
+</code></pre>
 
 <ul>
 <li><a href="https://kivy.org/docs/installation/installation-rpi.html">Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation</a></li>
@@ -143,36 +141,32 @@ $ source ~/.profile</p>
 
 <h2 id="raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定</h2>
 
-<blockquote>
-<p>$ vi ~/.kivy/config.ini<br />
-[input]<br />
-mouse = mouse<br />
-mtdev_%(name)s = probesysfs,provider=mtdev<br />
-hid_%(name)s = probesysfs,provider=hidinput</p>
-</blockquote>
+<pre><code>$ vi ~/.kivy/config.ini
+[input]
+mouse = mouse
+mtdev\_%(name)s = probesysfs,provider=mtdev
+hid\_%(name)s = probesysfs,provider=hidinput
+</code></pre>
 
 <h2 id="kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41">Kivyデモを実行</h2>
 
 <p>デモ実行に必要なパッケージをインストールする。</p>
 
-<blockquote>
-<p>$ sudo apt-get install xclip xsel<br />
-$ sudo pip install pygments docutils</p>
-</blockquote>
+<pre><code>$ sudo apt-get install xclip xsel
+$ sudo pip install pygments docutils
+</code></pre>
 
 <h3 id="デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</h3>
 
-<blockquote>
-<p>$ cd ~/kivy/examples/demo/showcase<br />
-$ python main.py</p>
-</blockquote>
+<pre><code>$ cd ~/kivy/examples/demo/showcase
+$ python main.py
+</code></pre>
 
 <h3 id="デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</h3>
 
-<blockquote>
-<p>$ cd ~/kivy/examples/3Drendering<br />
-$ python main.py</p>
-</blockquote>
+<pre><code>$ cd ~/kivy/examples/3Drendering
+$ python main.py
+</code></pre>
 
 <h2 id="kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</h2>
 
@@ -180,16 +174,15 @@ $ python main.py</p>
 
 <p>ソースコードを作成する。</p>
 
-<blockquote>
-<p>$ vi paint.py<br />
-<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script></p>
-</blockquote>
+<pre><code>$ vi paint.py
+</code></pre>
+
+<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script>
 
 <p>実行する。</p>
 
-<blockquote>
-<p>$ python paint.py</p>
-</blockquote>
+<pre><code>$ python paint.py  
+</code></pre>
 
 <p>Raspberry Pi 7&rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。</p>
 
@@ -218,6 +211,8 @@ $ python main.py</p>
                   
                   <li class="next"><a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</a></li>
                   
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/">Raspbianをバックアップ・リストアする</a></li>
                   
                 </ul>
               </div>
@@ -276,6 +271,8 @@ $ python main.py</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -307,7 +304,7 @@ $ python main.py</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -318,6 +315,10 @@ $ python main.py</p>
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -340,7 +341,7 @@ $ python main.py</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

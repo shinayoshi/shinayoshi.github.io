@@ -7,8 +7,89 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 16 Jul 2016 20:49:31 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 07 Aug 2016 22:29:12 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspbianをバックアップ・リストアする</title>
+      <link>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</link>
+      <pubDate>Sun, 07 Aug 2016 22:29:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</guid>
+      <description>
+
+&lt;p&gt;RaspbianをSDカード丸ごとバックアップ・リストアするメモです。
+今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。&lt;/p&gt;
+
+&lt;h2 id=&#34;バックアップ:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;バックアップ&lt;/h2&gt;
+
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
+   2:                      Linux                         32.2 GB    disk1s2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードのディスクイメージをバックアップする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img
+Password:
+30735+0 records in
+30735+0 records out
+32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;リストア:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;リストア&lt;/h2&gt;
+
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
+   2:                      Linux                         32.2 GB    disk1s2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ディスクイメージをSDカードにリストアする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=~/Desktop/raspi_backup.img of=/dev/rdisk1
+Password:
+30735+0 records in
+30735+0 records out
+32227983360 bytes transferred in 2153.545392 secs (14965082 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>RaspbianにKivyをセットアップ</title>
@@ -24,22 +105,20 @@
 
 &lt;p&gt;Kivyに必要なパッケージをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
-$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
 
-&lt;p&gt;$ sudo reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+$ sudo reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Kivyをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ git clone &lt;a href=&#34;https://github.com/kivy/kivy&#34;&gt;https://github.com/kivy/kivy&lt;/a&gt;&lt;br /&gt;
-$ cd kivy&lt;br /&gt;
-$ make&lt;br /&gt;
-$ echo &amp;ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;rdquo; &amp;gt;&amp;gt; ~/.profile&lt;br /&gt;
-$ source ~/.profile&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/kivy/kivy
+$ cd kivy
+$ make
+$ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile
+$ source ~/.profile
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation&lt;/a&gt;&lt;/li&gt;
@@ -47,36 +126,32 @@ $ source ~/.profile&lt;/p&gt;
 
 &lt;h2 id=&#34;raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDの利用設定&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ vi ~/.kivy/config.ini&lt;br /&gt;
-[input]&lt;br /&gt;
-mouse = mouse&lt;br /&gt;
-mtdev_%(name)s = probesysfs,provider=mtdev&lt;br /&gt;
-hid_%(name)s = probesysfs,provider=hidinput&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ vi ~/.kivy/config.ini
+[input]
+mouse = mouse
+mtdev\_%(name)s = probesysfs,provider=mtdev
+hid\_%(name)s = probesysfs,provider=hidinput
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyデモを実行&lt;/h2&gt;
 
 &lt;p&gt;デモ実行に必要なパッケージをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install xclip xsel&lt;br /&gt;
-$ sudo pip install pygments docutils&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install xclip xsel
+$ sudo pip install pygments docutils
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ１(showcase)&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cd ~/kivy/examples/demo/showcase&lt;br /&gt;
-$ python main.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cd ~/kivy/examples/demo/showcase
+$ python main.py
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ２(3Drendering)&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cd ~/kivy/examples/3Drendering&lt;br /&gt;
-$ python main.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cd ~/kivy/examples/3Drendering
+$ python main.py
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのプログラムを作成・実行&lt;/h2&gt;
 
@@ -84,16 +159,15 @@ $ python main.py&lt;/p&gt;
 
 &lt;p&gt;ソースコードを作成する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ vi paint.py&lt;br /&gt;
-&lt;script src=&#34;https://gist.github.com/kurozumi/31f250c38662a102afa5.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ vi paint.py
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;script src=&#34;https://gist.github.com/kurozumi/31f250c38662a102afa5.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;実行する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ python paint.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ python paint.py  
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。&lt;/p&gt;
 
@@ -125,12 +199,11 @@ Raspberry Pi 3に接続して最低限使えるようにするまでをメモす
 
 &lt;p&gt;購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-lcd_rotate=2&lt;br /&gt;
-$ sudo reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
+#Add the following line
+lcd_rotate=2
+$ sudo reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd&#34;&gt;Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity&lt;/a&gt;&lt;/li&gt;
@@ -140,26 +213,23 @@ $ sudo reboot&lt;/p&gt;
 
 &lt;p&gt;日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install task-japanese task-japanese-desktop&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install task-japanese task-japanese-desktop
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e&#34;&gt;スクリーンキーボードのインストール&lt;/h2&gt;
 
 &lt;p&gt;Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install florence&lt;br /&gt;
-$ sudo apt-get install at-spi2-core&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install florence
+$ sudo apt-get install at-spi2-core
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ログイン画面でもOn Screen Keyboardを使用できるように設定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf&lt;br /&gt;
-show-indicators=~language;~a11y;~session;~power&lt;br /&gt;
-keyboard=florence &amp;ndash;focus&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf
+show-indicators=~language;~a11y;~session;~power
+keyboard=florence --focus
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://xmodulo.com/onscreen-virtual-keyboard-linux.html&#34;&gt;How to use on-screen virtual keyboard on Linux - Xmodulo&lt;/a&gt;&lt;/li&gt;
@@ -171,16 +241,14 @@ keyboard=florence &amp;ndash;focus&lt;/p&gt;
 
 &lt;p&gt;xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install xrdp&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install xrdp
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cat /etc/xrdp/xrdp.ini
-$ cat /etc/xrdp/sesman.ini&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /etc/xrdp/xrdp.ini
+$ cat /etc/xrdp/sesman.ini
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
@@ -205,60 +273,55 @@ $ cat /etc/xrdp/sesman.ini&lt;/p&gt;
 
 &lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo iwlist wlan0 scan&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo iwlist wlan0 scan
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
 
 &lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}&lt;br /&gt;
-$ sudo sh -c &amp;ldquo;wpa_passphrase &amp;lsquo;アクセスポイント名(ESSID)&amp;rsquo; &amp;lsquo;アクセスポイントのパスワード&amp;rsquo; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;rdquo;&lt;br /&gt;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf&lt;br /&gt;
-country=JP&lt;br /&gt;
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev&lt;br /&gt;
-update_config=1&lt;br /&gt;
-network={&lt;br /&gt;
-    ssid=&amp;ldquo;アクセスポイント名(ESSID)&amp;rdquo;&lt;br /&gt;
-    #psk=&amp;ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;rdquo;&lt;br /&gt;
-    psk=暗号化されたパスワード&lt;br /&gt;
-}&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
+$ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+country=JP
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot;
+    #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot;
+    psk=暗号化されたパスワード
+}
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
 
 &lt;p&gt;WiFiを有効化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
 
 &lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-interface wlan0&lt;br /&gt;
-static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
-static routers=192.168.100.1&lt;br /&gt;
-static domain_name_servers=192.168.100.1&lt;br /&gt;
-#static domain_name=&lt;br /&gt;
-#static domain_search=&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface wlan0
+static ip_address=192.168.100.10⁄24
+static routers=192.168.100.1
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
 
@@ -287,10 +350,9 @@ $ ifconfig wlan0&lt;/p&gt;
 
 &lt;h2 id=&#34;パッケージ更新:29d369a29c800517b14390fe39a79e9d&#34;&gt;パッケージ更新&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
-$ sudo apt-get upgrade&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
@@ -300,16 +362,15 @@ $ sudo apt-get upgrade&lt;/p&gt;
 
 &lt;p&gt;Raspberry Pi 3のIPアドレスを固定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpd.conf&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-interface eth0&lt;br /&gt;
-static ip_address=192.168.40.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
-static routers=192.168.40.254&lt;br /&gt;
-static domain_name_servers=192.168.100.1&lt;br /&gt;
-#static domain_name=&lt;br /&gt;
-#static domain_search=&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
@@ -319,21 +380,48 @@ static domain_name_servers=192.168.100.1&lt;br /&gt;
 
 &lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-max_usb_current=1&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h2 id=&#34;ntp設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;NTP設定&lt;/h2&gt;
+
+&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
+#Add the line
+pool ntp.nict.jp iburst
+pool ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo service ntp restart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ntpq -p
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo raspi-config&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;ディスク拡張:29d369a29c800517b14390fe39a79e9d&#34;&gt;ディスク拡張&lt;/h3&gt;
 
@@ -343,7 +431,7 @@ max_usb_current=1&lt;/p&gt;
 &lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
+&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
 
 &lt;ol&gt;
 &lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
@@ -356,7 +444,7 @@ max_usb_current=1&lt;/p&gt;
 &lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
+&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
 
 &lt;ol&gt;
 &lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
@@ -410,14 +498,14 @@ max_usb_current=1&lt;/p&gt;
 
 &lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
 
-&lt;ol&gt;
+&lt;ul&gt;
 &lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
 &lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
 &lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
 &lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
 &lt;li&gt;LANケーブル(Raspberry Pi 3の有線LAN接続用)&lt;/li&gt;
 &lt;li&gt;Mac(作業用)&lt;/li&gt;
-&lt;/ol&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbianダウンロード&lt;/h2&gt;
 
@@ -432,26 +520,35 @@ max_usb_current=1&lt;/p&gt;
 
 &lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;SDカードデバイスを確認する。
-&amp;gt; $ diskutil list&lt;br /&gt;
-&amp;gt; /dev/disk1&lt;br /&gt;
-&amp;gt;    #:                       TYPE NAME                    SIZE       IDENTIFIER&lt;br /&gt;
-&amp;gt;    0:     FDisk_partition_scheme                        *32.2 GB    disk1&lt;br /&gt;
-&amp;gt;    1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードデバイスをアンマウントする。
-&amp;gt; $ diskutil umountDisk /dev/disk1&lt;br /&gt;
-&amp;gt; Unmount of all volumes on disk1 was successful&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードにRaspbianのイメージを書き込む。
-&amp;gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1&lt;br /&gt;
-&amp;gt; Password:&lt;br /&gt;
-&amp;gt; 958+1 records in&lt;br /&gt;
-&amp;gt; 958+1 records out&lt;br /&gt;
-&amp;gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードデバイスを取り出す。
-&amp;gt; $ diskutil eject /dev/disk1&lt;br /&gt;
-&amp;gt; Disk /dev/disk1 ejected&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
+Password:
+958+1 records in
+958+1 records out
+4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian起動&lt;/h2&gt;
 
@@ -460,15 +557,18 @@ Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
 
 &lt;h2 id=&#34;raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian接続&lt;/h2&gt;
 
-&lt;ol&gt;
-&lt;li&gt;Raspberry Pi 3のIPアドレスを確認する。
-&amp;gt; $ arp -a&lt;br /&gt;
-&amp;gt; ? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]&lt;/li&gt;
-&lt;li&gt;SSHでRaspberry Pi 3に接続する。
-&amp;gt; $ ssh pi@192.168.1.10&lt;br /&gt;
-&amp;gt; pi@192.168.1.10&amp;rsquo;s password:&lt;br /&gt;
-&amp;gt; ※piユーザのデフォルトパスワードは「raspberry」&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;Raspberry Pi 3のIPアドレスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ arp -a
+? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SSHでRaspberry Pi 3に接続する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh pi@192.168.1.10
+pi@192.168.1.10&#39;s password:
+※piユーザのデフォルトパスワードは「raspberry」
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
 

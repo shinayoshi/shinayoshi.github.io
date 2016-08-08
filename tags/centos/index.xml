@@ -24,62 +24,55 @@
 
 &lt;p&gt;Webサーバ(Apache)とPHPをインストールします。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# yum install httpd php php-mbstring&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# yum install httpd php php-mbstring
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの設定&lt;/h2&gt;
 
 &lt;p&gt;Apacheを設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# vi /etc/httpd/conf/httpd.conf&lt;br /&gt;
-#ServerName www.example.com:80&lt;br /&gt;
-↓変更&lt;br /&gt;
-ServerName www.example.com:80&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vi /etc/httpd/conf/httpd.conf
+#ServerName www.example.com:80
+↓変更
+ServerName www.example.com:80
 
-&lt;p&gt;#&lt;br /&gt;
-# AllowOverride controls what directives may be placed in .htaccess files.&lt;br /&gt;
-# It can be &amp;ldquo;All&amp;rdquo;, &amp;ldquo;None&amp;rdquo;, or any combination of the keywords:&lt;br /&gt;
-#   Options FileInfo AuthConfig Limit&lt;br /&gt;
-#&lt;br /&gt;
-    AllowOverride None&lt;br /&gt;
-    ↓変更&lt;br /&gt;
-    AllowOverride All&lt;/p&gt;
+#
+# AllowOverride controls what directives may be placed in .htaccess files.
+# It can be &amp;quot;All&amp;quot;, &amp;quot;None&amp;quot;, or any combination of the keywords:
+#   Options FileInfo AuthConfig Limit
+#
+    AllowOverride None
+    ↓変更
+    AllowOverride All
 
-&lt;p&gt;AddDefaultCharset UTF-8&lt;br /&gt;
-↓変更&lt;br /&gt;
-#AddDefaultCharset UTF-8&lt;/p&gt;
-&lt;/blockquote&gt;
+AddDefaultCharset UTF-8
+↓変更
+#AddDefaultCharset UTF-8
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの起動&lt;/h2&gt;
 
 &lt;p&gt;Apacheを起動します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl start httpd&lt;br /&gt;
-$ sudo systemctl enable httpd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Firewallの設定&lt;/h2&gt;
 
 &lt;p&gt;FirewallでWeb通信を許可します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --permanent --zone=public --add-service=http&lt;br /&gt;
-$ sudo firewall-cmd --reload&lt;br /&gt;
-$ sudo firewall-cmd --list-all-zones&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
+$ sudo firewall-cmd \-\-reload
+$ sudo firewall-cmd \-\-list-all-zones
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;動作確認&lt;/h2&gt;
 
 &lt;p&gt;外部からWebサイトにアクセスできるか確認します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /var/www/html/index.php&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /var/www/html/index.php
+&amp;lt;!DOCTYPE html&amp;gt;
 &amp;lt;html lang=&amp;quot;ja&amp;quot;&amp;gt;
   &amp;lt;head&amp;gt;
     &amp;lt;meta charset=&amp;quot;utf-8&amp;quot; /&amp;gt;
@@ -117,16 +110,14 @@ $ sudo firewall-cmd --list-all-zones&lt;/p&gt;
 
 &lt;p&gt;お名前.comのコンソール画面でログインを行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;login: root&lt;br /&gt;
-Password:&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;login: root
+Password:
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ログインに成功すると以下のようなプロンプトが表示されます。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;[root@&amp;lt;ホスト名&amp;gt; ~]#&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;[root@&amp;lt;ホスト名&amp;gt; ~\]#
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以降の手順では、rootアカウントのプロンプトを&lt;code&gt;#&lt;/code&gt;で表現します。&lt;/p&gt;
 
@@ -134,14 +125,13 @@ Password:&lt;/p&gt;
 
 &lt;p&gt;シリアルコンソールで接続できるように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# vi /etc/default/grub&lt;br /&gt;
-GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;rdquo;&lt;br /&gt;
-↓変更&lt;br /&gt;
-GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;rdquo;&lt;br /&gt;
-# grub2-mkconfig -o /boot/grub2/grub.cfg&lt;br /&gt;
-# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# vi /etc/default/grub
+GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;quot;
+↓変更
+GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;quot;
+# grub2-mkconfig \-o /boot/grub2/grub.cfg
+# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;共用sshサーバ経由のシリアルコンソール接続:130a6ce433fd353093f8e4a56dec5622&#34;&gt;共用SSHサーバ経由のシリアルコンソール接続&lt;/h2&gt;
 
@@ -153,15 +143,13 @@ GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb q
 
 &lt;p&gt;ホスト名の変更を行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# hostnamectl set-hostname newhost.example.com&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# hostnamectl set-hostname newhost.example.com
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ホスト名の変更を反映するために再起動を行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。&lt;/p&gt;
 
@@ -169,53 +157,48 @@ GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb q
 
 &lt;p&gt;パッケージを最新の状態に更新します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# yum -y update&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# yum \-y update
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;kernelのバージョンアップがあった場合にはサーバの再起動を実施します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;管理者アカウントの作成:130a6ce433fd353093f8e4a56dec5622&#34;&gt;管理者アカウントの作成&lt;/h2&gt;
 
 &lt;p&gt;通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# useradd centos&lt;br /&gt;
-# passwd centos&lt;br /&gt;
-Changing password for user centos.&lt;br /&gt;
-New password: &amp;lt;パスワード入力&amp;gt;&lt;br /&gt;
-Retype new password: &amp;lt;パスワード再入力&amp;gt;&lt;br /&gt;
-passwd: all authentication tokens updated successfully.&lt;br /&gt;
-# gpasswd -a centos wheel&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# useradd centos
+# passwd centos
+Changing password for user centos.
+New password: &amp;lt;パスワード入力&amp;gt;
+Retype new password: &amp;lt;パスワード再入力&amp;gt;
+passwd: all authentication tokens updated successfully.
+# gpasswd \-a centos wheel
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;sudo権限の付与:130a6ce433fd353093f8e4a56dec5622&#34;&gt;sudo権限の付与&lt;/h2&gt;
 
 &lt;p&gt;管理者アカウントにsudo権限を付与します。以下ではcentosにROOT関連のコマンドとSHUTDOWN関連のコマンド以外のすべてのコマンドの実行権限を付与しています。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# visudo -f /etc/sudoers.d/wheel&lt;br /&gt;
-Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo&lt;br /&gt;
-Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init&lt;br /&gt;
-%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# visudo \-f /etc/sudoers.d/wheel
+Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo
+Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init
+%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;rootのログアウトと管理者アカウントでログイン:130a6ce433fd353093f8e4a56dec5622&#34;&gt;rootのログアウトと管理者アカウントでログイン&lt;/h2&gt;
 
 &lt;p&gt;管理者アカウントを作成してsudoが使えるようになったので、rootアカウントをログアウトして管理者アカウントでログインし直します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# exit&lt;br /&gt;
-logout&lt;br /&gt;
-＜省略＞&lt;br /&gt;
-login: centos&lt;br /&gt;
-Password:&lt;br /&gt;
-[centos@&amp;lt;ホスト名&amp;gt; ~]$&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# exit
+logout
+＜省略＞
+login: centos
+Password:
+[centos@&amp;lt;ホスト名&amp;gt; ~]$
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以降の手順では、管理者アカウントのプロンプトを&lt;code&gt;$&lt;/code&gt;で表現します。&lt;/p&gt;
 
@@ -223,22 +206,20 @@ Password:&lt;br /&gt;
 
 &lt;p&gt;すべての作業は管理者アカウントで行うため、rootアカウントを無効化します。※シリアルコンソールからもrootでログインできなくなりますので、設定する際は慎重に行ってください。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo passwd -l root&lt;br /&gt;
-[sudo] password for centos:&lt;br /&gt;
-Locking password for user root.&lt;br /&gt;
-passwd: Success&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo passwd -l root
+[sudo] password for centos:
+Locking password for user root.
+passwd: Success
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;root宛てメールの転送:130a6ce433fd353093f8e4a56dec5622&#34;&gt;root宛てメールの転送&lt;/h2&gt;
 
 &lt;p&gt;root宛てに届くメールを管理者アカウントに転送するように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/aliases&lt;br /&gt;
-root:           centos&lt;br /&gt;
-$ sudo newaliases&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/aliases
+root:           centos
+$ sudo newaliases
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;firewalldの設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定&lt;/h2&gt;
 
@@ -246,141 +227,120 @@ $ sudo newaliases&lt;/p&gt;
 
 &lt;h3 id=&#34;firewalldのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldのインストール&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install firewalld&lt;br /&gt;
-$ sudo systemctl start firewalld&lt;br /&gt;
-$ sudo systemctl enable firewalld&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum \-y install firewalld
+$ sudo systemctl start firewalld
+$ sudo systemctl enable firewalld
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;firewalldの設定確認:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定確認&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --get-active-zones&lt;br /&gt;
-$ sudo firewall-cmd --list-all-zones&lt;br /&gt;
-$ sudo firewall-cmd --get-services&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --get-active-zones
+$ sudo firewall-cmd --list-all-zones
+$ sudo firewall-cmd --get-services
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの初期設定&lt;/h3&gt;
 
-&lt;!---
-デフォルトゾーンをdropに変更します。
-
-&gt; $ sudo firewall-cmd \-\-set-default-zone=drop  
-&gt; $ sudo firewall-cmd \-\-get-default-zone  -
---&gt;
-
 &lt;p&gt;eth0のゾーンをpublicに変更します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --zone=public --change-interface=eth0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --change-interface=eth0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;publicゾーンで不要なサービスを無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh&lt;br /&gt;
-$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client&lt;br /&gt;
-$ sudo firewall-cmd --reload&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh
+$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client
+$ sudo firewall-cmd --reload
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定の確認&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --zone=public --list-all&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --list-all
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;selinuxの無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;SELinuxの無効化&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo setenforce Permissive&lt;br /&gt;
-$ sudo getenforce&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo setenforce Permissive
+$ sudo getenforce
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;$ sudo vi /etc/selinux/config&lt;br /&gt;
-SELINUX=enforcing&lt;br /&gt;
-↓変更&lt;br /&gt;
-SELINUX=permissive&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/selinux/config
+SELINUX=enforcing
+↓変更
+SELINUX=permissive
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ipv6の無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;IPv6の無効化&lt;/h2&gt;
 
 &lt;p&gt;IPv6を無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1&lt;br /&gt;
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1&lt;br /&gt;
-$ sudo sysctl -a | grep disable_ipv6&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上記のコマンドではシステムを再起動した場合にIPv6が有効になってしまうため、再起動しても無効になるように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf&lt;br /&gt;
-net.ipv6.conf.all.disable_ipv6=1&lt;br /&gt;
-net.ipv6.conf.default.disable_ipv6=1&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;postfixのipv6無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;PostfixのIPv6無効化&lt;/h3&gt;
 
 &lt;p&gt;IPv6の無効化に併せてPostfixもIPv6を無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/postfix/main.cf&lt;br /&gt;
-#inet_protocols = all&lt;br /&gt;
-inet_protocols = ipv4&lt;br /&gt;
-$ sudo systemctl restart postfix&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/postfix/main.cf
+#inet_protocols = all
+inet_protocols = ipv4
+$ sudo systemctl restart postfix
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ntpの時刻同期:130a6ce433fd353093f8e4a56dec5622&#34;&gt;NTPの時刻同期&lt;/h2&gt;
 
 &lt;p&gt;chronyにより時刻同期を行うように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install chrony&lt;br /&gt;
-$ sudo vi /etc/chrony.conf&lt;br /&gt;
-#server 0.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 1.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 2.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 3.centos.pool.ntp.org iburst&lt;br /&gt;
-server ntp.nict.jp iburst&lt;br /&gt;
-server ntp.jst.mfeed.ad.jp iburst&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum -y install chrony
+$ sudo vi /etc/chrony.conf
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;chronydを起動します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl start chronyd&lt;br /&gt;
-$ sudo systemctl enable chronyd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start chronyd
+$ sudo systemctl enable chronyd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;時刻の同期状況を確認するには以下のコマンドを実行します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ chronyc sources&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ chronyc sources
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;不要サービスの停止:130a6ce433fd353093f8e4a56dec5622&#34;&gt;不要サービスの停止&lt;/h2&gt;
 
 &lt;p&gt;セキュリティのため、サーバのリソースのために不要サービスを停止します。お名前.comのVPS(KVM)には共用SSH経由のシリアルコンソールでログインするため、SSHを停止しています。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl list-units --type=service&lt;br /&gt;
-$ sudo systemctl stop sshd&lt;br /&gt;
-$ sudo systemctl disable sshd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl list-units --type=service
+$ sudo systemctl stop sshd
+$ sudo systemctl disable sshd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;logwatchのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;logwatchのインストール&lt;/h2&gt;
 
 &lt;p&gt;logwatchをインストールします。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install logwatch&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum -y install logwatch
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;logwatchの実行結果を確認します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo logwatch --output stdout&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上、初期設定は終了となります。&lt;/p&gt;
 </description>

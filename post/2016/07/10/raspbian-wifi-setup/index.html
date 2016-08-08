@@ -118,60 +118,55 @@
 
 <p>接続するWiFiネットワークを確認する。</p>
 
-<blockquote>
-<p>$ sudo iwlist wlan0 scan</p>
-</blockquote>
+<pre><code>$ sudo iwlist wlan0 scan
+</code></pre>
 
 <h2 id="アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97">アクセスポイントの設定</h2>
 
 <p>アクセスポイントを設定する。</p>
 
-<blockquote>
-<p>$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}<br />
-$ sudo sh -c &ldquo;wpa_passphrase &lsquo;アクセスポイント名(ESSID)&rsquo; &lsquo;アクセスポイントのパスワード&rsquo; &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&rdquo;<br />
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf<br />
-country=JP<br />
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev<br />
-update_config=1<br />
-network={<br />
-    ssid=&ldquo;アクセスポイント名(ESSID)&rdquo;<br />
-    #psk=&ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&rdquo;<br />
-    psk=暗号化されたパスワード<br />
-}</p>
-</blockquote>
+<pre><code>$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
+$ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+country=JP
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid=&quot;アクセスポイント名(ESSID)&quot;
+    #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot;
+    psk=暗号化されたパスワード
+}
+</code></pre>
 
 <h2 id="wifiの有効化:366b0c30f1d198568510d56bfae90a97">WiFiの有効化</h2>
 
 <p>WiFiを有効化する。</p>
 
-<blockquote>
-<p>$ sudo ifdown wlan0<br />
-$ sudo ifup wlan0<br />
-$ ifconfig wlan0</p>
-</blockquote>
+<pre><code>$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+</code></pre>
 
 <h2 id="ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97">IPアドレスの固定化</h2>
 
 <p>IPアドレスを固定化する。</p>
 
-<blockquote>
-<p>$ sudo vi /etc/dhcpcd.conf<br />
-#Add the following line<br />
-interface wlan0<br />
-static ip_address=192.168.100.<sup>10</sup>&frasl;<sub>24</sub><br />
-static routers=192.168.100.1<br />
-static domain_name_servers=192.168.100.1<br />
-#static domain_name=<br />
-#static domain_search=</p>
-</blockquote>
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface wlan0
+static ip_address=192.168.100.10⁄24
+static routers=192.168.100.1
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre>
 
 <p>WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。</p>
 
-<blockquote>
-<p>$ sudo ifdown wlan0<br />
-$ sudo ifup wlan0<br />
-$ ifconfig wlan0</p>
-</blockquote>
+<pre><code>$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+</code></pre>
 
 <h2 id="参考:366b0c30f1d198568510d56bfae90a97">参考</h2>
 
@@ -265,6 +260,8 @@ $ ifconfig wlan0</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -296,7 +293,7 @@ $ ifconfig wlan0</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -307,6 +304,10 @@ $ ifconfig wlan0</p>
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -329,7 +330,7 @@ $ ifconfig wlan0</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

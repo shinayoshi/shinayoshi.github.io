@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianをバックアップ・リストアする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Aug 7, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    backup
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    RaspbianをSDカード丸ごとバックアップ・リストアするメモです。 今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。 バックアップ SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードのディスクイメージをバックアップする。 $ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">RaspbianにKivyをセットアップ</h2>
                   <p class="list-group-item-text">
@@ -91,7 +112,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。 Kivyのインストール Kivyに必要なパッケージをインストールする。 $ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。 $ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&rdquo; &gt;&gt; ~/.profile $ source ~/.profile Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定 $
+                    Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。 Kivyのインストール Kivyに必要なパッケージをインストールする。 $ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。 $ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile $ source ~/.profile Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定 $
                   </p>
                 </a>
                 
@@ -133,7 +154,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &ldquo;wpa_passphrase &lsquo;アクセスポイント名(ESSID)&rsquo; &lsquo;アクセスポイントのパスワード&rsquo; &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&rdquo; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&ldquo;アクセスポイント名(ESSID)&rdquo; #psk=&ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&rdquo; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10&frasl;24 static routers=192.168.100.1 static
+                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static
                   </p>
                 </a>
                 
@@ -154,7 +175,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpd.conf #Add the following line interface eth0 static ip_address=192.168.40.10&frasl;24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org raspi-config関連 $ sudo raspi-config ディスク拡張 「1
+                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org NTP設定 NTP同期先を設定する。 $ sudo vi /etc/ntp.conf
                   </p>
                 </a>
                 
@@ -175,7 +196,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 &gt; $ diskutil list &gt; /dev/disk1 &gt; #: TYPE NAME SIZE IDENTIFIER &gt; 0: FDisk_partition_scheme *32.2 GB disk1 &gt; 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 &gt; $ diskutil umountDisk /dev/disk1 &gt; Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 &gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 &gt; Password: &gt; 958+1 records in &gt; 958+1 records out &gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 &gt; $ diskutil eject /dev/disk1 &gt; Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 &gt; $ arp -a &gt; ?
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 Password: 958+1 records in 958+1 records out 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 $ arp -a ?
                   </p>
                 </a>
                 
@@ -193,7 +214,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &ldquo;All&rdquo;, &ldquo;None&rdquo;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
+                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
                   </p>
                 </a>
                 
@@ -211,7 +232,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&rdquo; ↓変更 GRUB_CMDLINE_LINUX=&ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&rdquo; # grub2-mkconfig -o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum -y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
+                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~\]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig \-o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum \-y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
                   </p>
                 </a>
                 
@@ -279,6 +300,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -310,7 +333,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -321,6 +344,10 @@
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -343,7 +370,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

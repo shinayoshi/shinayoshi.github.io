@@ -91,7 +91,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &ldquo;wpa_passphrase &lsquo;アクセスポイント名(ESSID)&rsquo; &lsquo;アクセスポイントのパスワード&rsquo; &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&rdquo; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&ldquo;アクセスポイント名(ESSID)&rdquo; #psk=&ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&rdquo; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10&frasl;24 static routers=192.168.100.1 static
+                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static
                   </p>
                 </a>
                 
@@ -159,6 +159,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -190,7 +192,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -201,6 +203,10 @@
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -223,7 +229,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     

@@ -7,8 +7,89 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 16 Jul 2016 20:49:31 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 07 Aug 2016 22:29:12 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspbianをバックアップ・リストアする</title>
+      <link>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</link>
+      <pubDate>Sun, 07 Aug 2016 22:29:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</guid>
+      <description>
+
+&lt;p&gt;RaspbianをSDカード丸ごとバックアップ・リストアするメモです。
+今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。&lt;/p&gt;
+
+&lt;h2 id=&#34;バックアップ:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;バックアップ&lt;/h2&gt;
+
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
+   2:                      Linux                         32.2 GB    disk1s2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードのディスクイメージをバックアップする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img
+Password:
+30735+0 records in
+30735+0 records out
+32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;リストア:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;リストア&lt;/h2&gt;
+
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
+   2:                      Linux                         32.2 GB    disk1s2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ディスクイメージをSDカードにリストアする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=~/Desktop/raspi_backup.img of=/dev/rdisk1
+Password:
+30735+0 records in
+30735+0 records out
+32227983360 bytes transferred in 2153.545392 secs (14965082 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>RaspbianにKivyをセットアップ</title>
@@ -24,22 +105,20 @@
 
 &lt;p&gt;Kivyに必要なパッケージをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
-$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
 
-&lt;p&gt;$ sudo reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+$ sudo reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Kivyをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ git clone &lt;a href=&#34;https://github.com/kivy/kivy&#34;&gt;https://github.com/kivy/kivy&lt;/a&gt;&lt;br /&gt;
-$ cd kivy&lt;br /&gt;
-$ make&lt;br /&gt;
-$ echo &amp;ldquo;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;rdquo; &amp;gt;&amp;gt; ~/.profile&lt;br /&gt;
-$ source ~/.profile&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/kivy/kivy
+$ cd kivy
+$ make
+$ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile
+$ source ~/.profile
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kivy.org/docs/installation/installation-rpi.html&#34;&gt;Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation&lt;/a&gt;&lt;/li&gt;
@@ -47,36 +126,32 @@ $ source ~/.profile&lt;/p&gt;
 
 &lt;h2 id=&#34;raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDの利用設定&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ vi ~/.kivy/config.ini&lt;br /&gt;
-[input]&lt;br /&gt;
-mouse = mouse&lt;br /&gt;
-mtdev_%(name)s = probesysfs,provider=mtdev&lt;br /&gt;
-hid_%(name)s = probesysfs,provider=hidinput&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ vi ~/.kivy/config.ini
+[input]
+mouse = mouse
+mtdev\_%(name)s = probesysfs,provider=mtdev
+hid\_%(name)s = probesysfs,provider=hidinput
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyデモを実行&lt;/h2&gt;
 
 &lt;p&gt;デモ実行に必要なパッケージをインストールする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install xclip xsel&lt;br /&gt;
-$ sudo pip install pygments docutils&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install xclip xsel
+$ sudo pip install pygments docutils
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ１(showcase)&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cd ~/kivy/examples/demo/showcase&lt;br /&gt;
-$ python main.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cd ~/kivy/examples/demo/showcase
+$ python main.py
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;デモ２(3Drendering)&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cd ~/kivy/examples/3Drendering&lt;br /&gt;
-$ python main.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cd ~/kivy/examples/3Drendering
+$ python main.py
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41&#34;&gt;Kivyのプログラムを作成・実行&lt;/h2&gt;
 
@@ -84,16 +159,15 @@ $ python main.py&lt;/p&gt;
 
 &lt;p&gt;ソースコードを作成する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ vi paint.py&lt;br /&gt;
-&lt;script src=&#34;https://gist.github.com/kurozumi/31f250c38662a102afa5.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ vi paint.py
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;script src=&#34;https://gist.github.com/kurozumi/31f250c38662a102afa5.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;実行する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ python paint.py&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ python paint.py  
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。&lt;/p&gt;
 
@@ -125,12 +199,11 @@ Raspberry Pi 3に接続して最低限使えるようにするまでをメモす
 
 &lt;p&gt;購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-lcd_rotate=2&lt;br /&gt;
-$ sudo reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
+#Add the following line
+lcd_rotate=2
+$ sudo reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd&#34;&gt;Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity&lt;/a&gt;&lt;/li&gt;
@@ -140,26 +213,23 @@ $ sudo reboot&lt;/p&gt;
 
 &lt;p&gt;日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install task-japanese task-japanese-desktop&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install task-japanese task-japanese-desktop
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e&#34;&gt;スクリーンキーボードのインストール&lt;/h2&gt;
 
 &lt;p&gt;Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install florence&lt;br /&gt;
-$ sudo apt-get install at-spi2-core&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install florence
+$ sudo apt-get install at-spi2-core
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ログイン画面でもOn Screen Keyboardを使用できるように設定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf&lt;br /&gt;
-show-indicators=~language;~a11y;~session;~power&lt;br /&gt;
-keyboard=florence &amp;ndash;focus&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf
+show-indicators=~language;~a11y;~session;~power
+keyboard=florence --focus
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://xmodulo.com/onscreen-virtual-keyboard-linux.html&#34;&gt;How to use on-screen virtual keyboard on Linux - Xmodulo&lt;/a&gt;&lt;/li&gt;
@@ -171,16 +241,14 @@ keyboard=florence &amp;ndash;focus&lt;/p&gt;
 
 &lt;p&gt;xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get install xrdp&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install xrdp
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ cat /etc/xrdp/xrdp.ini
-$ cat /etc/xrdp/sesman.ini&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ cat /etc/xrdp/xrdp.ini
+$ cat /etc/xrdp/sesman.ini
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
@@ -205,60 +273,55 @@ $ cat /etc/xrdp/sesman.ini&lt;/p&gt;
 
 &lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo iwlist wlan0 scan&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo iwlist wlan0 scan
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
 
 &lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}&lt;br /&gt;
-$ sudo sh -c &amp;ldquo;wpa_passphrase &amp;lsquo;アクセスポイント名(ESSID)&amp;rsquo; &amp;lsquo;アクセスポイントのパスワード&amp;rsquo; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;rdquo;&lt;br /&gt;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf&lt;br /&gt;
-country=JP&lt;br /&gt;
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev&lt;br /&gt;
-update_config=1&lt;br /&gt;
-network={&lt;br /&gt;
-    ssid=&amp;ldquo;アクセスポイント名(ESSID)&amp;rdquo;&lt;br /&gt;
-    #psk=&amp;ldquo;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;rdquo;&lt;br /&gt;
-    psk=暗号化されたパスワード&lt;br /&gt;
-}&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
+$ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot;
+$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+country=JP
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot;
+    #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot;
+    psk=暗号化されたパスワード
+}
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
 
 &lt;p&gt;WiFiを有効化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
 
 &lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpcd.conf&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-interface wlan0&lt;br /&gt;
-static ip_address=192.168.100.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
-static routers=192.168.100.1&lt;br /&gt;
-static domain_name_servers=192.168.100.1&lt;br /&gt;
-#static domain_name=&lt;br /&gt;
-#static domain_search=&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface wlan0
+static ip_address=192.168.100.10⁄24
+static routers=192.168.100.1
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo ifdown wlan0&lt;br /&gt;
-$ sudo ifup wlan0&lt;br /&gt;
-$ ifconfig wlan0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
+$ sudo ifup wlan0
+$ ifconfig wlan0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
 
@@ -287,10 +350,9 @@ $ ifconfig wlan0&lt;/p&gt;
 
 &lt;h2 id=&#34;パッケージ更新:29d369a29c800517b14390fe39a79e9d&#34;&gt;パッケージ更新&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo apt-get update&lt;br /&gt;
-$ sudo apt-get upgrade&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
@@ -300,16 +362,15 @@ $ sudo apt-get upgrade&lt;/p&gt;
 
 &lt;p&gt;Raspberry Pi 3のIPアドレスを固定する。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/dhcpd.conf&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-interface eth0&lt;br /&gt;
-static ip_address=192.168.40.&lt;sup&gt;10&lt;/sup&gt;&amp;frasl;&lt;sub&gt;24&lt;/sub&gt;&lt;br /&gt;
-static routers=192.168.40.254&lt;br /&gt;
-static domain_name_servers=192.168.100.1&lt;br /&gt;
-#static domain_name=&lt;br /&gt;
-#static domain_search=&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
@@ -319,21 +380,48 @@ static domain_name_servers=192.168.100.1&lt;br /&gt;
 
 &lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /boot/config.txt&lt;br /&gt;
-#Add the following line&lt;br /&gt;
-max_usb_current=1&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;h2 id=&#34;ntp設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;NTP設定&lt;/h2&gt;
+
+&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
+#Add the line
+pool ntp.nict.jp iburst
+pool ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo service ntp restart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ntpq -p
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo raspi-config&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;ディスク拡張:29d369a29c800517b14390fe39a79e9d&#34;&gt;ディスク拡張&lt;/h3&gt;
 
@@ -343,7 +431,7 @@ max_usb_current=1&lt;/p&gt;
 &lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
+&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
 
 &lt;ol&gt;
 &lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
@@ -356,7 +444,7 @@ max_usb_current=1&lt;/p&gt;
 &lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
+&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
 
 &lt;ol&gt;
 &lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
@@ -410,14 +498,14 @@ max_usb_current=1&lt;/p&gt;
 
 &lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
 
-&lt;ol&gt;
+&lt;ul&gt;
 &lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
 &lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
 &lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
 &lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
 &lt;li&gt;LANケーブル(Raspberry Pi 3の有線LAN接続用)&lt;/li&gt;
 &lt;li&gt;Mac(作業用)&lt;/li&gt;
-&lt;/ol&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbianダウンロード&lt;/h2&gt;
 
@@ -432,26 +520,35 @@ max_usb_current=1&lt;/p&gt;
 
 &lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;SDカードデバイスを確認する。
-&amp;gt; $ diskutil list&lt;br /&gt;
-&amp;gt; /dev/disk1&lt;br /&gt;
-&amp;gt;    #:                       TYPE NAME                    SIZE       IDENTIFIER&lt;br /&gt;
-&amp;gt;    0:     FDisk_partition_scheme                        *32.2 GB    disk1&lt;br /&gt;
-&amp;gt;    1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードデバイスをアンマウントする。
-&amp;gt; $ diskutil umountDisk /dev/disk1&lt;br /&gt;
-&amp;gt; Unmount of all volumes on disk1 was successful&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードにRaspbianのイメージを書き込む。
-&amp;gt; $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1&lt;br /&gt;
-&amp;gt; Password:&lt;br /&gt;
-&amp;gt; 958+1 records in&lt;br /&gt;
-&amp;gt; 958+1 records out&lt;br /&gt;
-&amp;gt; 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;SDカードデバイスを取り出す。
-&amp;gt; $ diskutil eject /dev/disk1&lt;br /&gt;
-&amp;gt; Disk /dev/disk1 ejected&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
+Password:
+958+1 records in
+958+1 records out
+4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian起動&lt;/h2&gt;
 
@@ -460,15 +557,18 @@ Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
 
 &lt;h2 id=&#34;raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian接続&lt;/h2&gt;
 
-&lt;ol&gt;
-&lt;li&gt;Raspberry Pi 3のIPアドレスを確認する。
-&amp;gt; $ arp -a&lt;br /&gt;
-&amp;gt; ? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]&lt;/li&gt;
-&lt;li&gt;SSHでRaspberry Pi 3に接続する。
-&amp;gt; $ ssh pi@192.168.1.10&lt;br /&gt;
-&amp;gt; pi@192.168.1.10&amp;rsquo;s password:&lt;br /&gt;
-&amp;gt; ※piユーザのデフォルトパスワードは「raspberry」&lt;br /&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;Raspberry Pi 3のIPアドレスを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ arp -a
+? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SSHでRaspberry Pi 3に接続する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh pi@192.168.1.10
+pi@192.168.1.10&#39;s password:
+※piユーザのデフォルトパスワードは「raspberry」
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
 
@@ -494,62 +594,55 @@ Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
 
 &lt;p&gt;Webサーバ(Apache)とPHPをインストールします。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# yum install httpd php php-mbstring&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# yum install httpd php php-mbstring
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの設定&lt;/h2&gt;
 
 &lt;p&gt;Apacheを設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# vi /etc/httpd/conf/httpd.conf&lt;br /&gt;
-#ServerName www.example.com:80&lt;br /&gt;
-↓変更&lt;br /&gt;
-ServerName www.example.com:80&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# vi /etc/httpd/conf/httpd.conf
+#ServerName www.example.com:80
+↓変更
+ServerName www.example.com:80
 
-&lt;p&gt;#&lt;br /&gt;
-# AllowOverride controls what directives may be placed in .htaccess files.&lt;br /&gt;
-# It can be &amp;ldquo;All&amp;rdquo;, &amp;ldquo;None&amp;rdquo;, or any combination of the keywords:&lt;br /&gt;
-#   Options FileInfo AuthConfig Limit&lt;br /&gt;
-#&lt;br /&gt;
-    AllowOverride None&lt;br /&gt;
-    ↓変更&lt;br /&gt;
-    AllowOverride All&lt;/p&gt;
+#
+# AllowOverride controls what directives may be placed in .htaccess files.
+# It can be &amp;quot;All&amp;quot;, &amp;quot;None&amp;quot;, or any combination of the keywords:
+#   Options FileInfo AuthConfig Limit
+#
+    AllowOverride None
+    ↓変更
+    AllowOverride All
 
-&lt;p&gt;AddDefaultCharset UTF-8&lt;br /&gt;
-↓変更&lt;br /&gt;
-#AddDefaultCharset UTF-8&lt;/p&gt;
-&lt;/blockquote&gt;
+AddDefaultCharset UTF-8
+↓変更
+#AddDefaultCharset UTF-8
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの起動&lt;/h2&gt;
 
 &lt;p&gt;Apacheを起動します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl start httpd&lt;br /&gt;
-$ sudo systemctl enable httpd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Firewallの設定&lt;/h2&gt;
 
 &lt;p&gt;FirewallでWeb通信を許可します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --permanent --zone=public --add-service=http&lt;br /&gt;
-$ sudo firewall-cmd --reload&lt;br /&gt;
-$ sudo firewall-cmd --list-all-zones&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
+$ sudo firewall-cmd \-\-reload
+$ sudo firewall-cmd \-\-list-all-zones
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;動作確認&lt;/h2&gt;
 
 &lt;p&gt;外部からWebサイトにアクセスできるか確認します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /var/www/html/index.php&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /var/www/html/index.php
+&amp;lt;!DOCTYPE html&amp;gt;
 &amp;lt;html lang=&amp;quot;ja&amp;quot;&amp;gt;
   &amp;lt;head&amp;gt;
     &amp;lt;meta charset=&amp;quot;utf-8&amp;quot; /&amp;gt;
@@ -587,16 +680,14 @@ $ sudo firewall-cmd --list-all-zones&lt;/p&gt;
 
 &lt;p&gt;お名前.comのコンソール画面でログインを行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;login: root&lt;br /&gt;
-Password:&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;login: root
+Password:
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ログインに成功すると以下のようなプロンプトが表示されます。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;[root@&amp;lt;ホスト名&amp;gt; ~]#&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;[root@&amp;lt;ホスト名&amp;gt; ~\]#
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以降の手順では、rootアカウントのプロンプトを&lt;code&gt;#&lt;/code&gt;で表現します。&lt;/p&gt;
 
@@ -604,14 +695,13 @@ Password:&lt;/p&gt;
 
 &lt;p&gt;シリアルコンソールで接続できるように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# vi /etc/default/grub&lt;br /&gt;
-GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;rdquo;&lt;br /&gt;
-↓変更&lt;br /&gt;
-GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;rdquo;&lt;br /&gt;
-# grub2-mkconfig -o /boot/grub2/grub.cfg&lt;br /&gt;
-# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# vi /etc/default/grub
+GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;quot;
+↓変更
+GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;quot;
+# grub2-mkconfig \-o /boot/grub2/grub.cfg
+# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;共用sshサーバ経由のシリアルコンソール接続:130a6ce433fd353093f8e4a56dec5622&#34;&gt;共用SSHサーバ経由のシリアルコンソール接続&lt;/h2&gt;
 
@@ -623,15 +713,13 @@ GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb q
 
 &lt;p&gt;ホスト名の変更を行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# hostnamectl set-hostname newhost.example.com&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# hostnamectl set-hostname newhost.example.com
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ホスト名の変更を反映するために再起動を行います。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。&lt;/p&gt;
 
@@ -639,53 +727,48 @@ GRUB_CMDLINE_LINUX=&amp;ldquo;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb q
 
 &lt;p&gt;パッケージを最新の状態に更新します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# yum -y update&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# yum \-y update
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;kernelのバージョンアップがあった場合にはサーバの再起動を実施します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# reboot&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# reboot
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;管理者アカウントの作成:130a6ce433fd353093f8e4a56dec5622&#34;&gt;管理者アカウントの作成&lt;/h2&gt;
 
 &lt;p&gt;通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# useradd centos&lt;br /&gt;
-# passwd centos&lt;br /&gt;
-Changing password for user centos.&lt;br /&gt;
-New password: &amp;lt;パスワード入力&amp;gt;&lt;br /&gt;
-Retype new password: &amp;lt;パスワード再入力&amp;gt;&lt;br /&gt;
-passwd: all authentication tokens updated successfully.&lt;br /&gt;
-# gpasswd -a centos wheel&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# useradd centos
+# passwd centos
+Changing password for user centos.
+New password: &amp;lt;パスワード入力&amp;gt;
+Retype new password: &amp;lt;パスワード再入力&amp;gt;
+passwd: all authentication tokens updated successfully.
+# gpasswd \-a centos wheel
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;sudo権限の付与:130a6ce433fd353093f8e4a56dec5622&#34;&gt;sudo権限の付与&lt;/h2&gt;
 
 &lt;p&gt;管理者アカウントにsudo権限を付与します。以下ではcentosにROOT関連のコマンドとSHUTDOWN関連のコマンド以外のすべてのコマンドの実行権限を付与しています。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# visudo -f /etc/sudoers.d/wheel&lt;br /&gt;
-Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo&lt;br /&gt;
-Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init&lt;br /&gt;
-%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# visudo \-f /etc/sudoers.d/wheel
+Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo
+Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init
+%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;rootのログアウトと管理者アカウントでログイン:130a6ce433fd353093f8e4a56dec5622&#34;&gt;rootのログアウトと管理者アカウントでログイン&lt;/h2&gt;
 
 &lt;p&gt;管理者アカウントを作成してsudoが使えるようになったので、rootアカウントをログアウトして管理者アカウントでログインし直します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;# exit&lt;br /&gt;
-logout&lt;br /&gt;
-＜省略＞&lt;br /&gt;
-login: centos&lt;br /&gt;
-Password:&lt;br /&gt;
-[centos@&amp;lt;ホスト名&amp;gt; ~]$&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;# exit
+logout
+＜省略＞
+login: centos
+Password:
+[centos@&amp;lt;ホスト名&amp;gt; ~]$
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以降の手順では、管理者アカウントのプロンプトを&lt;code&gt;$&lt;/code&gt;で表現します。&lt;/p&gt;
 
@@ -693,22 +776,20 @@ Password:&lt;br /&gt;
 
 &lt;p&gt;すべての作業は管理者アカウントで行うため、rootアカウントを無効化します。※シリアルコンソールからもrootでログインできなくなりますので、設定する際は慎重に行ってください。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo passwd -l root&lt;br /&gt;
-[sudo] password for centos:&lt;br /&gt;
-Locking password for user root.&lt;br /&gt;
-passwd: Success&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo passwd -l root
+[sudo] password for centos:
+Locking password for user root.
+passwd: Success
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;root宛てメールの転送:130a6ce433fd353093f8e4a56dec5622&#34;&gt;root宛てメールの転送&lt;/h2&gt;
 
 &lt;p&gt;root宛てに届くメールを管理者アカウントに転送するように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/aliases&lt;br /&gt;
-root:           centos&lt;br /&gt;
-$ sudo newaliases&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/aliases
+root:           centos
+$ sudo newaliases
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;firewalldの設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定&lt;/h2&gt;
 
@@ -716,141 +797,120 @@ $ sudo newaliases&lt;/p&gt;
 
 &lt;h3 id=&#34;firewalldのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldのインストール&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install firewalld&lt;br /&gt;
-$ sudo systemctl start firewalld&lt;br /&gt;
-$ sudo systemctl enable firewalld&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum \-y install firewalld
+$ sudo systemctl start firewalld
+$ sudo systemctl enable firewalld
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;firewalldの設定確認:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定確認&lt;/h3&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --get-active-zones&lt;br /&gt;
-$ sudo firewall-cmd --list-all-zones&lt;br /&gt;
-$ sudo firewall-cmd --get-services&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --get-active-zones
+$ sudo firewall-cmd --list-all-zones
+$ sudo firewall-cmd --get-services
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの初期設定&lt;/h3&gt;
 
-&lt;!---
-デフォルトゾーンをdropに変更します。
-
-&gt; $ sudo firewall-cmd \-\-set-default-zone=drop  
-&gt; $ sudo firewall-cmd \-\-get-default-zone  -
---&gt;
-
 &lt;p&gt;eth0のゾーンをpublicに変更します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --zone=public --change-interface=eth0&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --change-interface=eth0
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;publicゾーンで不要なサービスを無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh&lt;br /&gt;
-$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client&lt;br /&gt;
-$ sudo firewall-cmd --reload&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh
+$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client
+$ sudo firewall-cmd --reload
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;設定の確認&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo firewall-cmd --zone=public --list-all&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --list-all
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;selinuxの無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;SELinuxの無効化&lt;/h2&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo setenforce Permissive&lt;br /&gt;
-$ sudo getenforce&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo setenforce Permissive
+$ sudo getenforce
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;$ sudo vi /etc/selinux/config&lt;br /&gt;
-SELINUX=enforcing&lt;br /&gt;
-↓変更&lt;br /&gt;
-SELINUX=permissive&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/selinux/config
+SELINUX=enforcing
+↓変更
+SELINUX=permissive
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ipv6の無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;IPv6の無効化&lt;/h2&gt;
 
 &lt;p&gt;IPv6を無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1&lt;br /&gt;
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1&lt;br /&gt;
-$ sudo sysctl -a | grep disable_ipv6&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上記のコマンドではシステムを再起動した場合にIPv6が有効になってしまうため、再起動しても無効になるように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf&lt;br /&gt;
-net.ipv6.conf.all.disable_ipv6=1&lt;br /&gt;
-net.ipv6.conf.default.disable_ipv6=1&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;postfixのipv6無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;PostfixのIPv6無効化&lt;/h3&gt;
 
 &lt;p&gt;IPv6の無効化に併せてPostfixもIPv6を無効化します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo vi /etc/postfix/main.cf&lt;br /&gt;
-#inet_protocols = all&lt;br /&gt;
-inet_protocols = ipv4&lt;br /&gt;
-$ sudo systemctl restart postfix&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/postfix/main.cf
+#inet_protocols = all
+inet_protocols = ipv4
+$ sudo systemctl restart postfix
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;ntpの時刻同期:130a6ce433fd353093f8e4a56dec5622&#34;&gt;NTPの時刻同期&lt;/h2&gt;
 
 &lt;p&gt;chronyにより時刻同期を行うように設定します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install chrony&lt;br /&gt;
-$ sudo vi /etc/chrony.conf&lt;br /&gt;
-#server 0.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 1.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 2.centos.pool.ntp.org iburst&lt;br /&gt;
-#server 3.centos.pool.ntp.org iburst&lt;br /&gt;
-server ntp.nict.jp iburst&lt;br /&gt;
-server ntp.jst.mfeed.ad.jp iburst&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum -y install chrony
+$ sudo vi /etc/chrony.conf
+#server 0.centos.pool.ntp.org iburst
+#server 1.centos.pool.ntp.org iburst
+#server 2.centos.pool.ntp.org iburst
+#server 3.centos.pool.ntp.org iburst
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;chronydを起動します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl start chronyd&lt;br /&gt;
-$ sudo systemctl enable chronyd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start chronyd
+$ sudo systemctl enable chronyd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;時刻の同期状況を確認するには以下のコマンドを実行します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ chronyc sources&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ chronyc sources
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;不要サービスの停止:130a6ce433fd353093f8e4a56dec5622&#34;&gt;不要サービスの停止&lt;/h2&gt;
 
 &lt;p&gt;セキュリティのため、サーバのリソースのために不要サービスを停止します。お名前.comのVPS(KVM)には共用SSH経由のシリアルコンソールでログインするため、SSHを停止しています。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo systemctl list-units --type=service&lt;br /&gt;
-$ sudo systemctl stop sshd&lt;br /&gt;
-$ sudo systemctl disable sshd&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl list-units --type=service
+$ sudo systemctl stop sshd
+$ sudo systemctl disable sshd
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;logwatchのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;logwatchのインストール&lt;/h2&gt;
 
 &lt;p&gt;logwatchをインストールします。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo yum -y install logwatch&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo yum -y install logwatch
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;logwatchの実行結果を確認します。&lt;/p&gt;
 
-&lt;blockquote&gt;
-&lt;p&gt;$ sudo logwatch --output stdout&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上、初期設定は終了となります。&lt;/p&gt;
 </description>

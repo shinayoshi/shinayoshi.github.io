@@ -102,11 +102,12 @@
 <li><a href="#パッケージ更新:29d369a29c800517b14390fe39a79e9d">パッケージ更新</a></li>
 <li><a href="#ipアドレス固定化:29d369a29c800517b14390fe39a79e9d">IPアドレス固定化</a></li>
 <li><a href="#usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d">USBポートの電流供給増加</a></li>
+<li><a href="#ntp設定:29d369a29c800517b14390fe39a79e9d">NTP設定</a></li>
 <li><a href="#raspi-config関連:29d369a29c800517b14390fe39a79e9d">raspi-config関連</a>
 <ul>
 <li><a href="#ディスク拡張:29d369a29c800517b14390fe39a79e9d">ディスク拡張</a></li>
-<li><a href="#タイムゾーン設定:29d369a29c800517b14390fe39a79e9d">タイムゾーン設定</a></li>
 <li><a href="#文字コード設定:29d369a29c800517b14390fe39a79e9d">文字コード設定</a></li>
+<li><a href="#タイムゾーン設定:29d369a29c800517b14390fe39a79e9d">タイムゾーン設定</a></li>
 <li><a href="#wifiの国設定:29d369a29c800517b14390fe39a79e9d">Wifiの国設定</a></li>
 <li><a href="#ホスト名変更:29d369a29c800517b14390fe39a79e9d">ホスト名変更</a></li>
 <li><a href="#raspi-config終了:29d369a29c800517b14390fe39a79e9d">raspi-config終了</a></li>
@@ -127,10 +128,9 @@
 
 <h2 id="パッケージ更新:29d369a29c800517b14390fe39a79e9d">パッケージ更新</h2>
 
-<blockquote>
-<p>$ sudo apt-get update<br />
-$ sudo apt-get upgrade</p>
-</blockquote>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
 
 <ul>
 <li><a href="https://www.raspberrypi.org/documentation/raspbian/updating.md">Updating and Upgrading Raspbian - Raspberry Pi Documentation</a></li>
@@ -140,16 +140,15 @@ $ sudo apt-get upgrade</p>
 
 <p>Raspberry Pi 3のIPアドレスを固定する。</p>
 
-<blockquote>
-<p>$ sudo vi /etc/dhcpd.conf<br />
-#Add the following line<br />
-interface eth0<br />
-static ip_address=192.168.40.<sup>10</sup>&frasl;<sub>24</sub><br />
-static routers=192.168.40.254<br />
-static domain_name_servers=192.168.100.1<br />
-#static domain_name=<br />
-#static domain_search=</p>
-</blockquote>
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre>
 
 <ul>
 <li>&ldquo;man dhcpcd.conf&rdquo;</li>
@@ -159,21 +158,48 @@ static domain_name_servers=192.168.100.1<br />
 
 <p>USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。</p>
 
-<blockquote>
-<p>$ sudo vi /boot/config.txt<br />
-#Add the following line<br />
-max_usb_current=1</p>
-</blockquote>
+<pre><code>$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+</code></pre>
 
 <ul>
 <li><a href="http://elinux.org/RPiconfig">RPiconfig - eLinux.org</a></li>
 </ul>
 
+<h2 id="ntp設定:29d369a29c800517b14390fe39a79e9d">NTP設定</h2>
+
+<p>NTP同期先を設定する。</p>
+
+<pre><code>$ sudo vi /etc/ntp.conf
+#Add the line
+pool ntp.nict.jp iburst
+pool ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre>
+
+<p>NTPサーバを再起動する。</p>
+
+<pre><code>$ sudo service ntp restart
+</code></pre>
+
+<p>時刻同期の状態を確認する。</p>
+
+<pre><code>$ ntpq -p
+</code></pre>
+
+<ul>
+<li><a href="http://vogel.at.webry.info/201501/article_5.html">NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ</a></li>
+</ul>
+
 <h2 id="raspi-config関連:29d369a29c800517b14390fe39a79e9d">raspi-config関連</h2>
 
-<blockquote>
-<p>$ sudo raspi-config</p>
-</blockquote>
+<pre><code>$ sudo raspi-config
+</code></pre>
 
 <h3 id="ディスク拡張:29d369a29c800517b14390fe39a79e9d">ディスク拡張</h3>
 
@@ -183,7 +209,7 @@ max_usb_current=1</p>
 <li>raspi-configの初期画面に戻る。</li>
 </ol>
 
-<h3 id="タイムゾーン設定:29d369a29c800517b14390fe39a79e9d">タイムゾーン設定</h3>
+<h3 id="文字コード設定:29d369a29c800517b14390fe39a79e9d">文字コード設定</h3>
 
 <ol>
 <li>「5 Internationalisation Options」を選択する。</li>
@@ -196,7 +222,7 @@ max_usb_current=1</p>
 <li>raspi-configの初期画面に戻る。</li>
 </ol>
 
-<h3 id="文字コード設定:29d369a29c800517b14390fe39a79e9d">文字コード設定</h3>
+<h3 id="タイムゾーン設定:29d369a29c800517b14390fe39a79e9d">タイムゾーン設定</h3>
 
 <ol>
 <li>「5 Internationalisation Options」を選択する。</li>
@@ -319,6 +345,8 @@ max_usb_current=1</p>
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
@@ -350,7 +378,7 @@ max_usb_current=1</p>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">7</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
     
   </div>
 </section>
@@ -361,6 +389,10 @@ max_usb_current=1</p>
     <h1 class="panel-title">Tags</h1>
   </div>
   <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
     
     
     <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
@@ -383,7 +415,7 @@ max_usb_current=1</p>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (5)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
     
     
     
