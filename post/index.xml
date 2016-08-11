@@ -183,6 +183,7 @@ $ sudo apt-get upgrade
 
 &lt;pre&gt;&lt;code&gt;$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php
 $ sudo apt-get install php5-mysql
+$ sudo apt-get install task-japanese
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;mysqlの初期設定:4df21ad0746a34acfa37879eaf637713&#34;&gt;MySQLの初期設定&lt;/h3&gt;
@@ -350,6 +351,10 @@ DBPassword=zabbix_password
 
 $ sudo vi /etc/default/zabbix-server
 START=yes
+
+$ sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/share/zabbix/fonts/
+$ sudo vi /usr/share/zabbix/include/defines.inc.php
+define(&#39;ZBX_GRAPH_FONT_NAME&#39;,		&#39;unifont&#39;);
 
 $ sudo systemctl restart zabbix-server
 &lt;/code&gt;&lt;/pre&gt;
