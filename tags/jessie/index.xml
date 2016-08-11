@@ -7,8 +7,100 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Thu, 11 Aug 2016 11:51:20 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 11 Aug 2016 15:51:09 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/jessie/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>ZabbixでSNMPデバイスの監視を行う</title>
+      <link>http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/</link>
+      <pubDate>Thu, 11 Aug 2016 15:51:09 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。&lt;/p&gt;
+
+&lt;p&gt;とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。&lt;/p&gt;
+
+&lt;h2 id=&#34;パッケージの更新:f5404dafe03c7d830d1b17663408aefc&#34;&gt;パッケージの更新&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Serverのパッケージを最新する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc&#34;&gt;SNMP関連パッケージのインストール&lt;/h2&gt;
+
+&lt;p&gt;Zabbix ServerにSNMP関連のパッケージをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install snmp snmp-mibs-downloader
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;!-- $ sudo apt-get install snmpd --&gt;
+
+&lt;!-- $ sudo apt-get install snmptrapd snmptt --&gt;
+
+&lt;h2 id=&#34;snmpの設定:f5404dafe03c7d830d1b17663408aefc&#34;&gt;SNMPの設定&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;/usr/bin/download-mibs&lt;/code&gt;でダウンロードしたMIBSを読み込めるように設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/snmp/snmp.conf
+#mibs :
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;メモ：デフォルトでは以下のディレクトリを検索する。&lt;code&gt;snmpstatus --help&lt;/code&gt;の出力で確認。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;${HOME}/.snmp/mibs
+/usr/share/snmp/mibs
+/usr/share/snmp/mibs/iana
+/usr/share/snmp/mibs/ietf
+/usr/share/mibs/site
+/usr/share/snmp/mibs
+/usr/share/mibs/iana
+/usr/share/mibs/ietf
+/usr/share/mibs/netsnmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc&#34;&gt;Zabbix Serverの再起動&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-server
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc&#34;&gt;Zabbix ServerでのSNMP Device監視設定&lt;/h2&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスしてログインする。&lt;/p&gt;
+
+&lt;p&gt;「設定」⇒「ホスト」⇒「ホストの作成」を選択する。&lt;/p&gt;
+
+&lt;p&gt;ホストの設定画面が表示されるので最低限以下を設定する。&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;ホスト&amp;rdquo;タブ&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ホスト名：監視対象機器のホスト名。&lt;/li&gt;
+&lt;li&gt;グループ：所属するグループ。適切なグループがなければ新規作成。&lt;/li&gt;
+&lt;li&gt;エージェントのインターフェース：削除。&lt;/li&gt;
+&lt;li&gt;SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;ldquo;テンプレート&amp;rdquo;タブ&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;テンプレートとのリンク：&amp;rdquo;Template SNMP Device&amp;rdquo;を追加。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;ldquo;マクロ&amp;rdquo;タブ&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;マクロ：&lt;code&gt;{$SNMP_COMMUNITY}&lt;/code&gt; ⇒ 値：&lt;code&gt;監視対象機器のコミュニティ名&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Raspbian(Jessie)にZabbix Agentをインストール</title>

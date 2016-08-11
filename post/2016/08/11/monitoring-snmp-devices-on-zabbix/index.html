@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,11 +71,157 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <section>
-                <h1>404 Page not found</h1>
-                <p>We were unable to find the page you were looking for.</p>
-                <p>Back to the <a href="http://www.shinayoshi.net//">HOME</a>.</p>
-              </section>
+              <article>
+                <div class="title">
+                  <h1>ZabbixでSNMPデバイスの監視を行う</h1>
+                  <p>
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</a></li>
+<li><a href="#snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</a></li>
+<li><a href="#snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</a></li>
+<li><a href="#zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</a></li>
+<li><a href="#zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。</p>
+
+<p>とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。</p>
+
+<h2 id="パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</h2>
+
+<p>Zabbix Serverのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</h2>
+
+<p>Zabbix ServerにSNMP関連のパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get install snmp snmp-mibs-downloader
+</code></pre>
+
+<!-- $ sudo apt-get install snmpd -->
+
+<!-- $ sudo apt-get install snmptrapd snmptt -->
+
+<h2 id="snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</h2>
+
+<p><code>/usr/bin/download-mibs</code>でダウンロードしたMIBSを読み込めるように設定する。</p>
+
+<pre><code>$ sudo vi /etc/snmp/snmp.conf
+#mibs :
+</code></pre>
+
+<p>メモ：デフォルトでは以下のディレクトリを検索する。<code>snmpstatus --help</code>の出力で確認。</p>
+
+<pre><code>${HOME}/.snmp/mibs
+/usr/share/snmp/mibs
+/usr/share/snmp/mibs/iana
+/usr/share/snmp/mibs/ietf
+/usr/share/mibs/site
+/usr/share/snmp/mibs
+/usr/share/mibs/iana
+/usr/share/mibs/ietf
+/usr/share/mibs/netsnmp
+</code></pre>
+
+<h2 id="zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</h2>
+
+<p>Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。</p>
+
+<pre><code>$ sudo systemctl restart zabbix-server
+</code></pre>
+
+<h2 id="zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
+
+<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
+
+<p>ホストの設定画面が表示されるので最低限以下を設定する。</p>
+
+<p>&ldquo;ホスト&rdquo;タブ</p>
+
+<ul>
+<li>ホスト名：監視対象機器のホスト名。</li>
+<li>グループ：所属するグループ。適切なグループがなければ新規作成。</li>
+<li>エージェントのインターフェース：削除。</li>
+<li>SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。</li>
+</ul>
+
+<p>&ldquo;テンプレート&rdquo;タブ</p>
+
+<ul>
+<li>テンプレートとのリンク：&rdquo;Template SNMP Device&rdquo;を追加。</li>
+</ul>
+
+<p>&ldquo;マクロ&rdquo;タブ</p>
+
+<ul>
+<li>マクロ：<code>{$SNMP_COMMUNITY}</code> ⇒ 値：<code>監視対象機器のコミュニティ名</code></li>
+</ul>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></li>
+                  
+                  
+                </ul>
+              </div>
             </div>
             <div class="sidebar col-md-3">
               <aside>
