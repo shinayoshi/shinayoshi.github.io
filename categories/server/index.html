@@ -74,6 +74,54 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Agentをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。 パッケージの更新 Raspbianのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール $ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。 $ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。 ホスト名の設定やテンプレートの選択を行い、保存を選択する。 以上
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Serverをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed Aug 10, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。 3 Installation from packages [Zabbix Documentation 2.2] パッケージの更新 Raspbianのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。 $ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql MySQLの初期設定 MySQLのセキュア設定 $ mysql_secure_installation In order to log into MySQL to secure it, we'll need the current password for the root user. If you've just installed MySQL, and you haven't set the root password yet, the password will be blank, so you should just press enter here.
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbianをバックアップ・リストアする</h2>
                   <p class="list-group-item-text">
@@ -300,6 +348,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Serverをインストール [ 2016-08-10 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
@@ -316,10 +368,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">お名前.com VPS(KVM)の初期設定(CentOS 7 1511) [ 2016-01-16 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">囲碁・将棋の思考エンジンの覚え書き [ 2015-10-31 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2015/09/06/first-post/" class="list-group-item">hugo始めました [ 2015-09-06 ]</a>
-      
     
   </div>
 </section>
@@ -333,7 +381,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">8</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">10</span>server</a>
     
   </div>
 </section>
@@ -362,7 +410,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (3)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (5)</a>
     
     
     
@@ -370,7 +418,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (6)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (8)</a>
     
     
     
@@ -379,6 +427,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (2)</a>
     
     
   </div>

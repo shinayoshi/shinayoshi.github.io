@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/shogi/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/shogi/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,38 +71,113 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Shogi</h1>
-              <div class="list-group">
-                
-                <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">
-                  <h2 class="list-group-item-heading">囲碁・将棋の思考エンジンの覚え書き</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
+              <article>
+                <div class="title">
+                  <h1>Raspbian(Jessie)にZabbix Agentをインストール</h1>
+                  <p>
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
                     
                     
-                    diary
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    igo
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
                     
                      , 
-                    shogi
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
                     
                   </p>
-                  <p class="list-group-item-text">
-                    囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。 実際に使用したことはないため、使用方法や強さはわかりません。あしからず。 囲碁の思考エンジン Pachi Fuego GNU Go 将棋の思考エンジン Bonanza Apery GPSshogi 将棋GUIソフト 将棋所
-                  </p>
-                </a>
-                
-              </div>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</a></li>
+<li><a href="#zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</a></li>
+<li><a href="#zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</a></li>
+<li><a href="#zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
+Zabbix Serverのインストールは別のメモになります。</p>
+
+<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
+
+<p>Raspbianのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
+
+<p>Zabbix Agentのインストール</p>
+
+<pre><code>$ sudo apt-get install zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
+
+<p>Zabbix Agentを設定する。</p>
+
+<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
+Server=(Zabbix server IP address)
+ServerActive=(Zabbix server IP address)
+Hostname=(Hostname)
+
+$ sudo systemctl restart zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
+
+<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
+
+<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
               <div class="pagination">
                 <ul class="pager">
-  
-  <li>Page 1 of 1</li>
-  
-</ul>
-
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/">Raspbian(Jessie)にZabbix Serverをインストール</a></li>
+                  
+                  
+                </ul>
               </div>
             </div>
             <div class="sidebar col-md-3">
