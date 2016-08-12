@@ -74,6 +74,102 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
+
+<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
+
+<p>Webサーバ(Apache)とPHPをインストールします。</p>
+
+<pre><code># yum install httpd php php-mbstring
+</code></pre>
+
+<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
+
+<p>Apacheを設定します。</p>
+
+<pre><code># vi /etc/httpd/conf/httpd.conf
+#ServerName www.example.com:80
+↓変更
+ServerName www.example.com:80
+
+#
+# AllowOverride controls what directives may be placed in .htaccess files.
+# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
+#   Options FileInfo AuthConfig Limit
+#
+    AllowOverride None
+    ↓変更
+    AllowOverride All
+
+AddDefaultCharset UTF-8
+↓変更
+#AddDefaultCharset UTF-8
+</code></pre>
+
+<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
+
+<p>Apacheを起動します。</p>
+
+<pre><code>$ sudo systemctl start httpd
+$ sudo systemctl enable httpd
+</code></pre>
+
+<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
+
+<p>FirewallでWeb通信を許可します。</p>
+
+<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
+$ sudo firewall-cmd \-\-reload
+$ sudo firewall-cmd \-\-list-all-zones
+</code></pre>
+
+<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
+
+<p>外部からWebサイトにアクセスできるか確認します。</p>
+
+<pre><code>$ sudo vi /var/www/html/index.php
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ja&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;title&gt;net-tools&lt;/title&gt;
+    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
+    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
+正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
+
+<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
+
+<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></h1>
                   <p>
                     <span class="label label-primary">Sat Jan 16, 2016</span> in
@@ -475,6 +571,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
@@ -493,8 +591,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Raspbianのインストール [ 2016-07-09 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">ApacheでWebサイトを公開する [ 2016-05-15 ]</a>
-      
     
   </div>
 </section>
@@ -508,7 +604,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">11</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">12</span>server</a>
     
   </div>
 </section>
@@ -533,11 +629,15 @@ $ sudo systemctl disable sshd
     
     
     
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (6)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (7)</a>
     
     
     
@@ -545,7 +645,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (9)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (10)</a>
     
     
     

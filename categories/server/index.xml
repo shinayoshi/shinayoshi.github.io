@@ -7,8 +7,50 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Thu, 11 Aug 2016 15:51:09 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 13 Aug 2016 00:34:26 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</title>
+      <link>http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/</link>
+      <pubDate>Sat, 13 Aug 2016 00:34:26 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;mibファイルのアップロード:7017348ad71b7a4303759dd4acee2115&#34;&gt;MIBファイルのアップロード&lt;/h2&gt;
+
+&lt;p&gt;FortiGateのプライベートMIB(&lt;code&gt;FORTINET-CORE-MIB.mib&lt;/code&gt;、&lt;code&gt;FORTINET-FORTIGATE-MIB.mib&lt;/code&gt;)を&lt;code&gt;/home/pi&lt;/code&gt;直下にアップロードします。&lt;/p&gt;
+
+&lt;h2 id=&#34;プライベートmibの設定:7017348ad71b7a4303759dd4acee2115&#34;&gt;プライベートMIBの設定&lt;/h2&gt;
+
+&lt;p&gt;プライベートMIBファイルを&lt;code&gt;/usr/share/snmp/mibs/vendor&lt;/code&gt;に移動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /usr/share/snmp/mibs/vendor
+$ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/
+$ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プライベートMIBを使用するように&lt;code&gt;snmp.conf&lt;/code&gt;を設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/snmp/snmp.conf
+mibdirs +/usr/share/snmp/mibs/vendor
+mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;プライベートmibの設定確認:7017348ad71b7a4303759dd4acee2115&#34;&gt;プライベートMIBの設定確認&lt;/h2&gt;
+
+&lt;p&gt;FortiGateのMIBフィールド名が表示されることを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4
+FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>ZabbixでSNMPデバイスの監視を行う</title>

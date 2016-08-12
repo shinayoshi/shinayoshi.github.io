@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/post/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/post/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,94 +71,104 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Posts</h1>
-              <div class="list-group">
-                
-                <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun May 15, 2016</span> in
+              <article>
+                <div class="title">
+                  <h1>Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</h1>
+                  <p>
+                    <span class="label label-primary">Sat Aug 13, 2016</span> in
                     
                     
-                    server
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    centos
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 16, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    centos
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~\]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig \-o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum \-y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">
-                  <h2 class="list-group-item-heading">囲碁・将棋の思考エンジンの覚え書き</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
-                    
-                    
-                    diary
-                     using tags
-                    
-                    
-                    igo
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
                     
                      , 
-                    shogi
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/fgt-60d">FGT-60D</a>
                     
                   </p>
-                  <p class="list-group-item-text">
-                    囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。 実際に使用したことはないため、使用方法や強さはわかりません。あしからず。 囲碁の思考エンジン Pachi Fuego GNU Go 将棋の思考エンジン Bonanza Apery GPSshogi 将棋GUIソフト 将棋所
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2015/09/06/first-post/" class="list-group-item">
-                  <h2 class="list-group-item-heading">hugo始めました</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun Sep 6, 2015</span> in
-                    
-                    
-                    diary
-                     using tags
-                    
-                    
-                    blog
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Hugoでブログ始めました。 本ブログでは私が得た技術的な知識・経験を投稿していく予定です。 今後ともよろしくお願いします。
-                  </p>
-                </a>
-                
-              </div>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#mibファイルのアップロード:7017348ad71b7a4303759dd4acee2115">MIBファイルのアップロード</a></li>
+<li><a href="#プライベートmibの設定:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定</a></li>
+<li><a href="#プライベートmibの設定確認:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定確認</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。</p>
+
+<h2 id="mibファイルのアップロード:7017348ad71b7a4303759dd4acee2115">MIBファイルのアップロード</h2>
+
+<p>FortiGateのプライベートMIB(<code>FORTINET-CORE-MIB.mib</code>、<code>FORTINET-FORTIGATE-MIB.mib</code>)を<code>/home/pi</code>直下にアップロードします。</p>
+
+<h2 id="プライベートmibの設定:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定</h2>
+
+<p>プライベートMIBファイルを<code>/usr/share/snmp/mibs/vendor</code>に移動する。</p>
+
+<pre><code>$ sudo mkdir /usr/share/snmp/mibs/vendor
+$ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/
+$ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*
+</code></pre>
+
+<p>プライベートMIBを使用するように<code>snmp.conf</code>を設定する。</p>
+
+<pre><code>$ sudo vi /etc/snmp/snmp.conf
+mibdirs +/usr/share/snmp/mibs/vendor
+mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB
+</code></pre>
+
+<h2 id="プライベートmibの設定確認:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定確認</h2>
+
+<p>FortiGateのMIBフィールド名が表示されることを確認する。</p>
+
+<pre><code>$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4
+FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
+</code></pre>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
               <div class="pagination">
                 <ul class="pager">
-  
-  <li class="previous"><a href="/post/">&larr; Newer</a></li>
-  
-  <li>Page 2 of 2</li>
-  
-</ul>
-
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/">ZabbixでSNMPデバイスの監視を行う</a></li>
+                  
+                  
+                </ul>
               </div>
             </div>
             <div class="sidebar col-md-3">
