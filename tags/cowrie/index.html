@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/tags/cowrie/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/cowrie/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,146 +71,41 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <article>
-                <div class="title">
-                  <h1>ApacheでWebサイトを公開する</h1>
-                  <p>
-                    <span class="label label-primary">Sun May 15, 2016</span> in
+              <h1>Cowrie</h1>
+              <div class="list-group">
+                
+                <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にCowrieをインストールする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Aug 15, 2016</span> in
                     
                     
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                    Server
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    cowrie
                     
                   </p>
-                </div>
-                <div class="panel panel-info">
-                  <div class="panel-heading">
-                    <p class="panel-title">Table of Contents</p>
-                  </div>
-                  <div class="panel-body">
-                    <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</a></li>
-<li><a href="#apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</a></li>
-<li><a href="#apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</a></li>
-<li><a href="#firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</a></li>
-<li><a href="#動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</a></li>
-<li><a href="#その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</a></li>
-</ul></li>
-</ul>
-</nav>
-                  </div>
-                </div>
-                <div class="contents">
-                  
-
-<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
-
-<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
-
-<p>Webサーバ(Apache)とPHPをインストールします。</p>
-
-<pre><code># yum install httpd php php-mbstring
-</code></pre>
-
-<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
-
-<p>Apacheを設定します。</p>
-
-<pre><code># vi /etc/httpd/conf/httpd.conf
-#ServerName www.example.com:80
-↓変更
-ServerName www.example.com:80
-
-#
-# AllowOverride controls what directives may be placed in .htaccess files.
-# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
-#   Options FileInfo AuthConfig Limit
-#
-    AllowOverride None
-    ↓変更
-    AllowOverride All
-
-AddDefaultCharset UTF-8
-↓変更
-#AddDefaultCharset UTF-8
-</code></pre>
-
-<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
-
-<p>Apacheを起動します。</p>
-
-<pre><code>$ sudo systemctl start httpd
-$ sudo systemctl enable httpd
-</code></pre>
-
-<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
-
-<p>FirewallでWeb通信を許可します。</p>
-
-<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
-</code></pre>
-
-<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
-
-<p>外部からWebサイトにアクセスできるか確認します。</p>
-
-<pre><code>$ sudo vi /var/www/html/index.php
-&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;ja&quot;&gt;
-  &lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot; /&gt;
-    &lt;title&gt;net-tools&lt;/title&gt;
-    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
-    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
-正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
-
-<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
-
-<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。</p>
-
-                  
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-   
-  var disqus_shortname = 'shinayoshi';
-
-   
-  (function() {
-  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-
-
-                </div>
-              </article>
+                  <p class="list-group-item-text">
+                    Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。 はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。 個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。 Raspbianの初期設定 Raspbianの初期設定として以下を行いました。 パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= NTP設定 NTP同期先を設定する。 $ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst NTPサーバを再起動する。 $ sudo systemctl restart ntp 時刻同期の状態を確認する。 $ ntpq -p raspi-config関連 $ sudo raspi-config ディスク拡張 文字コード設定 タイムゾーン設定 Wifiの国設定 ホスト名変更 公開鍵認証方式の設定 $ ssh-keygen -t rsa Generating public/private rsa key pair.
+                  </p>
+                </a>
+                
+              </div>
               <div class="pagination">
                 <ul class="pager">
-                  
-                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></li>
-                  
-                  
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></li>
-                  
-                </ul>
+  
+  <li>Page 1 of 1</li>
+  
+</ul>
+
               </div>
             </div>
             <div class="sidebar col-md-3">

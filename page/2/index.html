@@ -74,6 +74,114 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。</p>
+
+<h2 id="使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6">使用したもの</h2>
+
+<ul>
+<li>Raspberry Pi 3 Model B</li>
+<li>micro SDカード(32GB)</li>
+<li>USB ACアダプタ(Raspberry Pi 3の電源用)</li>
+<li>USBケーブル(Raspberry Pi 3の電源用)</li>
+<li>LANケーブル(Raspberry Pi 3の有線LAN接続用)</li>
+<li>Mac(作業用)</li>
+</ul>
+
+<h2 id="raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbianダウンロード</h2>
+
+<p>公式サイトからRaspbianをダウンロードする。
+2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。</p>
+
+<ul>
+<li><a href="https://www.raspberrypi.org/downloads/raspbian/">Download Raspbian for Raspberry Pi</a></li>
+</ul>
+
+<h2 id="raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian書き込み</h2>
+
+<p>SDカードにRaspbianのイメージを書き込む。</p>
+
+<p>SDカードデバイスを確認する。</p>
+
+<pre><code>$ diskutil list
+/dev/disk1
+   #:                       TYPE NAME                    SIZE       IDENTIFIER
+   0:     FDisk_partition_scheme                        *32.2 GB    disk1
+   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
+</code></pre>
+
+<p>SDカードデバイスをアンマウントする。</p>
+
+<pre><code>$ diskutil unmountDisk /dev/disk1
+Unmount of all volumes on disk1 was successful
+</code></pre>
+
+<p>SDカードにRaspbianのイメージを書き込む。</p>
+
+<pre><code>$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
+Password:
+958+1 records in
+958+1 records out
+4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
+</code></pre>
+
+<p>SDカードデバイスを取り出す。</p>
+
+<pre><code>$ diskutil eject /dev/disk1
+Disk /dev/disk1 ejected
+</code></pre>
+
+<h2 id="raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian起動</h2>
+
+<p>Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
+Raspberry Pi 3には有線LANも接続しておく。</p>
+
+<h2 id="raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian接続</h2>
+
+<p>Raspberry Pi 3のIPアドレスを確認する。</p>
+
+<pre><code>$ arp -a
+? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
+</code></pre>
+
+<p>SSHでRaspberry Pi 3に接続する。</p>
+
+<pre><code>$ ssh pi@192.168.1.10
+pi@192.168.1.10's password:
+※piユーザのデフォルトパスワードは「raspberry」
+</code></pre>
+
+<h2 id="参考:b6f02b3d9579b63dd4fc7d440d3b8ed6">参考</h2>
+
+<ul>
+<li><a href="https://www.raspberrypi.org/documentation/installation/installing-images/mac.md">Installing operating system images on Mac OS - Raspberry Pi Documentation</a></li>
+</ul>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></h1>
                   <p>
                     <span class="label label-primary">Sun May 15, 2016</span> in
@@ -571,6 +679,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
@@ -589,8 +699,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Raspbianのインストール [ 2016-07-09 ]</a>
-      
     
   </div>
 </section>
@@ -604,7 +712,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">12</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">13</span>server</a>
     
   </div>
 </section>
@@ -629,6 +737,10 @@ $ sudo systemctl disable sshd
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (1)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
     
     
@@ -637,7 +749,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (7)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (8)</a>
     
     
     
@@ -645,7 +757,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (10)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
     
     
     

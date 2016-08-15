@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 Password: 958+1 records in 958+1 records out 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 $ arp -a ?
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
                   <p class="list-group-item-text">
@@ -176,6 +197,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
@@ -194,8 +217,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">Raspbianのインストール [ 2016-07-09 ]</a>
-      
     
   </div>
 </section>
@@ -209,7 +230,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">12</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">13</span>server</a>
     
   </div>
 </section>
@@ -234,6 +255,10 @@
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (1)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
     
     
@@ -242,7 +267,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (7)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (8)</a>
     
     
     
@@ -250,7 +275,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (10)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
     
     
     
