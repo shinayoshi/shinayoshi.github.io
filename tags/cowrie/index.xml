@@ -18,7 +18,7 @@
       <guid>http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</guid>
       <description>
 
-&lt;p&gt;[](&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;http://bruteforce.gr/kippo-graph&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Kippo-Graphの公式(&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog&lt;/a&gt;)を参考にKippo-Graphをインストールするまでのメモです。&lt;/p&gt;
 
 &lt;h2 id=&#34;mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899&#34;&gt;MySQLのインストールと初期設定&lt;/h2&gt;
 
@@ -198,8 +198,6 @@ $ sudo systemctl restart apache2
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;kippo-graphのインストール:d89df975e87a1641818c282be53c7899&#34;&gt;Kippo-Graphのインストール&lt;/h2&gt;
-
-&lt;p&gt;Kippo-Graphの公式(&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog&lt;/a&gt;)を参考にKippo-Graphをインストールする。&lt;/p&gt;
 
 &lt;p&gt;関連パッケージのインストール。&lt;/p&gt;
 
