@@ -251,7 +251,7 @@ Thanks for using MySQL!
 
 &lt;p&gt;MySQLの初期設定&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql/my.cnf
 [mysqld]
 character-set-server=utf8
 collation-server=utf8_general_ci
@@ -294,7 +294,7 @@ ServerSignature Off
 
 &lt;p&gt;Apache2のServerName設定&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} /etc/apache2/conf-available/fqdn.conf&amp;quot;
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
 $ sudo a2enconf fqdn
 &lt;/code&gt;&lt;/pre&gt;
 

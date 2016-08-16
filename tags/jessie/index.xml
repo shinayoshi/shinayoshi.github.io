@@ -7,8 +7,296 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Mon, 15 Aug 2016 20:46:34 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 16 Aug 2016 08:43:57 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/jessie/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Kippo-GraphをインストールしてCowrieのログを可視化する</title>
+      <link>http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</link>
+      <pubDate>Tue, 16 Aug 2016 08:43:57 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</guid>
+      <description>
+
+&lt;p&gt;[](&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;http://bruteforce.gr/kippo-graph&lt;/a&gt;)&lt;/p&gt;
+
+&lt;h2 id=&#34;mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899&#34;&gt;MySQLのインストールと初期設定&lt;/h2&gt;
+
+&lt;p&gt;MySQLをインストールする。&lt;/p&gt;
+
+&lt;p&gt;インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get install mysql-server
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQLのセキュア設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql_secure_installation
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we&#39;ll need the current
+password for the root user.  If you&#39;ve just installed MySQL, and
+you haven&#39;t set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer &#39;n&#39;.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from &#39;localhost&#39;.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named &#39;test&#39; that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can&#39;t drop database &#39;test&#39;; database doesn&#39;t exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you&#39;ve completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQLの初期設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html&#34;&gt;MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;MySQLの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart mysql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cowrieのログ出力先を変更:d89df975e87a1641818c282be53c7899&#34;&gt;Cowrieのログ出力先を変更&lt;/h2&gt;
+
+&lt;p&gt;Cowrie用データベースの作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql -uroot -p
+Enter password:
+mysql&amp;gt; create database cowrie character set utf8 collate utf8_bin;
+mysql&amp;gt; grant all privileges on cowrie.* to cowrie@localhost identified by &#39;cowrie_password&#39;;
+mysql&amp;gt; quit
+
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd ${COWRIE_INSTALL_DIR}
+$ vi cowrie.cfg
+#[output_mysql]
+#host = localhost
+#database = cowrie
+#username = cowrie
+#password = secret
+#port = 3306
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./stop.sh
+$ ./start.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;apache2のインストール:d89df975e87a1641818c282be53c7899&#34;&gt;Apache2のインストール&lt;/h2&gt;
+
+&lt;p&gt;Apache2をインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install apache2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のセキュリティ設定。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の文字コード設定。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のServerName設定。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
+$ sudo a2enconf fqdn
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の再起動。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;kippo-graphのインストール:d89df975e87a1641818c282be53c7899&#34;&gt;Kippo-Graphのインストール&lt;/h2&gt;
+
+&lt;p&gt;Kippo-Graphの公式(&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog&lt;/a&gt;)を参考にKippo-Graphをインストールする。&lt;/p&gt;
+
+&lt;p&gt;関連パッケージのインストール。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+$ sudo apt-get install dnsutils
+$ sudo systemctl restart apache2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Kippo-Graphのインストール。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&amp;lt;IfModule mod_alias.c&amp;gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&amp;lt;/IfModule&amp;gt;
+$ sudo a2enconf kippo-graph
+$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Kippo-Graphの設定。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define(&#39;DB_HOST&#39;, &#39;localhost&#39;);
+define(&#39;DB_USER&#39;, &#39;cowrie&#39;);
+define(&#39;DB_PASS&#39;, &#39;cowrie_password&#39;);
+define(&#39;DB_NAME&#39;, &#39;cowrie&#39;);
+define(&#39;DB_PORT&#39;, &#39;3306&#39;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;kippo-graphの修正:d89df975e87a1641818c282be53c7899&#34;&gt;Kippo-Graphの修正&lt;/h2&gt;
+
+&lt;p&gt;KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。&lt;/p&gt;
+
+&lt;p&gt;PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;class/KippoPlayLog.class.php&lt;/code&gt;の修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&amp;lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&amp;gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;include/play.php&lt;/code&gt;の修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php include/play.php.org
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&amp;lt;                 $log = base64_encode($row[&#39;ttylog&#39;]);
+---
+&amp;gt;                 $log = base64_encode(file_get_contents($row[&#39;ttylog&#39;]));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ttylogへのシンボリックリンク作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
+$ sudo chown www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrie起動スクリプトの修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}/
+$ cp -p start.sh start.sh.org
+$ vi start.sh
+$ diff start.sh.org start.sh
+31c31
+&amp;lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&amp;gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&amp;lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&amp;gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./stop.sh
+$ ./start.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Raspbian(Jessie)にCowrieをインストールする</title>
@@ -191,7 +479,7 @@ hostname = cowrie01
 
 &lt;p&gt;終了するときは以下のコマンドを実行する。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ kill `cat cowrie.pid`
+&lt;pre&gt;&lt;code&gt;$ ./stop.sh
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieポートのポートフォワード&lt;/h2&gt;
@@ -497,7 +785,7 @@ Thanks for using MySQL!
 
 &lt;p&gt;MySQLの初期設定&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql/my.cnf
 [mysqld]
 character-set-server=utf8
 collation-server=utf8_general_ci
@@ -540,7 +828,7 @@ ServerSignature Off
 
 &lt;p&gt;Apache2のServerName設定&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} /etc/apache2/conf-available/fqdn.conf&amp;quot;
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
 $ sudo a2enconf fqdn
 &lt;/code&gt;&lt;/pre&gt;
 

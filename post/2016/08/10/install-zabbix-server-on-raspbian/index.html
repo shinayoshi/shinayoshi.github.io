@@ -209,7 +209,7 @@ Thanks for using MySQL!
 
 <p>MySQLの初期設定</p>
 
-<pre><code>$ sudo vi /etc/mysql
+<pre><code>$ sudo vi /etc/mysql/my.cnf
 [mysqld]
 character-set-server=utf8
 collation-server=utf8_general_ci
@@ -252,7 +252,7 @@ ServerSignature Off
 
 <p>Apache2のServerName設定</p>
 
-<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} /etc/apache2/conf-available/fqdn.conf&quot;
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
 $ sudo a2enconf fqdn
 </code></pre>
 
@@ -413,6 +413,8 @@ $ sudo systemctl restart zabbix-server
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
@@ -431,8 +433,6 @@ $ sudo systemctl restart zabbix-server
       
       <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
-      
     
   </div>
 </section>
@@ -446,7 +446,7 @@ $ sudo systemctl restart zabbix-server
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">13</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">14</span>server</a>
     
   </div>
 </section>
@@ -471,7 +471,7 @@ $ sudo systemctl restart zabbix-server
     
     
     
-    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (1)</a>
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (2)</a>
     
     
     
@@ -483,7 +483,11 @@ $ sudo systemctl restart zabbix-server
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (8)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (9)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
     
     
     

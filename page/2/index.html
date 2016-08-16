@@ -74,6 +74,179 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/">Raspbianの初期設定</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。</p>
+
+<h2 id="前提:29d369a29c800517b14390fe39a79e9d">前提</h2>
+
+<p>Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。</p>
+
+<h2 id="パッケージ更新:29d369a29c800517b14390fe39a79e9d">パッケージ更新</h2>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<ul>
+<li><a href="https://www.raspberrypi.org/documentation/raspbian/updating.md">Updating and Upgrading Raspbian - Raspberry Pi Documentation</a></li>
+</ul>
+
+<h2 id="ipアドレス固定化:29d369a29c800517b14390fe39a79e9d">IPアドレス固定化</h2>
+
+<p>Raspberry Pi 3のIPアドレスを固定する。</p>
+
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre>
+
+<ul>
+<li>&ldquo;man dhcpcd.conf&rdquo;</li>
+</ul>
+
+<h2 id="usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d">USBポートの電流供給増加</h2>
+
+<p>USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。</p>
+
+<pre><code>$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+</code></pre>
+
+<ul>
+<li><a href="http://elinux.org/RPiconfig">RPiconfig - eLinux.org</a></li>
+</ul>
+
+<h2 id="ntp設定:29d369a29c800517b14390fe39a79e9d">NTP設定</h2>
+
+<p>NTP同期先を設定する。</p>
+
+<pre><code>$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre>
+
+<p>NTPサーバを再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>時刻同期の状態を確認する。</p>
+
+<pre><code>$ ntpq -p
+</code></pre>
+
+<ul>
+<li><a href="http://vogel.at.webry.info/201501/article_5.html">NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ</a></li>
+</ul>
+
+<h2 id="chkconfigのインストール:29d369a29c800517b14390fe39a79e9d">chkconfigのインストール</h2>
+
+<p>Raspbian起動時のサービスを管理するためにchkconfigをインストールする。</p>
+
+<pre><code>$ sudo apt-get install chkconfig
+</code></pre>
+
+<h2 id="raspi-config関連:29d369a29c800517b14390fe39a79e9d">raspi-config関連</h2>
+
+<pre><code>$ sudo raspi-config
+</code></pre>
+
+<h3 id="ディスク拡張:29d369a29c800517b14390fe39a79e9d">ディスク拡張</h3>
+
+<ol>
+<li>「1 Expand Filesystem」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="文字コード設定:29d369a29c800517b14390fe39a79e9d">文字コード設定</h3>
+
+<ol>
+<li>「5 Internationalisation Options」を選択する。</li>
+<li>「I1 Change Locale」を選択する。</li>
+<li>「en_GB.UTF-8 UTF-8」の選択を外す。</li>
+<li>「ja_JP.UTF-8 UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>「ja_JP.UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="タイムゾーン設定:29d369a29c800517b14390fe39a79e9d">タイムゾーン設定</h3>
+
+<ol>
+<li>「5 Internationalisation Options」を選択する。</li>
+<li>「I2 Change Timezone」を選択する。</li>
+<li>「Asia」を選択する。</li>
+<li>「Tokyo」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="wifiの国設定:29d369a29c800517b14390fe39a79e9d">Wifiの国設定</h3>
+
+<ol>
+<li>「5 Internationalisation Options」を選択する。</li>
+<li>「I4 Change Wi-fi Country」を選択する。</li>
+<li>「JP Japan」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="ホスト名変更:29d369a29c800517b14390fe39a79e9d">ホスト名変更</h3>
+
+<ol>
+<li>「9 Advanced Options」を選択する。</li>
+<li>「A2 Hostname」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>ホスト名を設定する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="raspi-config終了:29d369a29c800517b14390fe39a79e9d">raspi-config終了</h3>
+
+<ol>
+<li>「Finish」を選択する。</li>
+<li>リブートの確認が求められるため、「Yes」を選択する。</li>
+</ol>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></h1>
                   <p>
                     <span class="label label-primary">Sat Jul 9, 2016</span> in
@@ -679,6 +852,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
@@ -697,8 +872,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">Raspbianの初期設定 [ 2016-07-09 ]</a>
-      
     
   </div>
 </section>
@@ -712,7 +885,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">13</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">14</span>server</a>
     
   </div>
 </section>
@@ -737,7 +910,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (1)</a>
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (2)</a>
     
     
     
@@ -749,7 +922,11 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (8)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (9)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
     
     
     

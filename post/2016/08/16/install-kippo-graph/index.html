@@ -73,22 +73,22 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>Raspbian(Jessie)にCowrieをインストールする</h1>
+                  <h1>Kippo-GraphをインストールしてCowrieのログを可視化する</h1>
                   <p>
-                    <span class="label label-primary">Mon Aug 15, 2016</span> in
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
                     
                     
                     <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
                     <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
                     
                      , 
                     <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/kippo-graph">kippo-graph</a>
                     
                   </p>
                 </div>
@@ -101,21 +101,11 @@
 <ul>
 <li>
 <ul>
-<li><a href="#raspbianの初期設定:4c0925631b42437e2f8c229197506152">Raspbianの初期設定</a>
-<ul>
-<li><a href="#パッケージの最新化:4c0925631b42437e2f8c229197506152">パッケージの最新化</a></li>
-<li><a href="#ipアドレスの固定化:4c0925631b42437e2f8c229197506152">IPアドレスの固定化</a></li>
-<li><a href="#ntp設定:4c0925631b42437e2f8c229197506152">NTP設定</a></li>
-<li><a href="#raspi-config関連:4c0925631b42437e2f8c229197506152">raspi-config関連</a></li>
-</ul></li>
-<li><a href="#公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152">公開鍵認証方式の設定</a></li>
-<li><a href="#sshサーバの設定:4c0925631b42437e2f8c229197506152">SSHサーバの設定</a></li>
-<li><a href="#ユーザ設定:4c0925631b42437e2f8c229197506152">ユーザ設定</a></li>
-<li><a href="#cowrieのインストール:4c0925631b42437e2f8c229197506152">Cowrieのインストール</a></li>
-<li><a href="#cowrieの設定:4c0925631b42437e2f8c229197506152">Cowrieの設定</a></li>
-<li><a href="#cowrieの起動と終了:4c0925631b42437e2f8c229197506152">Cowrieの起動と終了</a></li>
-<li><a href="#cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152">Cowrieポートのポートフォワード</a></li>
-<li><a href="#iptables設定の保存:4c0925631b42437e2f8c229197506152">iptables設定の保存</a></li>
+<li><a href="#mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899">MySQLのインストールと初期設定</a></li>
+<li><a href="#cowrieのログ出力先を変更:d89df975e87a1641818c282be53c7899">Cowrieのログ出力先を変更</a></li>
+<li><a href="#apache2のインストール:d89df975e87a1641818c282be53c7899">Apache2のインストール</a></li>
+<li><a href="#kippo-graphのインストール:d89df975e87a1641818c282be53c7899">Kippo-Graphのインストール</a></li>
+<li><a href="#kippo-graphの修正:d89df975e87a1641818c282be53c7899">Kippo-Graphの修正</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -124,196 +114,280 @@
                 <div class="contents">
                   
 
-<p>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
-はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。</p>
+<p>[](<a href="http://bruteforce.gr/kippo-graph">http://bruteforce.gr/kippo-graph</a>)</p>
 
-<p>個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。</p>
+<h2 id="mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899">MySQLのインストールと初期設定</h2>
 
-<h2 id="raspbianの初期設定:4c0925631b42437e2f8c229197506152">Raspbianの初期設定</h2>
+<p>MySQLをインストールする。</p>
 
-<p>Raspbianの初期設定として以下を行いました。</p>
-
-<h3 id="パッケージの最新化:4c0925631b42437e2f8c229197506152">パッケージの最新化</h3>
+<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
 
 <pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
+$ sudo apt-get install mysql-server
 </code></pre>
 
-<h3 id="ipアドレスの固定化:4c0925631b42437e2f8c229197506152">IPアドレスの固定化</h3>
+<p>MySQLのセキュア設定</p>
 
-<pre><code>$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.10.10/24
-static routers=192.168.10.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
+<pre><code>$ mysql_secure_installation
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we'll need the current
+password for the root user.  If you've just installed MySQL, and
+you haven't set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you've completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
 </code></pre>
 
-<h3 id="ntp設定:4c0925631b42437e2f8c229197506152">NTP設定</h3>
+<p>MySQLの初期設定</p>
 
-<p>NTP同期先を設定する。</p>
+<pre><code>$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
 
-<pre><code>$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-</code></pre>
+[mysqldump]
+default-character-set=utf8
 
-<p>NTPサーバを再起動する。</p>
-
-<pre><code>$ sudo systemctl restart ntp
-</code></pre>
-
-<p>時刻同期の状態を確認する。</p>
-
-<pre><code>$ ntpq -p
-</code></pre>
-
-<h3 id="raspi-config関連:4c0925631b42437e2f8c229197506152">raspi-config関連</h3>
-
-<pre><code>$ sudo raspi-config
+[mysql]
+default-character-set=utf8
 </code></pre>
 
 <ul>
-<li>ディスク拡張</li>
-<li>文字コード設定</li>
-<li>タイムゾーン設定</li>
-<li>Wifiの国設定</li>
-<li>ホスト名変更</li>
+<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
 </ul>
 
-<h2 id="公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152">公開鍵認証方式の設定</h2>
+<p>MySQLの再起動</p>
 
-<pre><code>$ ssh-keygen -t rsa
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
-Created directory '/home/pi/.ssh'.
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/pi/.ssh/id_rsa.
-Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
-
-$ cd ~/.ssh/
-$ cat id_rsa.pub &gt; authorized_keys
-$ chmod 600 authorized_keys
+<pre><code>$ sudo systemctl restart mysql
 </code></pre>
 
-<p>Raspbianで作成した秘密鍵をローカルPCにコピーする。</p>
+<h2 id="cowrieのログ出力先を変更:d89df975e87a1641818c282be53c7899">Cowrieのログ出力先を変更</h2>
 
-<pre><code>$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
+<p>Cowrie用データベースの作成</p>
+
+<pre><code>$ mysql -uroot -p
+Enter password:
+mysql&gt; create database cowrie character set utf8 collate utf8_bin;
+mysql&gt; grant all privileges on cowrie.* to cowrie@localhost identified by 'cowrie_password';
+mysql&gt; quit
+
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
 </code></pre>
 
-<p>公開鍵認証方式でsshログインできることを確認する。</p>
+<p>CowrieのログをMySQLのデータベースに出力する。</p>
 
-<pre><code>$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
+<pre><code>$ cd ${COWRIE_INSTALL_DIR}
+$ vi cowrie.cfg
+#[output_mysql]
+#host = localhost
+#database = cowrie
+#username = cowrie
+#password = secret
+#port = 3306
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
 </code></pre>
 
-<h2 id="sshサーバの設定:4c0925631b42437e2f8c229197506152">SSHサーバの設定</h2>
-
-<p>Cowrieで<code>22/tcp</code>を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。</p>
-
-<pre><code>$ sudo vi /etc/ssh/sshd_config
-#Port 22
-Port 20022
-
-#PermitRootLogin without-password
-PermitRootLogin no
-
-#PasswordAuthentication yes
-PasswordAuthentication no
-</code></pre>
-
-<p>SSHサーバの設定を再起動する。</p>
-
-<pre><code>$ sudo systemd ssh restart
-</code></pre>
-
-<p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
-
-<pre><code>$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
-</code></pre>
-
-<h2 id="ユーザ設定:4c0925631b42437e2f8c229197506152">ユーザ設定</h2>
-
-<p>rootユーザが無効化されていることを確認する(2列目が<code>L</code>であることを確認)。</p>
-
-<pre><code>$ sudo passwd -S root
-root L 05/27/2016 0 99999 7 -1
-</code></pre>
-
-<p>Cowrieユーザを作成する。</p>
-
-<pre><code>$ sudo adduser --disabled-password cowrie
-ユーザ `cowrie' を追加しています...
-新しいグループ `cowrie' (1001) を追加しています...
-新しいユーザ `cowrie' (1001) をグループ `cowrie' として追加しています...
-ホームディレクトリ `/home/cowrie' を作成しています...
-`/etc/skel' からファイルをコピーしています...
-cowrie のユーザ情報を変更中
-新しい値を入力してください。標準設定値を使うならリターンを押してください
-	フルネーム []: 
-	部屋番号 []: 
-	職場電話番号 []: 
-	自宅電話番号 []: 
-	その他 []: 
-以上で正しいですか? [Y/n] y
-</code></pre>
-
-<h2 id="cowrieのインストール:4c0925631b42437e2f8c229197506152">Cowrieのインストール</h2>
-
-<p>Cowrienの公式サイトの<a href="https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md">INSTALL.md</a>を参考にインストールを行う。</p>
-
-<pre><code>$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
-
-$ sudo su - cowrie
-$ git clone http://github.com/micheloosterhof/cowrie
-$ cd cowrie/
-$ cp cowrie.cfg.dist cowrie.cfg
-</code></pre>
-
-<h2 id="cowrieの設定:4c0925631b42437e2f8c229197506152">Cowrieの設定</h2>
-
-<pre><code>$ vi cowrie.cfg
-#sensor_name=myhostname
-sensor_name=rpicowrie
-
-#hostname = svr04
-hostname = cowrie01
-</code></pre>
-
-<h2 id="cowrieの起動と終了:4c0925631b42437e2f8c229197506152">Cowrieの起動と終了</h2>
-
-<p>起動するときは以下のコマンドを実行する。</p>
-
-<pre><code>$ ./start.sh
-</code></pre>
-
-<p>終了するときは以下のコマンドを実行する。</p>
+<p>Cowrieの再起動</p>
 
 <pre><code>$ ./stop.sh
+$ ./start.sh
 </code></pre>
 
-<h2 id="cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152">Cowrieポートのポートフォワード</h2>
+<h2 id="apache2のインストール:d89df975e87a1641818c282be53c7899">Apache2のインストール</h2>
 
-<p>Cowrieでは<code>2222/tcp</code>でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。</p>
+<p>Apache2をインストールする。</p>
 
-<pre><code>$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-$ sudo iptables -t nat -n -L
+<pre><code>$ sudo apt-get install apache2
 </code></pre>
 
-<h2 id="iptables設定の保存:4c0925631b42437e2f8c229197506152">iptables設定の保存</h2>
+<p>Apache2のセキュリティ設定。</p>
 
-<p>再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。</p>
+<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+</code></pre>
 
-<pre><code>$ sudo apt-get install iptables-persistent
-$ sudo systemctl enable netfilter-persistent
+<p>Apache2の文字コード設定。</p>
+
+<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+</code></pre>
+
+<p>Apache2のServerName設定。</p>
+
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
+$ sudo a2enconf fqdn
+</code></pre>
+
+<p>Apache2の再起動。</p>
+
+<pre><code>$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre>
+
+<h2 id="kippo-graphのインストール:d89df975e87a1641818c282be53c7899">Kippo-Graphのインストール</h2>
+
+<p>Kippo-Graphの公式(<a href="http://bruteforce.gr/kippo-graph">Kippo-Graph - BruteForce Lab&rsquo;s Blog</a>)を参考にKippo-Graphをインストールする。</p>
+
+<p>関連パッケージのインストール。</p>
+
+<pre><code>$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+$ sudo apt-get install dnsutils
+$ sudo systemctl restart apache2
+</code></pre>
+
+<p>Kippo-Graphのインストール。</p>
+
+<pre><code>$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&lt;IfModule mod_alias.c&gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&lt;/IfModule&gt;
+$ sudo a2enconf kippo-graph
+$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre>
+
+<p>Kippo-Graphの設定。</p>
+
+<pre><code>$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'cowrie');
+define('DB_PASS', 'cowrie_password');
+define('DB_NAME', 'cowrie');
+define('DB_PORT', '3306');
+</code></pre>
+
+<h2 id="kippo-graphの修正:d89df975e87a1641818c282be53c7899">Kippo-Graphの修正</h2>
+
+<p>KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。</p>
+
+<p>PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。</p>
+
+<p><code>class/KippoPlayLog.class.php</code>の修正</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+</code></pre>
+
+<p><code>include/play.php</code>の修正</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php include/play.php.org
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&lt;                 $log = base64_encode($row['ttylog']);
+---
+&gt;                 $log = base64_encode(file_get_contents($row['ttylog']));
+</code></pre>
+
+<p>ttylogへのシンボリックリンク作成</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
+$ sudo chown www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+</code></pre>
+
+<p>Cowrie起動スクリプトの修正</p>
+
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}/
+$ cp -p start.sh start.sh.org
+$ vi start.sh
+$ diff start.sh.org start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre>
+
+<p>Cowrieの再起動</p>
+
+<pre><code>$ ./stop.sh
+$ ./start.sh
 </code></pre>
 
 <p>以上</p>
@@ -339,10 +413,8 @@ $ sudo systemctl enable netfilter-persistent
               <div class="pagination">
                 <ul class="pager">
                   
-                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></li>
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/">Raspbian(Jessie)にCowrieをインストールする</a></li>
                   
-                  
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></li>
                   
                 </ul>
               </div>
