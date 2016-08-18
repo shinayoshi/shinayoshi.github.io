@@ -74,6 +74,189 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/">Cowrieのセキュリティ設定</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
+Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。</p>
+
+<h2 id="ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7">IPv6の無効化</h2>
+
+<p>IPv6は使用しないため、IPv6を無効化する。</p>
+
+<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
+</code></pre>
+
+<p>再起動後もIPv6が無効化するように設定する。</p>
+
+<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+</code></pre>
+
+<h2 id="selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7">SELinuxの無効化</h2>
+
+<p>Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。</p>
+
+<h2 id="iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7">iptablesの設定</h2>
+
+<p>iptablesでfirewallを設定する。</p>
+
+<pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可
+#$ sudo iptables -D INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信は許可。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<p>本当はOUTPUTのポリシーもDROPにしてアクセス制限をした方がよいと思うが、今回は割愛。</p>
+
+<ul>
+<li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
+<li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
+</ul>
+
+<h2 id="ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7">ログ出力先をsyslogに変更</h2>
+
+<p>twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。</p>
+
+<p>ログ保管用のディレクトリ作成。</p>
+
+<pre><code>$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+</code></pre>
+
+<p>rsyslogの設定。</p>
+
+<pre><code>$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == 'cowrie' then /var/log/cowrie/cowrie.log
+&amp; ~
+</code></pre>
+
+<p>rsyslogの再起動。</p>
+
+<pre><code>$ sudo systemctl restart rsyslog
+</code></pre>
+
+<p>Cowrieのログ出力先変更。</p>
+
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}
+$ vi start.sh
+$ diff ./start.sh.back20160818 ./start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre>
+
+<h2 id="logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7">logrotateの設定</h2>
+
+<p>logrotateをインストールする(はじめからインストール済みのはず)。</p>
+
+<pre><code>$ sudo apt-get install logrotate
+</code></pre>
+
+<p>Cowrie用のlogrotate設定を作成する。</p>
+
+<pre><code>$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &gt; /dev/null
+        endscript
+}
+</code></pre>
+
+<p>logrotateをテスト実行し、エラーがないことを確認する。</p>
+
+<pre><code>$ sudo logrotate -d /etc/logrotate.d/cowrie
+</code></pre>
+
+<ul>
+<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
+</ul>
+
+<p>&ndash;&gt;</p>
+
+<h2 id="logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7">logwatchのインストール</h2>
+
+<p>logwatchをインストールする。</p>
+
+<pre><code>$ sudo apt-get install logwatch
+</code></pre>
+
+<p>logwatchの実行結果を確認する。</p>
+
+<pre><code>$ sudo logwatch --output stdout
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></h1>
                   <p>
                     <span class="label label-primary">Tue Aug 16, 2016</span> in
@@ -223,6 +406,10 @@ $ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
 
 <pre><code>$ cd ${COWRIE_INSTALL_DIR}
 $ vi cowrie.cfg
+↓コメントアウト
+#[iutput_jsonloi]
+#logfile = log/cowrie.json
+
 #[output_mysql]
 #host = localhost
 #database = cowrie
@@ -501,13 +688,15 @@ Port 20022
 #PermitRootLogin without-password
 PermitRootLogin no
 
+ChallengeResponseAuthentication no
+
 #PasswordAuthentication yes
 PasswordAuthentication no
 </code></pre>
 
 <p>SSHサーバの設定を再起動する。</p>
 
-<pre><code>$ sudo systemd ssh restart
+<pre><code>$ sudo systemctl restart ssh
 </code></pre>
 
 <p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
@@ -1360,96 +1549,6 @@ $ cat /etc/xrdp/sesman.ini
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/">Raspberry Pi 3でWiFi設定</a></h1>
-                  <p>
-                    <span class="label label-primary">Sun Jul 10, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/wifi">WiFi</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
-今回はWiFi設定を行う。</p>
-
-<h2 id="wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97">WiFiネットワークのスキャン</h2>
-
-<p>接続するWiFiネットワークを確認する。</p>
-
-<pre><code>$ sudo iwlist wlan0 scan
-</code></pre>
-
-<h2 id="アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97">アクセスポイントの設定</h2>
-
-<p>アクセスポイントを設定する。</p>
-
-<pre><code>$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
-$ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
-country=JP
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-network={
-    ssid=&quot;アクセスポイント名(ESSID)&quot;
-    #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot;
-    psk=暗号化されたパスワード
-}
-</code></pre>
-
-<h2 id="wifiの有効化:366b0c30f1d198568510d56bfae90a97">WiFiの有効化</h2>
-
-<p>WiFiを有効化する。</p>
-
-<pre><code>$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-</code></pre>
-
-<h2 id="ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97">IPアドレスの固定化</h2>
-
-<p>IPアドレスを固定化する。</p>
-
-<pre><code>$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface wlan0
-static ip_address=192.168.100.10⁄24
-static routers=192.168.100.1
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-</code></pre>
-
-<p>WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。</p>
-
-<pre><code>$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-</code></pre>
-
-<h2 id="参考:366b0c30f1d198568510d56bfae90a97">参考</h2>
-
-<ul>
-<li><a href="https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md">Setting WiFi up via the command line - Raspberry Pi Documentation</a></li>
-<li><a href="http://move0tofu.hatenablog.jp/entry/2016/04/30/215517">Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&hellip;</a></li>
-</ul>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1515,6 +1614,8 @@ $ ifconfig wlan0
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
@@ -1533,8 +1634,6 @@ $ ifconfig wlan0
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
-      
     
   </div>
 </section>
@@ -1548,7 +1647,7 @@ $ ifconfig wlan0
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">14</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
     
   </div>
 </section>
@@ -1573,7 +1672,7 @@ $ ifconfig wlan0
     
     
     
-    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (2)</a>
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
     
     
     
@@ -1585,7 +1684,7 @@ $ ifconfig wlan0
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (9)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
     
     
     

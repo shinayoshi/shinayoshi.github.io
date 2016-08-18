@@ -73,22 +73,19 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>ZabbixでSNMPデバイスの監視を行う</h1>
+                  <h1>Cowrieのセキュリティ設定</h1>
                   <p>
-                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
                     
                     
                     <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
                     <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
                     
                      , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
                     
                   </p>
                 </div>
@@ -101,11 +98,12 @@
 <ul>
 <li>
 <ul>
-<li><a href="#パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</a></li>
-<li><a href="#snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</a></li>
-<li><a href="#snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</a></li>
-<li><a href="#zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</a></li>
-<li><a href="#zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</a></li>
+<li><a href="#ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7">IPv6の無効化</a></li>
+<li><a href="#selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7">SELinuxの無効化</a></li>
+<li><a href="#iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7">iptablesの設定</a></li>
+<li><a href="#ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7">ログ出力先をsyslogに変更</a></li>
+<li><a href="#logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7">logrotateの設定</a></li>
+<li><a href="#logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7">logwatchのインストール</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -114,85 +112,162 @@
                 <div class="contents">
                   
 
-<p>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。</p>
+<p>前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
+Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。</p>
 
-<p>とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。</p>
+<h2 id="ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7">IPv6の無効化</h2>
 
-<h2 id="パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</h2>
+<p>IPv6は使用しないため、IPv6を無効化する。</p>
 
-<p>Zabbix Serverのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
+<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
 </code></pre>
 
-<h2 id="snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</h2>
+<p>再起動後もIPv6が無効化するように設定する。</p>
 
-<p>Zabbix ServerにSNMP関連のパッケージをインストールする。</p>
-
-<pre><code>$ sudo apt-get install snmp snmp-mibs-downloader
+<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
 </code></pre>
 
-<!-- $ sudo apt-get install snmpd -->
+<h2 id="selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7">SELinuxの無効化</h2>
 
-<!-- $ sudo apt-get install snmptrapd snmptt -->
+<p>Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。</p>
 
-<h2 id="snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</h2>
+<h2 id="iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7">iptablesの設定</h2>
 
-<p><code>/usr/bin/download-mibs</code>でダウンロードしたMIBSを読み込めるように設定する。</p>
+<p>iptablesでfirewallを設定する。</p>
 
-<pre><code>$ sudo vi /etc/snmp/snmp.conf
-#mibs :
+<pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可
+#$ sudo iptables -D INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信は許可。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT ACCEPT
 </code></pre>
 
-<p>メモ：デフォルトでは以下のディレクトリを検索する。<code>snmpstatus --help</code>の出力で確認。</p>
+<p>iptablesの設定を保存する。</p>
 
-<pre><code>${HOME}/.snmp/mibs
-/usr/share/snmp/mibs
-/usr/share/snmp/mibs/iana
-/usr/share/snmp/mibs/ietf
-/usr/share/mibs/site
-/usr/share/snmp/mibs
-/usr/share/mibs/iana
-/usr/share/mibs/ietf
-/usr/share/mibs/netsnmp
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
 </code></pre>
 
-<h2 id="zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</h2>
-
-<p>Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。</p>
-
-<pre><code>$ sudo systemctl restart zabbix-server
-</code></pre>
-
-<h2 id="zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
-
-<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
-
-<p>ホストの設定画面が表示されるので最低限以下を設定する。</p>
-
-<p>&ldquo;ホスト&rdquo;タブ</p>
+<p>本当はOUTPUTのポリシーもDROPにしてアクセス制限をした方がよいと思うが、今回は割愛。</p>
 
 <ul>
-<li>ホスト名：監視対象機器のホスト名。</li>
-<li>グループ：所属するグループ。適切なグループがなければ新規作成。</li>
-<li>エージェントのインターフェース：削除。</li>
-<li>SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。</li>
+<li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
+<li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
 </ul>
 
-<p>&ldquo;テンプレート&rdquo;タブ</p>
+<h2 id="ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7">ログ出力先をsyslogに変更</h2>
+
+<p>twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。</p>
+
+<p>ログ保管用のディレクトリ作成。</p>
+
+<pre><code>$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+</code></pre>
+
+<p>rsyslogの設定。</p>
+
+<pre><code>$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == 'cowrie' then /var/log/cowrie/cowrie.log
+&amp; ~
+</code></pre>
+
+<p>rsyslogの再起動。</p>
+
+<pre><code>$ sudo systemctl restart rsyslog
+</code></pre>
+
+<p>Cowrieのログ出力先変更。</p>
+
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}
+$ vi start.sh
+$ diff ./start.sh.back20160818 ./start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre>
+
+<h2 id="logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7">logrotateの設定</h2>
+
+<p>logrotateをインストールする(はじめからインストール済みのはず)。</p>
+
+<pre><code>$ sudo apt-get install logrotate
+</code></pre>
+
+<p>Cowrie用のlogrotate設定を作成する。</p>
+
+<pre><code>$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &gt; /dev/null
+        endscript
+}
+</code></pre>
+
+<p>logrotateをテスト実行し、エラーがないことを確認する。</p>
+
+<pre><code>$ sudo logrotate -d /etc/logrotate.d/cowrie
+</code></pre>
 
 <ul>
-<li>テンプレートとのリンク：&rdquo;Template SNMP Device&rdquo;を追加。</li>
+<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
 </ul>
 
-<p>&ldquo;マクロ&rdquo;タブ</p>
+<p>&ndash;&gt;</p>
 
-<ul>
-<li>マクロ：<code>{$SNMP_COMMUNITY}</code> ⇒ 値：<code>監視対象機器のコミュニティ名</code></li>
-</ul>
+<h2 id="logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7">logwatchのインストール</h2>
+
+<p>logwatchをインストールする。</p>
+
+<pre><code>$ sudo apt-get install logwatch
+</code></pre>
+
+<p>logwatchの実行結果を確認する。</p>
+
+<pre><code>$ sudo logwatch --output stdout
+</code></pre>
 
 <p>以上</p>
 
@@ -217,10 +292,8 @@ $ sudo apt-get upgrade
               <div class="pagination">
                 <ul class="pager">
                   
-                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></li>
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></li>
                   
-                  
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></li>
                   
                 </ul>
               </div>

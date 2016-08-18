@@ -145,6 +145,10 @@ $ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
 
 &lt;pre&gt;&lt;code&gt;$ cd ${COWRIE_INSTALL_DIR}
 $ vi cowrie.cfg
+↓コメントアウト
+#[iutput_jsonloi]
+#logfile = log/cowrie.json
+
 #[output_mysql]
 #host = localhost
 #database = cowrie

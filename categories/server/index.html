@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Cowrieのセキュリティ設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    jessie
+                    
+                     , 
+                    cowrie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    前回まででCowrieのインストールやKippo-Graphでの可視化を行った。 Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化する。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 $ sudo sysctl -a | grep disable_ipv6 再起動後もIPv6が無効化するように設定する。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定する。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 #内部からの通信を始めた場合のパケットは許可 $ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT #ループバックからの通信は通す $ sudo iptables -A INPUT -i lo -j ACCEPT
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">
                   <h2 class="list-group-item-heading">Kippo-GraphをインストールしてCowrieのログを可視化する</h2>
                   <p class="list-group-item-text">
@@ -281,27 +302,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun Jul 10, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    WiFi
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -368,6 +368,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
@@ -386,8 +388,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">Raspberry Pi 3でWiFi設定 [ 2016-07-10 ]</a>
-      
     
   </div>
 </section>
@@ -401,7 +401,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">14</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
     
   </div>
 </section>
@@ -426,7 +426,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (2)</a>
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
     
     
     
@@ -438,7 +438,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (9)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
     
     
     

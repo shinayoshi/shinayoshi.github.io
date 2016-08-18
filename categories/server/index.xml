@@ -7,8 +7,177 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Tue, 16 Aug 2016 08:43:57 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 16 Aug 2016 18:59:00 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Cowrieのセキュリティ設定</title>
+      <link>http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/</link>
+      <pubDate>Tue, 16 Aug 2016 18:59:00 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/</guid>
+      <description>
+
+&lt;p&gt;前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
+Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。&lt;/p&gt;
+
+&lt;h2 id=&#34;ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;IPv6の無効化&lt;/h2&gt;
+
+&lt;p&gt;IPv6は使用しないため、IPv6を無効化する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再起動後もIPv6が無効化するように設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;SELinuxの無効化&lt;/h2&gt;
+
+&lt;p&gt;Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。&lt;/p&gt;
+
+&lt;h2 id=&#34;iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;iptablesの設定&lt;/h2&gt;
+
+&lt;p&gt;iptablesでfirewallを設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可
+#$ sudo iptables -D INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信は許可。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;本当はOUTPUTのポリシーもDROPにしてアクセス制限をした方がよいと思うが、今回は割愛。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351&#34;&gt;iptablesで鉄壁？の守りを実現する3つのTips&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/iptables.html&#34;&gt;CentOS iptablesによるパケットフィルタ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;ログ出力先をsyslogに変更&lt;/h2&gt;
+
+&lt;p&gt;twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。&lt;/p&gt;
+
+&lt;p&gt;ログ保管用のディレクトリ作成。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの設定。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == &#39;cowrie&#39; then /var/log/cowrie/cowrie.log
+&amp;amp; ~
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieのログ出力先変更。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}
+$ vi start.sh
+$ diff ./start.sh.back20160818 ./start.sh
+31c31
+&amp;lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&amp;gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&amp;lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&amp;gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logrotateの設定&lt;/h2&gt;
+
+&lt;p&gt;logrotateをインストールする(はじめからインストール済みのはず)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install logrotate
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrie用のlogrotate設定を作成する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+        endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -d /etc/logrotate.d/cowrie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;ndash;&amp;gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logwatchのインストール&lt;/h2&gt;
+
+&lt;p&gt;logwatchをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install logwatch
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logwatchの実行結果を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Kippo-GraphをインストールしてCowrieのログを可視化する</title>
@@ -145,6 +314,10 @@ $ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
 
 &lt;pre&gt;&lt;code&gt;$ cd ${COWRIE_INSTALL_DIR}
 $ vi cowrie.cfg
+↓コメントアウト
+#[iutput_jsonloi]
+#logfile = log/cowrie.json
+
 #[output_mysql]
 #host = localhost
 #database = cowrie
@@ -406,13 +579,15 @@ Port 20022
 #PermitRootLogin without-password
 PermitRootLogin no
 
+ChallengeResponseAuthentication no
+
 #PasswordAuthentication yes
 PasswordAuthentication no
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;SSHサーバの設定を再起動する。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo systemd ssh restart
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ssh
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。&lt;/p&gt;

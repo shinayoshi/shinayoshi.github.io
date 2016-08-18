@@ -120,13 +120,15 @@ Port 20022
 #PermitRootLogin without-password
 PermitRootLogin no
 
+ChallengeResponseAuthentication no
+
 #PasswordAuthentication yes
 PasswordAuthentication no
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;SSHサーバの設定を再起動する。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo systemd ssh restart
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ssh
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。&lt;/p&gt;
