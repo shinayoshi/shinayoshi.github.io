@@ -91,7 +91,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    前回まででCowrieのインストールやKippo-Graphでの可視化を行った。 Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化する。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 $ sudo sysctl -a | grep disable_ipv6 再起動後もIPv6が無効化するように設定する。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定する。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 #内部からの通信を始めた場合のパケットは許可 $ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT #ループバックからの通信は通す $ sudo iptables -A INPUT -i lo -j ACCEPT
+                    前回まででCowrieのインストールやKippo-Graphでの可視化を行った。 Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化する。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 $ sudo sysctl -a | grep disable_ipv6 再起動後もIPv6が無効化するように設定する。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定する。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 ##INPUTチェーン #IPスプーフィング対策 $ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset #セッションハイジャック対策 $ sudo iptables -A INPUT -p tcp !
                   </p>
                 </a>
                 

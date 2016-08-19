@@ -48,6 +48,16 @@ net.ipv6.conf.default.disable_ipv6=1
 &lt;pre&gt;&lt;code&gt;#Cowrieポートのポートフォワード(別手順で設定済み)
 #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
 
+##INPUTチェーン
+#IPスプーフィング対策
+$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+
+#セッションハイジャック対策
+$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#不正なパケット拒否
+$ sudo iptables -A INPUT -m state --state INVALID -j DROP
+
 #内部からの通信を始めた場合のパケットは許可
 $ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
@@ -57,24 +67,50 @@ $ sudo iptables -A INPUT -i lo -j ACCEPT
 #ICMPパケットは許可
 $ sudo iptables -A INPUT -p icmp -j ACCEPT
 
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
+
 #SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
 
 #HTTPは許可(ローカルネットワークからの接続のみ許可)
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
 
-#Cowrieは許可
-#$ sudo iptables -D INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
 #Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
 $ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
 
 #Zabbix-Agentへの通信は許可
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
 
+##OUTPUTチェーン
+#ループバックへの通信は通す
+$ sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#ICMP応答のパケットは通す
+$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#外部からの通信を始めた場合のパケットを許可
+$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#tcp-resetの通信は通す
+$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
+
+#ユーザrootが発したパケットは許可
+$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
+
+#NTPは許可
+$ sudo iptables -A OUTPUT -m state --state NEW -p udp --dport 123 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+
 #外部からの通信は拒否。外部への通信は許可。
 $ sudo iptables -P INPUT DROP
 $ sudo iptables -P FORWARD DROP
-$ sudo iptables -P OUTPUT ACCEPT
+$ sudo iptables -P OUTPUT DROP
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
@@ -82,11 +118,10 @@ $ sudo iptables -P OUTPUT ACCEPT
 &lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;本当はOUTPUTのポリシーもDROPにしてアクセス制限をした方がよいと思うが、今回は割愛。&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351&#34;&gt;iptablesで鉄壁？の守りを実現する3つのTips&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/iptables.html&#34;&gt;CentOS iptablesによるパケットフィルタ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kassyjp.ninja-web.net/ras/jessie/iptables.htm&#34;&gt;2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;ログ出力先をsyslogに変更&lt;/h2&gt;
@@ -129,7 +164,7 @@ $ diff ./start.sh.back20160818 ./start.sh
 
 &lt;h2 id=&#34;logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logrotateの設定&lt;/h2&gt;
 
-&lt;p&gt;logrotateをインストールする(はじめからインストール済みのはず)。&lt;/p&gt;
+&lt;p&gt;logrotateをインストールする(通常はインストール済みのはず)。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo apt-get install logrotate
 &lt;/code&gt;&lt;/pre&gt;
@@ -159,9 +194,8 @@ $ diff ./start.sh.back20160818 ./start.sh
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;&amp;ndash;&amp;gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logwatchのインストール&lt;/h2&gt;
 

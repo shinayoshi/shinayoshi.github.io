@@ -123,6 +123,16 @@ net.ipv6.conf.default.disable_ipv6=1
 <pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
 #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
 
+##INPUTチェーン
+#IPスプーフィング対策
+$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+
+#セッションハイジャック対策
+$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#不正なパケット拒否
+$ sudo iptables -A INPUT -m state --state INVALID -j DROP
+
 #内部からの通信を始めた場合のパケットは許可
 $ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
@@ -132,24 +142,50 @@ $ sudo iptables -A INPUT -i lo -j ACCEPT
 #ICMPパケットは許可
 $ sudo iptables -A INPUT -p icmp -j ACCEPT
 
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
+
 #SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
 
 #HTTPは許可(ローカルネットワークからの接続のみ許可)
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
 
-#Cowrieは許可
-#$ sudo iptables -D INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
 #Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
 $ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
 
 #Zabbix-Agentへの通信は許可
 $ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
 
+##OUTPUTチェーン
+#ループバックへの通信は通す
+$ sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#ICMP応答のパケットは通す
+$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#外部からの通信を始めた場合のパケットを許可
+$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#tcp-resetの通信は通す
+$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
+
+#ユーザrootが発したパケットは許可
+$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
+
+#NTPは許可
+$ sudo iptables -A OUTPUT -m state --state NEW -p udp --dport 123 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+
 #外部からの通信は拒否。外部への通信は許可。
 $ sudo iptables -P INPUT DROP
 $ sudo iptables -P FORWARD DROP
-$ sudo iptables -P OUTPUT ACCEPT
+$ sudo iptables -P OUTPUT DROP
 </code></pre>
 
 <p>iptablesの設定を保存する。</p>
@@ -157,11 +193,10 @@ $ sudo iptables -P OUTPUT ACCEPT
 <pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
 </code></pre>
 
-<p>本当はOUTPUTのポリシーもDROPにしてアクセス制限をした方がよいと思うが、今回は割愛。</p>
-
 <ul>
 <li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
 <li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
+<li><a href="http://kassyjp.ninja-web.net/ras/jessie/iptables.htm">2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋</a></li>
 </ul>
 
 <h2 id="ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7">ログ出力先をsyslogに変更</h2>
@@ -204,7 +239,7 @@ $ diff ./start.sh.back20160818 ./start.sh
 
 <h2 id="logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7">logrotateの設定</h2>
 
-<p>logrotateをインストールする(はじめからインストール済みのはず)。</p>
+<p>logrotateをインストールする(通常はインストール済みのはず)。</p>
 
 <pre><code>$ sudo apt-get install logrotate
 </code></pre>
@@ -234,9 +269,8 @@ $ diff ./start.sh.back20160818 ./start.sh
 
 <ul>
 <li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
+<li><a href="https://open-groove.net/linux/logrotate-test/">logrotate（ログローテート）の動作確認 | OpenGroove</a></li>
 </ul>
-
-<p>&ndash;&gt;</p>
 
 <h2 id="logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7">logwatchのインストール</h2>
 
