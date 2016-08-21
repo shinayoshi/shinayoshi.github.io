@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cacti on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/cacti/</link>
+    <description>Recent content in Cacti on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2016 shinayoshi</copyright>
+    <lastBuildDate>Sun, 21 Aug 2016 11:05:38 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/cacti/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Cactiにデバイスを登録する</title>
+      <link>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</link>
+      <pubDate>Sun, 21 Aug 2016 11:05:38 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</guid>
+      <description>
+
+&lt;p&gt;Cactiに新規デバイスを登録するメモです。
+SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install snmpd snmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成する。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/snmp/snmpd.conf{,.org}
+$ sudo cp snmpd.conf /etc/snmp/snmpd.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_01.png&#34; alt=&#34;cacti_register_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_02.png&#34; alt=&#34;cacti_register_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_03.png&#34; alt=&#34;cacti_register_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_04.png&#34; alt=&#34;cacti_register_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認する。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_05.png&#34; alt=&#34;cacti_register_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_06.png&#34; alt=&#34;cacti_register_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_07.png&#34; alt=&#34;cacti_register_07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_08.png&#34; alt=&#34;cacti_register_08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_09.png&#34; alt=&#34;cacti_register_09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_10.png&#34; alt=&#34;cacti_register_10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_11.png&#34; alt=&#34;cacti_register_11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_12.png&#34; alt=&#34;cacti_register_12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspbian(Jessie)にCactiをインストールする</title>
+      <link>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</link>
+      <pubDate>Sat, 20 Aug 2016 20:46:05 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)にCactiを導入するまでのメモです。
+Apache2やMySQLはインストール済みであることを前提としています。&lt;/p&gt;
+
+&lt;h2 id=&#34;cactiのインストール:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiのインストール&lt;/h2&gt;
+
+&lt;p&gt;Cactiをインストールする。
+途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install cacti cacti-spine
+
+↓&amp;lt;了解&amp;gt;を選択してEnter
+ ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
+ │                                                                           │ 
+ │ 警告: php に対するインクルードパスが変更されています!                     │ 
+ │                                                                           │ 
+ │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
+ │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
+ │                                                                           │ 
+ │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
+ │ かもしれません。                                                          │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓apache2を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
+ │                                                                           │ 
+ │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
+ │                                                                           │ 
+ │ ウェブサーバ:                                                             │ 
+ │                                                                           │ 
+ │                               apache2                                     │ 
+ │                               lighttpd                                    │ 
+ │                               どれでもない                                │ 
+ │                                                                           │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓&amp;lt;はい&amp;gt;を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
+ │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
+ │                                                                           │ 
+ │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
+ │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
+ │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
+ │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
+ │                                                                           │ 
+ │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
+ │                                                                           │ 
+ │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
+ │                                                                           │ 
+ │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのrootユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
+  │ ウントのパスワードを入力してください。                                   │ 
+  │                                                                          │ 
+  │ データベースの管理権限を持つユーザのパスワード:                          │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのcactiユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
+  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
+  │                                                                          │ 
+  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;データベースをMyISAMからInnoDBに変更する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/cacti/cli
+$ sudo php convert_innodb.php
+Converting All Non-Memory Cacti Database Tables to Innodb with Less than &#39;300000&#39; Records
+Converting Table -&amp;gt; &#39;cdef&#39; Successful
+Converting Table -&amp;gt; &#39;cdef_items&#39; Successful
+Converting Table -&amp;gt; &#39;colors&#39; Successful
+Converting Table -&amp;gt; &#39;data_input&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_fields&#39; Successful
+Converting Table -&amp;gt; &#39;data_local&#39; Successful
+Converting Table -&amp;gt; &#39;data_template&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data_rra&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;graph_local&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input_defs&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_gprint&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_graph&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_item&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree_items&#39; Successful
+Converting Table -&amp;gt; &#39;host&#39; Successful
+Converting Table -&amp;gt; &#39;host_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_cache&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;host_template&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_config&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_db_changes&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_hooks&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_realms&#39; Successful
+Converting Table -&amp;gt; &#39;poller&#39; Successful
+Converting Table -&amp;gt; &#39;poller_command&#39; Successful
+Converting Table -&amp;gt; &#39;poller_item&#39; Successful
+Converting Table -&amp;gt; &#39;poller_output&#39; Successful
+Converting Table -&amp;gt; &#39;poller_reindex&#39; Successful
+Converting Table -&amp;gt; &#39;poller_time&#39; Successful
+Converting Table -&amp;gt; &#39;rra&#39; Successful
+Converting Table -&amp;gt; &#39;rra_cf&#39; Successful
+Converting Table -&amp;gt; &#39;settings&#39; Successful
+Converting Table -&amp;gt; &#39;settings_graphs&#39; Successful
+Converting Table -&amp;gt; &#39;settings_tree&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd_sv&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_sv&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_perms&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_realm&#39; Successful
+Converting Table -&amp;gt; &#39;user_log&#39; Successful
+Converting Table -&amp;gt; &#39;version&#39; Successful
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiへのアクセス:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiへのアクセス&lt;/h2&gt;
+
+&lt;p&gt;ブラウザからCactiのURL(&lt;code&gt;http://IPアドレス/cacti&lt;/code&gt;)にアクセスする。&lt;/p&gt;
+
+&lt;p&gt;Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_01.png&#34; alt=&#34;cacti_install_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_02.png&#34; alt=&#34;cacti_install_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Errorがないことを確認してFinishをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_03.png&#34; alt=&#34;cacti_install_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓admin/adminでログイン&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_04.png&#34; alt=&#34;cacti_install_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓adminの新しいパスワードを入力してSaveをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_05.png&#34; alt=&#34;cacti_install_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_06.png&#34; alt=&#34;cacti_install_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

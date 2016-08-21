@@ -74,6 +74,48 @@
               <h1>Raspberrypi</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Jul 10, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    WiFi
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org NTP設定 NTP同期先を設定する。 $ sudo vi /etc/ntp.conf
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbianのインストール</h2>
                   <p class="list-group-item-text">
@@ -161,6 +203,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
@@ -177,10 +223,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
-      
     
   </div>
 </section>
@@ -194,7 +236,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
     
   </div>
 </section>
@@ -215,6 +257,10 @@
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
@@ -231,7 +277,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
     
     
     
@@ -243,7 +289,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
     
     
     

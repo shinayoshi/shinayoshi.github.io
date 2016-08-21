@@ -74,6 +74,201 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/">RaspbianにKivyをセットアップ</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/kivy">kivy</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。</p>
+
+<h2 id="kivyのインストール:7e54fa4db923fa1d790b8a2df258af41">Kivyのインストール</h2>
+
+<p>Kivyに必要なパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
+
+$ sudo reboot
+</code></pre>
+
+<p>Kivyをインストールする。</p>
+
+<pre><code>$ git clone https://github.com/kivy/kivy
+$ cd kivy
+$ make
+$ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile
+$ source ~/.profile
+</code></pre>
+
+<ul>
+<li><a href="https://kivy.org/docs/installation/installation-rpi.html">Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation</a></li>
+</ul>
+
+<h2 id="raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定</h2>
+
+<pre><code>$ vi ~/.kivy/config.ini
+[input]
+mouse = mouse
+mtdev\_%(name)s = probesysfs,provider=mtdev
+hid\_%(name)s = probesysfs,provider=hidinput
+</code></pre>
+
+<h2 id="kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41">Kivyデモを実行</h2>
+
+<p>デモ実行に必要なパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get install xclip xsel
+$ sudo pip install pygments docutils
+</code></pre>
+
+<h3 id="デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</h3>
+
+<pre><code>$ cd ~/kivy/examples/demo/showcase
+$ python main.py
+</code></pre>
+
+<h3 id="デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</h3>
+
+<pre><code>$ cd ~/kivy/examples/3Drendering
+$ python main.py
+</code></pre>
+
+<h2 id="kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</h2>
+
+<p><a href="http://a-zumi.net/python-kivy-simple-paint/">【Python】Kivyを使ってシンプルなペイントツールを作成する方法</a>を参考に、自前でペイントツールを作成し、実行する。</p>
+
+<p>ソースコードを作成する。</p>
+
+<pre><code>$ vi paint.py
+</code></pre>
+
+<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script>
+
+<p>実行する。</p>
+
+<pre><code>$ python paint.py  
+</code></pre>
+
+<p>Raspberry Pi 7&rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Jul 12, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 3のディスプレイとして「Official 7&rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。
+Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。</p>
+
+<h2 id="接続:2020837d634538f02be0a31ea2dca63e">接続</h2>
+
+<p>以下のWebサイトを参考に接続する。</p>
+
+<ul>
+<li><a href="https://raspberry-pi.ksyic.com/page/page/pgp.id/4">Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY:</a></li>
+<li><a href="https://www.raspberrypi.org/blog/the-eagerly-awaited-raspberry-pi-display/">The Eagerly Awaited Raspberry Pi Display - Raspberry Pi</a></li>
+</ul>
+
+<h2 id="天地逆転を直す:2020837d634538f02be0a31ea2dca63e">天地逆転を直す</h2>
+
+<p>購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。</p>
+
+<pre><code>$ sudo vi /boot/config.txt
+#Add the following line
+lcd_rotate=2
+$ sudo reboot
+</code></pre>
+
+<ul>
+<li><a href="http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd">Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity</a></li>
+</ul>
+
+<h2 id="日本語環境の整備:2020837d634538f02be0a31ea2dca63e">日本語環境の整備</h2>
+
+<p>日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。</p>
+
+<pre><code>$ sudo apt-get install task-japanese task-japanese-desktop
+</code></pre>
+
+<h2 id="スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e">スクリーンキーボードのインストール</h2>
+
+<p>Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</p>
+
+<pre><code>$ sudo apt-get install florence
+$ sudo apt-get install at-spi2-core
+</code></pre>
+
+<p>ログイン画面でもOn Screen Keyboardを使用できるように設定する。</p>
+
+<pre><code>$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf
+show-indicators=~language;~a11y;~session;~power
+keyboard=florence --focus
+</code></pre>
+
+<ul>
+<li><a href="http://xmodulo.com/onscreen-virtual-keyboard-linux.html">How to use on-screen virtual keyboard on Linux - Xmodulo</a></li>
+<li><a href="https://www.raspberrypi.org/forums/viewtopic.php?f=108&amp;t=123189">Raspberry Pi • View topic - Solution for Jessie and Florence virtual keyboard crash</a></li>
+<li><a href="https://www.raspberrypi.org/forums/viewtopic.php?f=63&amp;t=113526">Raspberry Pi • View topic - Virtual Keyboard on Login Screen</a></li>
+</ul>
+
+<h2 id="リモートデスクトップ接続:2020837d634538f02be0a31ea2dca63e">リモートデスクトップ接続</h2>
+
+<p>xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。</p>
+
+<pre><code>$ sudo apt-get install xrdp
+</code></pre>
+
+<p>Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。</p>
+
+<pre><code>$ cat /etc/xrdp/xrdp.ini
+$ cat /etc/xrdp/sesman.ini
+</code></pre>
+
+<ul>
+<li><a href="http://www.tapun.net/raspi/raspberry-pi-xrdp">Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記</a></li>
+</ul>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/">Raspberry Pi 3でWiFi設定</a></h1>
                   <p>
                     <span class="label label-primary">Sun Jul 10, 2016</span> in
@@ -942,6 +1137,10 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
@@ -958,10 +1157,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
-      
     
   </div>
 </section>
@@ -975,7 +1170,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
     
   </div>
 </section>
@@ -996,6 +1191,10 @@ $ sudo systemctl disable sshd
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
@@ -1012,7 +1211,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
     
     
     
@@ -1024,7 +1223,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
     
     
     

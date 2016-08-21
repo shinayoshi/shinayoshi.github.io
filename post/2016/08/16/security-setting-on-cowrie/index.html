@@ -196,12 +196,12 @@ $ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ES
 $ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
 
 #NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -p udp --dport 123 -j ACCEPT
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
 
 #Zabbix-Serverへの通信は許可
 $ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
 
-#外部からの通信は拒否。外部への通信は許可。
+#外部からの通信は拒否。外部への通信も拒否。
 $ sudo iptables -P INPUT DROP
 $ sudo iptables -P FORWARD DROP
 $ sudo iptables -P OUTPUT DROP
@@ -329,6 +329,8 @@ $ diff ./start.sh.back20160818 ./start.sh
                   <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></li>
                   
                   
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/">Raspbian(Jessie)にCactiをインストールする</a></li>
+                  
                 </ul>
               </div>
             </div>
@@ -386,6 +388,10 @@ $ diff ./start.sh.back20160818 ./start.sh
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
@@ -402,10 +408,6 @@ $ diff ./start.sh.back20160818 ./start.sh
       
       <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
-      
     
   </div>
 </section>
@@ -419,7 +421,7 @@ $ diff ./start.sh.back20160818 ./start.sh
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
     
   </div>
 </section>
@@ -440,6 +442,10 @@ $ diff ./start.sh.back20160818 ./start.sh
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
@@ -456,7 +462,7 @@ $ diff ./start.sh.back20160818 ./start.sh
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
     
     
     
@@ -468,7 +474,7 @@ $ diff ./start.sh.back20160818 ./start.sh
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
     
     
     

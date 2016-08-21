@@ -102,12 +102,12 @@ $ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ES
 $ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
 
 #NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -p udp --dport 123 -j ACCEPT
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
 
 #Zabbix-Serverへの通信は許可
 $ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
 
-#外部からの通信は拒否。外部への通信は許可。
+#外部からの通信は拒否。外部への通信も拒否。
 $ sudo iptables -P INPUT DROP
 $ sudo iptables -P FORWARD DROP
 $ sudo iptables -P OUTPUT DROP

@@ -74,6 +74,48 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">RaspbianにKivyをセットアップ</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    kivy
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。 Kivyのインストール Kivyに必要なパッケージをインストールする。 $ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。 $ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile $ source ~/.profile Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定 $
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jul 12, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3のディスプレイとして「Official 7&rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。 接続 以下のWebサイトを参考に接続する。 Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi 天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。 $ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity 日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。 $ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
                   <p class="list-group-item-text">
@@ -278,6 +320,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
@@ -294,10 +340,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">RaspbianにKivyをセットアップ [ 2016-07-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続 [ 2016-07-12 ]</a>
-      
     
   </div>
 </section>
@@ -311,7 +353,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">15</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
     
   </div>
 </section>
@@ -332,6 +374,10 @@
     
     
     
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
     
     
@@ -348,7 +394,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (10)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
     
     
     
@@ -360,7 +406,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (11)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
     
     
     

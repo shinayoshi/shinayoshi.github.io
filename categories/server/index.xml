@@ -7,8 +7,368 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Tue, 16 Aug 2016 18:59:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 21 Aug 2016 11:05:38 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Cactiにデバイスを登録する</title>
+      <link>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</link>
+      <pubDate>Sun, 21 Aug 2016 11:05:38 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</guid>
+      <description>
+
+&lt;p&gt;Cactiに新規デバイスを登録するメモです。
+SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install snmpd snmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成する。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/snmp/snmpd.conf{,.org}
+$ sudo cp snmpd.conf /etc/snmp/snmpd.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_01.png&#34; alt=&#34;cacti_register_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_02.png&#34; alt=&#34;cacti_register_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_03.png&#34; alt=&#34;cacti_register_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_04.png&#34; alt=&#34;cacti_register_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認する。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_05.png&#34; alt=&#34;cacti_register_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_06.png&#34; alt=&#34;cacti_register_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_07.png&#34; alt=&#34;cacti_register_07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_08.png&#34; alt=&#34;cacti_register_08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_09.png&#34; alt=&#34;cacti_register_09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_10.png&#34; alt=&#34;cacti_register_10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_11.png&#34; alt=&#34;cacti_register_11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_12.png&#34; alt=&#34;cacti_register_12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspbian(Jessie)にCactiをインストールする</title>
+      <link>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</link>
+      <pubDate>Sat, 20 Aug 2016 20:46:05 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)にCactiを導入するまでのメモです。
+Apache2やMySQLはインストール済みであることを前提としています。&lt;/p&gt;
+
+&lt;h2 id=&#34;cactiのインストール:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiのインストール&lt;/h2&gt;
+
+&lt;p&gt;Cactiをインストールする。
+途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install cacti cacti-spine
+
+↓&amp;lt;了解&amp;gt;を選択してEnter
+ ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
+ │                                                                           │ 
+ │ 警告: php に対するインクルードパスが変更されています!                     │ 
+ │                                                                           │ 
+ │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
+ │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
+ │                                                                           │ 
+ │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
+ │ かもしれません。                                                          │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓apache2を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
+ │                                                                           │ 
+ │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
+ │                                                                           │ 
+ │ ウェブサーバ:                                                             │ 
+ │                                                                           │ 
+ │                               apache2                                     │ 
+ │                               lighttpd                                    │ 
+ │                               どれでもない                                │ 
+ │                                                                           │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓&amp;lt;はい&amp;gt;を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
+ │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
+ │                                                                           │ 
+ │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
+ │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
+ │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
+ │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
+ │                                                                           │ 
+ │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
+ │                                                                           │ 
+ │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
+ │                                                                           │ 
+ │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのrootユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
+  │ ウントのパスワードを入力してください。                                   │ 
+  │                                                                          │ 
+  │ データベースの管理権限を持つユーザのパスワード:                          │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのcactiユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
+  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
+  │                                                                          │ 
+  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;データベースをMyISAMからInnoDBに変更する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/cacti/cli
+$ sudo php convert_innodb.php
+Converting All Non-Memory Cacti Database Tables to Innodb with Less than &#39;300000&#39; Records
+Converting Table -&amp;gt; &#39;cdef&#39; Successful
+Converting Table -&amp;gt; &#39;cdef_items&#39; Successful
+Converting Table -&amp;gt; &#39;colors&#39; Successful
+Converting Table -&amp;gt; &#39;data_input&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_fields&#39; Successful
+Converting Table -&amp;gt; &#39;data_local&#39; Successful
+Converting Table -&amp;gt; &#39;data_template&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data_rra&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;graph_local&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input_defs&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_gprint&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_graph&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_item&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree_items&#39; Successful
+Converting Table -&amp;gt; &#39;host&#39; Successful
+Converting Table -&amp;gt; &#39;host_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_cache&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;host_template&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_config&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_db_changes&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_hooks&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_realms&#39; Successful
+Converting Table -&amp;gt; &#39;poller&#39; Successful
+Converting Table -&amp;gt; &#39;poller_command&#39; Successful
+Converting Table -&amp;gt; &#39;poller_item&#39; Successful
+Converting Table -&amp;gt; &#39;poller_output&#39; Successful
+Converting Table -&amp;gt; &#39;poller_reindex&#39; Successful
+Converting Table -&amp;gt; &#39;poller_time&#39; Successful
+Converting Table -&amp;gt; &#39;rra&#39; Successful
+Converting Table -&amp;gt; &#39;rra_cf&#39; Successful
+Converting Table -&amp;gt; &#39;settings&#39; Successful
+Converting Table -&amp;gt; &#39;settings_graphs&#39; Successful
+Converting Table -&amp;gt; &#39;settings_tree&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd_sv&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_sv&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_perms&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_realm&#39; Successful
+Converting Table -&amp;gt; &#39;user_log&#39; Successful
+Converting Table -&amp;gt; &#39;version&#39; Successful
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiへのアクセス:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiへのアクセス&lt;/h2&gt;
+
+&lt;p&gt;ブラウザからCactiのURL(&lt;code&gt;http://IPアドレス/cacti&lt;/code&gt;)にアクセスする。&lt;/p&gt;
+
+&lt;p&gt;Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_01.png&#34; alt=&#34;cacti_install_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_02.png&#34; alt=&#34;cacti_install_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Errorがないことを確認してFinishをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_03.png&#34; alt=&#34;cacti_install_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓admin/adminでログイン&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_04.png&#34; alt=&#34;cacti_install_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓adminの新しいパスワードを入力してSaveをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_05.png&#34; alt=&#34;cacti_install_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_06.png&#34; alt=&#34;cacti_install_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Cowrieのセキュリティ設定</title>
@@ -102,12 +462,12 @@ $ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ES
 $ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
 
 #NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -p udp --dport 123 -j ACCEPT
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
 
 #Zabbix-Serverへの通信は許可
 $ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
 
-#外部からの通信は拒否。外部への通信は許可。
+#外部からの通信は拒否。外部への通信も拒否。
 $ sudo iptables -P INPUT DROP
 $ sudo iptables -P FORWARD DROP
 $ sudo iptables -P OUTPUT DROP
@@ -1075,7 +1435,7 @@ php_value memory_limit 128M
 php_value post_max_size 16M
 php_value upload_max_filesize 2M
 php_value max_input_time 300
-php_value date.timezone Asia/Tokyow
+php_value date.timezone Asia/Tokyo
 
 $ sudo a2enconf zabbix
 $ sudo apachectl configtest
@@ -1689,342 +2049,6 @@ pi@192.168.1.10&#39;s password:
 &lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>ApacheでWebサイトを公開する</title>
-      <link>http://www.shinayoshi.net/post/2016/05/15/apache-setup/</link>
-      <pubDate>Sun, 15 May 2016 22:14:46 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/05/15/apache-setup/</guid>
-      <description>
-
-&lt;p&gt;ApacheでWebサイトを公開するまでの手順のメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;ApacheとPHPのインストール&lt;/h2&gt;
-
-&lt;p&gt;Webサーバ(Apache)とPHPをインストールします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# yum install httpd php php-mbstring
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの設定&lt;/h2&gt;
-
-&lt;p&gt;Apacheを設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# vi /etc/httpd/conf/httpd.conf
-#ServerName www.example.com:80
-↓変更
-ServerName www.example.com:80
-
-#
-# AllowOverride controls what directives may be placed in .htaccess files.
-# It can be &amp;quot;All&amp;quot;, &amp;quot;None&amp;quot;, or any combination of the keywords:
-#   Options FileInfo AuthConfig Limit
-#
-    AllowOverride None
-    ↓変更
-    AllowOverride All
-
-AddDefaultCharset UTF-8
-↓変更
-#AddDefaultCharset UTF-8
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Apacheの起動&lt;/h2&gt;
-
-&lt;p&gt;Apacheを起動します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl start httpd
-$ sudo systemctl enable httpd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;Firewallの設定&lt;/h2&gt;
-
-&lt;p&gt;FirewallでWeb通信を許可します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;動作確認&lt;/h2&gt;
-
-&lt;p&gt;外部からWebサイトにアクセスできるか確認します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /var/www/html/index.php
-&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html lang=&amp;quot;ja&amp;quot;&amp;gt;
-  &amp;lt;head&amp;gt;
-    &amp;lt;meta charset=&amp;quot;utf-8&amp;quot; /&amp;gt;
-    &amp;lt;title&amp;gt;net-tools&amp;lt;/title&amp;gt;
-    &amp;lt;meta name=&amp;quot;description&amp;quot; content=&amp;quot;shinayoshi shinayoshi.net&amp;quot; /&amp;gt;
-    &amp;lt;meta name=&amp;quot;author&amp;quot; content=&amp;quot;shinayoshi&amp;quot; /&amp;gt;
-  &amp;lt;/head&amp;gt;
-  &amp;lt;body&amp;gt;
-    &amp;lt;p&amp;gt;&amp;lt;?php echo $_SERVER[&amp;quot;REMOTE_ADDR&amp;quot;]; ?&amp;gt;&amp;lt;/p&amp;gt;
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Webブラウザ等でWebサーバにアクセスできることを確認します。
-正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。&lt;/p&gt;
-
-&lt;h2 id=&#34;その他:cb5d764d8c08bb095f7a6ed7bff2ff04&#34;&gt;その他&lt;/h2&gt;
-
-&lt;p&gt;実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</title>
-      <link>http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/</link>
-      <pubDate>Sat, 16 Jan 2016 22:30:25 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/</guid>
-      <description>
-
-&lt;p&gt;お名前.comのVPS(KVM)の初期設定メモを残しておく。
-「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。&lt;/p&gt;
-
-&lt;h2 id=&#34;rootでログイン:130a6ce433fd353093f8e4a56dec5622&#34;&gt;rootでログイン&lt;/h2&gt;
-
-&lt;p&gt;お名前.comのコンソール画面でログインを行います。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;login: root
-Password:
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ログインに成功すると以下のようなプロンプトが表示されます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[root@&amp;lt;ホスト名&amp;gt; ~\]#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以降の手順では、rootアカウントのプロンプトを&lt;code&gt;#&lt;/code&gt;で表現します。&lt;/p&gt;
-
-&lt;h2 id=&#34;シリアルコンソール接続の有効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;シリアルコンソール接続の有効化&lt;/h2&gt;
-
-&lt;p&gt;シリアルコンソールで接続できるように設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# vi /etc/default/grub
-GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;quot;
-↓変更
-GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;quot;
-# grub2-mkconfig \-o /boot/grub2/grub.cfg
-# reboot
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;共用sshサーバ経由のシリアルコンソール接続:130a6ce433fd353093f8e4a56dec5622&#34;&gt;共用SSHサーバ経由のシリアルコンソール接続&lt;/h2&gt;
-
-&lt;p&gt;お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。&lt;/p&gt;
-
-&lt;p&gt;SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。&lt;a href=&#34;http://guide.onamae-server.com/vpskvm/3_14_15_75_2/&#34;&gt;SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;ホスト名変更:130a6ce433fd353093f8e4a56dec5622&#34;&gt;ホスト名変更&lt;/h2&gt;
-
-&lt;p&gt;ホスト名の変更を行います。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# hostnamectl set-hostname newhost.example.com
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ホスト名の変更を反映するために再起動を行います。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# reboot
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。&lt;/p&gt;
-
-&lt;h2 id=&#34;パッケージの更新:130a6ce433fd353093f8e4a56dec5622&#34;&gt;パッケージの更新&lt;/h2&gt;
-
-&lt;p&gt;パッケージを最新の状態に更新します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# yum \-y update
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;kernelのバージョンアップがあった場合にはサーバの再起動を実施します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# reboot
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;管理者アカウントの作成:130a6ce433fd353093f8e4a56dec5622&#34;&gt;管理者アカウントの作成&lt;/h2&gt;
-
-&lt;p&gt;通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# useradd centos
-# passwd centos
-Changing password for user centos.
-New password: &amp;lt;パスワード入力&amp;gt;
-Retype new password: &amp;lt;パスワード再入力&amp;gt;
-passwd: all authentication tokens updated successfully.
-# gpasswd \-a centos wheel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;sudo権限の付与:130a6ce433fd353093f8e4a56dec5622&#34;&gt;sudo権限の付与&lt;/h2&gt;
-
-&lt;p&gt;管理者アカウントにsudo権限を付与します。以下ではcentosにROOT関連のコマンドとSHUTDOWN関連のコマンド以外のすべてのコマンドの実行権限を付与しています。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# visudo \-f /etc/sudoers.d/wheel
-Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo
-Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init
-%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;rootのログアウトと管理者アカウントでログイン:130a6ce433fd353093f8e4a56dec5622&#34;&gt;rootのログアウトと管理者アカウントでログイン&lt;/h2&gt;
-
-&lt;p&gt;管理者アカウントを作成してsudoが使えるようになったので、rootアカウントをログアウトして管理者アカウントでログインし直します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# exit
-logout
-＜省略＞
-login: centos
-Password:
-[centos@&amp;lt;ホスト名&amp;gt; ~]$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以降の手順では、管理者アカウントのプロンプトを&lt;code&gt;$&lt;/code&gt;で表現します。&lt;/p&gt;
-
-&lt;h2 id=&#34;rootアカウントの無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;rootアカウントの無効化&lt;/h2&gt;
-
-&lt;p&gt;すべての作業は管理者アカウントで行うため、rootアカウントを無効化します。※シリアルコンソールからもrootでログインできなくなりますので、設定する際は慎重に行ってください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo passwd -l root
-[sudo] password for centos:
-Locking password for user root.
-passwd: Success
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;root宛てメールの転送:130a6ce433fd353093f8e4a56dec5622&#34;&gt;root宛てメールの転送&lt;/h2&gt;
-
-&lt;p&gt;root宛てに届くメールを管理者アカウントに転送するように設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/aliases
-root:           centos
-$ sudo newaliases
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;firewalldの設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定&lt;/h2&gt;
-
-&lt;p&gt;Firewalldを使用して不要な通信を拒否するように設定します。&lt;/p&gt;
-
-&lt;h3 id=&#34;firewalldのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldのインストール&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo yum \-y install firewalld
-$ sudo systemctl start firewalld
-$ sudo systemctl enable firewalld
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;firewalldの設定確認:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの設定確認&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --get-active-zones
-$ sudo firewall-cmd --list-all-zones
-$ sudo firewall-cmd --get-services
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622&#34;&gt;Firewalldの初期設定&lt;/h3&gt;
-
-&lt;p&gt;eth0のゾーンをpublicに変更します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --change-interface=eth0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;publicゾーンで不要なサービスを無効化します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh
-$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client
-$ sudo firewall-cmd --reload
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;設定の確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --zone=public --list-all
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;selinuxの無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;SELinuxの無効化&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo setenforce Permissive
-$ sudo getenforce
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/selinux/config
-SELINUX=enforcing
-↓変更
-SELINUX=permissive
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ipv6の無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;IPv6の無効化&lt;/h2&gt;
-
-&lt;p&gt;IPv6を無効化します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-$ sudo sysctl -a | grep disable_ipv6
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;上記のコマンドではシステムを再起動した場合にIPv6が有効になってしまうため、再起動しても無効になるように設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
-net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6=1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;postfixのipv6無効化:130a6ce433fd353093f8e4a56dec5622&#34;&gt;PostfixのIPv6無効化&lt;/h3&gt;
-
-&lt;p&gt;IPv6の無効化に併せてPostfixもIPv6を無効化します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/postfix/main.cf
-#inet_protocols = all
-inet_protocols = ipv4
-$ sudo systemctl restart postfix
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ntpの時刻同期:130a6ce433fd353093f8e4a56dec5622&#34;&gt;NTPの時刻同期&lt;/h2&gt;
-
-&lt;p&gt;chronyにより時刻同期を行うように設定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo yum -y install chrony
-$ sudo vi /etc/chrony.conf
-#server 0.centos.pool.ntp.org iburst
-#server 1.centos.pool.ntp.org iburst
-#server 2.centos.pool.ntp.org iburst
-#server 3.centos.pool.ntp.org iburst
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;chronydを起動します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl start chronyd
-$ sudo systemctl enable chronyd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻の同期状況を確認するには以下のコマンドを実行します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ chronyc sources
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;不要サービスの停止:130a6ce433fd353093f8e4a56dec5622&#34;&gt;不要サービスの停止&lt;/h2&gt;
-
-&lt;p&gt;セキュリティのため、サーバのリソースのために不要サービスを停止します。お名前.comのVPS(KVM)には共用SSH経由のシリアルコンソールでログインするため、SSHを停止しています。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl list-units --type=service
-$ sudo systemctl stop sshd
-$ sudo systemctl disable sshd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;logwatchのインストール:130a6ce433fd353093f8e4a56dec5622&#34;&gt;logwatchのインストール&lt;/h2&gt;
-
-&lt;p&gt;logwatchをインストールします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo yum -y install logwatch
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;logwatchの実行結果を確認します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上、初期設定は終了となります。&lt;/p&gt;
 </description>
     </item>
     
