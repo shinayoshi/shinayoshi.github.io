@@ -74,6 +74,54 @@
               <h1>Jessie</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)でキャッシュDNSを構築する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    bind
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。 bind9のインストール $ sudo apt-get install bind9 dnsutils bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。 $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &quot;/etc/bind/rndc.key&quot;; acl &quot;internal-network&quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &quot;unknown&quot;; directory &quot;/var/cache/bind&quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl 300; max-cache-ttl
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にSquidをインストールする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Aug 22, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    squid
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。 Raspbianの初期設定 過去のブログ記事を参考に初期設定を実施する。 パッケージの最新化 パッケージのインストール &ndash; chkconfig &ndash; tcpdump &ndash; telnet &ndash; dnsutils IPアドレスの固定化 NTP設定 rpi-configの設定 &ndash; ディスク拡張 &ndash; 文字コード設定 &ndash; タイムゾーン設定 &ndash; Wifiの国設定 &ndash; ホスト名変更 公開鍵認証方式の設定 IPv6の無効化 SELinuxの無効化 iptablesの設定 logwatchのインストール Zabbix Agentのインストール・監視登録 SNMPDのインストール・Cacti登録 Squidのインストール Squidをインストールする。 $ sudo apt-get install squid Squidを設定する。 $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf 609,611c609,616 &lt; acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &lt; acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &lt; acl localnet src 192.168.0.0/16 # RFC1918 possible internal network --- &gt; #acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &gt; #acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &gt; #acl localnet src 192.168.0.0/16 # RFC1918 possible internal network &gt; acl localnet src 192.168.10.0/24 &gt; acl localnet src 192.168.20.0/24 &gt; acl localnet src 192.168.30.0/24 &gt; acl localnet src 192.168.40.0/24 &gt; 676c681 &lt; #http_access allow localnet --- &gt; http_access allow localnet 1738a1744 &gt; cache_mem 256 MB 1747a1754 &gt; maximum_object_size_in_memory 512 KB 1945a1953 &gt; cache_dir ufs /var/spool/squid 10000 16 256 1988a1997 &gt; maximum_object_size 20480 KB 2097a2107 &gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh 2121c2131,2132 &lt; access_log /var/log/squid/access.log squid --- &gt; #access_log /var/log/squid/access.log squid &gt; access_log /var/log/squid/access.log combined 2217a2229 &gt; emulate_httpd_log off 2751c2763,2768 &lt; refresh_pattern .
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">
                   <h2 class="list-group-item-heading">Cactiにデバイスを登録する</h2>
                   <p class="list-group-item-text">
@@ -263,51 +311,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Serverをインストール</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Wed Aug 10, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                     , 
-                    zabbix
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。 3 Installation from packages [Zabbix Documentation 2.2] パッケージの更新 Raspbianのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。 $ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定 $ mysql_secure_installation In order to log into MySQL to secure it, we'll need the current password for the root user. If you've just installed MySQL, and you haven't set the root password yet, the password will be blank, so you should just press enter here.
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Tue Jul 12, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspberry Pi 3のディスプレイとして「Official 7&rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。 接続 以下のWebサイトを参考に接続する。 Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi 天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。 $ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity 日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。 $ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -374,6 +377,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
@@ -390,10 +397,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Serverをインストール [ 2016-08-10 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
-      
     
   </div>
 </section>
@@ -407,7 +410,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
     
   </div>
 </section>
@@ -421,6 +424,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
     
     
     
@@ -448,7 +455,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
     
     
     
@@ -460,11 +467,15 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
     
     
     
     <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
     
     
     

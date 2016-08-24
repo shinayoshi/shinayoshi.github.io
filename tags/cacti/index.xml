@@ -111,6 +111,10 @@ $ sudo systemctl start snmpd
 &lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&#34;iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;iptablesの通信許可&lt;/h2&gt;
 
 &lt;p&gt;CactiからのSNMP通信を許可する。&lt;/p&gt;

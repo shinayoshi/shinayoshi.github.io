@@ -74,6 +74,51 @@
               <h1>Jessie</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Serverをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed Aug 10, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。 3 Installation from packages [Zabbix Documentation 2.2] パッケージの更新 Raspbianのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。 $ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定 $ mysql_secure_installation In order to log into MySQL to secure it, we'll need the current password for the root user. If you've just installed MySQL, and you haven't set the root password yet, the password will be blank, so you should just press enter here.
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jul 12, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3のディスプレイとして「Official 7&rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。 接続 以下のWebサイトを参考に接続する。 Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi 天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。 $ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot Getting Started with the Raspberry Pi 7&rdquo; Touchscreen LCD - Pimoroni Yarr-niversity 日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。 $ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
                   <p class="list-group-item-text">
@@ -182,6 +227,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
@@ -198,10 +247,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Serverをインストール [ 2016-08-10 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
-      
     
   </div>
 </section>
@@ -215,7 +260,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
     
   </div>
 </section>
@@ -229,6 +274,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
     
     
     
@@ -256,7 +305,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
     
     
     
@@ -268,11 +317,15 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
     
     
     
     <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
     
     
     

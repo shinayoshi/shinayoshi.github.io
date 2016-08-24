@@ -74,6 +74,358 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/bind">bind</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
+Raspbianの基本的な設定は完了している前提です。</p>
+
+<h2 id="bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09">bind9のインストール</h2>
+
+<pre><code>$ sudo apt-get install bind9 dnsutils
+</code></pre>
+
+<p>bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。</p>
+
+<pre><code>$ sudo cat /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &quot;/etc/bind/rndc.key&quot;;
+
+acl &quot;internal-network&quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &quot;unknown&quot;;
+
+	directory &quot;/var/cache/bind&quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &quot;log_default&quot; {
+		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &quot;alert&quot; {
+		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &quot;query&quot; {
+		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &quot;log_default&quot;; };
+	category security { &quot;alert&quot;; };
+	category queries { &quot;query&quot;; };
+	category lame-servers { null; };
+};
+</code></pre>
+
+<p>コンフィグの不備を確認する。</p>
+
+<pre><code>$ sudo named-checkconf /etc/bind/named.conf
+</code></pre>
+
+<p>ログ保存先のディレクトリを作成する。</p>
+
+<pre><code>$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+</code></pre>
+
+<p>bind9を再起動する。</p>
+
+<pre><code>$ sudo systemctl restart bind9
+</code></pre>
+
+<h2 id="iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09">iptablesの設定</h2>
+
+<p>iptablesでfirewallを設定する。</p>
+
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+
+$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
+$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<h2 id="dnsの設定:de7ee9c067a99fe782c9ccc491d85d09">DNSの設定</h2>
+
+<p>キャッシュDNSを使用するように設定変更を行う。</p>
+
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$ sudo systemctl reload dhcpcd
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/">Raspbian(Jessie)にSquidをインストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 22, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/squid">squid</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。</p>
+
+<h2 id="raspbianの初期設定:b44e2973592bad70879d3cac4bdad4df">Raspbianの初期設定</h2>
+
+<p>過去のブログ記事を参考に初期設定を実施する。</p>
+
+<ul>
+<li>パッケージの最新化</li>
+<li>パッケージのインストール
+&ndash; chkconfig
+&ndash; tcpdump
+&ndash; telnet
+&ndash; dnsutils</li>
+<li>IPアドレスの固定化</li>
+<li>NTP設定</li>
+<li>rpi-configの設定
+&ndash; ディスク拡張
+&ndash; 文字コード設定
+&ndash; タイムゾーン設定
+&ndash; Wifiの国設定
+&ndash; ホスト名変更</li>
+<li>公開鍵認証方式の設定</li>
+<li>IPv6の無効化</li>
+<li>SELinuxの無効化</li>
+<li>iptablesの設定</li>
+<li>logwatchのインストール</li>
+<li>Zabbix Agentのインストール・監視登録</li>
+<li>SNMPDのインストール・Cacti登録</li>
+</ul>
+
+<h2 id="squidのインストール:b44e2973592bad70879d3cac4bdad4df">Squidのインストール</h2>
+
+<p>Squidをインストールする。</p>
+
+<pre><code>$ sudo apt-get install squid
+</code></pre>
+
+<p>Squidを設定する。</p>
+
+<pre><code>$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&gt; acl localnet src 192.168.10.0/24
+&gt; acl localnet src 192.168.20.0/24
+&gt; acl localnet src 192.168.30.0/24
+&gt; acl localnet src 192.168.40.0/24
+&gt; 
+676c681
+&lt; #http_access allow localnet
+---
+&gt; http_access allow localnet
+1738a1744
+&gt; cache_mem 256 MB
+1747a1754
+&gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&gt; maximum_object_size 20480 KB
+2097a2107
+&gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh
+2121c2131,2132
+&lt; access_log /var/log/squid/access.log squid
+---
+&gt; #access_log /var/log/squid/access.log squid
+&gt; access_log /var/log/squid/access.log combined
+2217a2229
+&gt; emulate_httpd_log off
+2751c2763,2768
+&lt; refresh_pattern .		0	20%	4320
+---
+&gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&gt; refresh_pattern . 45 20% 4320
+2944a2962
+&gt; via off
+3100a3119,3122
+&gt; header_access Referer deny all
+&gt; header_access X-Forwarded-For deny all
+&gt; header_access Via deny all
+&gt; header_access Cache-Control deny all
+3392a3415
+&gt; visible_hostname unknown
+4699a4723
+&gt; forwarded_for off
+</code></pre>
+
+<p>Squidの設定に不備がないか確認する。</p>
+
+<pre><code>$ sudo squid -k parse
+</code></pre>
+
+<p>Squidの設定を有効にする。</p>
+
+<pre><code>$ sudo systemctl reload squid
+</code></pre>
+
+<ul>
+<li><a href="http://www.unix-power.net/linux/squid.html">CentOS Squidの設定</a></li>
+<li><a href="http://tech.ckme.co.jp/proxy.shtml">Proxyサーバの設定（squid）：tech.ckme.co.jp</a></li>
+<li><a href="http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid">Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき</a></li>
+<li><a href="http://blog.asial.co.jp/1076">Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ</a></li>
+</ul>
+
+<h2 id="iptablesの通信許可設定:b44e2973592bad70879d3cac4bdad4df">iptablesの通信許可設定</h2>
+
+<p>内部NWからSquidへの通信を許可する。</p>
+
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 3128 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<h2 id="ブラウザのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">ブラウザのプロキシ設定</h2>
+
+<p>ブラウザ使用するプロキシ設定をSquidに変更する。</p>
+
+<p>Squidのログを確認してSquid経由でWebアクセスができていることを確認する。</p>
+
+<pre><code>$ sudo cat /var/log/squid/access.log
+</code></pre>
+
+<h2 id="raspbianのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">Raspbianのプロキシ設定</h2>
+
+<p>起動時にプロキシを使用するように設定する。</p>
+
+<pre><code>$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&quot;192.168.20.10:3128&quot;
+export http_proxy=&quot;http://${PROXY}&quot;
+export https_proxy=&quot;http://${PROXY}&quot;
+export no_proxy=&quot;localhost,127.0.0.1,192.168.*&quot;
+
+export HTTP_PROXY=&quot;${http_proxy}&quot;
+export HTTPS_PROXY=&quot;${https_proxy}&quot;
+export NO_PROXY=&quot;${no_proxy}&quot;
+$source /etc/profile.d/proxy.sh
+</code></pre>
+
+<p>上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には<code>-E</code>オプションを指定する。</p>
+
+<pre><code>$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/">Cactiにデバイスを登録する</a></h1>
                   <p>
                     <span class="label label-primary">Sun Aug 21, 2016</span> in
@@ -188,6 +540,10 @@ $ sudo systemctl start snmpd
 
 <pre><code>$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
 </code></pre>
+
+<ul>
+<li><a href="http://www.infraexpert.com/study/tcpip21.html">TCP/IP - SNMPとは</a></li>
+</ul>
 
 <h2 id="iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf">iptablesの通信許可</h2>
 
@@ -1091,7 +1447,7 @@ Your identification has been saved in /home/pi/.ssh/id_rsa.
 Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
 
 $ cd ~/.ssh/
-$ cat id_rsa.pub &gt; authorized_keys
+$ cat id_rsa.pub &gt;&gt; authorized_keys
 $ chmod 600 authorized_keys
 </code></pre>
 
@@ -1448,344 +1804,10 @@ $ sudo systemctl restart zabbix-agent
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/">Raspbian(Jessie)にZabbix Serverをインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Wed Aug 10, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にZabbix Serverをインストールするメモです。
-Zabbix Agentのインストールは別のメモになります。</p>
-
-<ul>
-<li><a href="https://www.zabbix.com/documentation/2.2/manual/installation/install_from_packages">3 Installation from packages [Zabbix Documentation 2.2]</a></li>
-</ul>
-
-<h2 id="パッケージの更新:4df21ad0746a34acfa37879eaf637713">パッケージの更新</h2>
-
-<p>Raspbianのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="zabbix-serverのインストール:4df21ad0746a34acfa37879eaf637713">Zabbix Serverのインストール</h2>
-
-<p>Zabbix Serverのインストール</p>
-
-<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
-
-<pre><code>$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php
-$ sudo apt-get install php5-mysql
-$ sudo apt-get install task-japanese
-</code></pre>
-
-<h3 id="mysqlの初期設定:4df21ad0746a34acfa37879eaf637713">MySQLの初期設定</h3>
-
-<p>MySQLのセキュア設定</p>
-
-<pre><code>$ mysql_secure_installation
-In order to log into MySQL to secure it, we'll need the current
-password for the root user.  If you've just installed MySQL, and
-you haven't set the root password yet, the password will be blank,
-so you should just press enter here.
-
-Enter current password for root (enter for none): 
-OK, successfully used password, moving on...
-
-Setting the root password ensures that nobody can log into the MySQL
-root user without the proper authorisation.
-
-You already have a root password set, so you can safely answer 'n'.
-
-Change the root password? [Y/n] n
- ... skipping.
-
-By default, a MySQL installation has an anonymous user, allowing anyone
-to log into MySQL without having to have a user account created for
-them.  This is intended only for testing, and to make the installation
-go a bit smoother.  You should remove them before moving into a
-production environment.
-
-Remove anonymous users? [Y/n] Y
- ... Success!
-
-Normally, root should only be allowed to connect from 'localhost'.  This
-ensures that someone cannot guess at the root password from the network.
-
-Disallow root login remotely? [Y/n] Y
- ... Success!
-
-By default, MySQL comes with a database named 'test' that anyone can
-access.  This is also intended only for testing, and should be removed
-before moving into a production environment.
-
-Remove test database and access to it? [Y/n] Y
- - Dropping test database...
-ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
- ... Failed!  Not critical, keep moving...
- - Removing privileges on test database...
- ... Success!
-
-Reloading the privilege tables will ensure that all changes made so far
-will take effect immediately.
-
-Reload privilege tables now? [Y/n] Y
- ... Success!
-
-Cleaning up...
-
-
-
-All done!  If you've completed all of the above steps, your MySQL
-installation should now be secure.
-
-Thanks for using MySQL!
-</code></pre>
-
-<p>MySQLの初期設定</p>
-
-<pre><code>$ sudo vi /etc/mysql/my.cnf
-[mysqld]
-character-set-server=utf8
-collation-server=utf8_general_ci
-skip-character-set-client-handshake
-default-storage-engine=InnoDB
-innodb_file_per_table
-innodb_buffer_pool_size=256M
-skip-name-resolve
-
-[mysqldump]
-default-character-set=utf8
-
-[mysql]
-default-character-set=utf8
-</code></pre>
-
-<ul>
-<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
-</ul>
-
-<p>MySQLの再起動</p>
-
-<pre><code>$ sudo systemctl restart mysql
-</code></pre>
-
-<h3 id="apache2の初期設定:4df21ad0746a34acfa37879eaf637713">Apache2の初期設定</h3>
-
-<p>Apache2のセキュリティ設定</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
-ServerTokens Prod
-ServerSignature Off
-</code></pre>
-
-<p>Apache2の文字コード設定</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
-#AddDefaultCharset UTF-8
-</code></pre>
-
-<p>Apache2のServerName設定</p>
-
-<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
-$ sudo a2enconf fqdn
-</code></pre>
-
-<p>Apache2の再起動</p>
-
-<pre><code>$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<ul>
-<li><a href="http://mk-55.hatenablog.com/entry/2014/07/07/004510">ubuntuにおけるapache2のAH00558エラーを解決する。 - mk_55&rsquo;s diary</a></li>
-</ul>
-
-<h2 id="zabbix-serverの設定:4df21ad0746a34acfa37879eaf637713">Zabbix Serverの設定</h2>
-
-<p>データベースの作成</p>
-
-<pre><code>$ mysql -uroot -p
-Enter password:
-mysql&gt; 
-mysql&gt; create database zabbix character set utf8 collate utf8_bin;
-mysql&gt; grant all privileges on zabbix.* to zabbix@localhost identified by 'zabbix_password';
-mysql&gt; quit
-
-$ zcat /usr/share/zabbix-server-mysql/schema.sql.gz | mysql -uzabbix -p zabbix
-$ zcat /usr/share/zabbix-server-mysql/images.sql.gz | mysql -uzabbix -p zabbix
-$ zcat /usr/share/zabbix-server-mysql/data.sql.gz | mysql -uzabbix -p zabbix
-</code></pre>
-
-<p>Apache2のZabbixサイト設定</p>
-
-<pre><code>$ sudo cp /usr/share/doc/zabbix-frontend-php/examples/apache.conf /etc/apache2/conf-available/zabbix.conf
-$ sudo vi /etc/apache2/conf-available/zabbix.conf
-# Add the following lines
-php_value max_execution_time 300
-php_value memory_limit 128M
-php_value post_max_size 16M
-php_value upload_max_filesize 2M
-php_value max_input_time 300
-php_value date.timezone Asia/Tokyo
-
-$ sudo a2enconf zabbix
-$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<p>Zabbixのサーバ設定</p>
-
-<pre><code>$ sudo vi /etc/zabbix/zabbix_server.conf
-DBHost=localhost
-DBName=zabbix
-DBUser=zabbix
-DBPassword=zabbix_password
-
-$ sudo vi /etc/default/zabbix-server
-START=yes
-
-$ sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/share/zabbix/fonts/
-$ sudo vi /usr/share/zabbix/include/defines.inc.php
-define('ZBX_GRAPH_FONT_NAME',		'unifont');
-
-$ sudo systemctl restart zabbix-server
-</code></pre>
-
-<h2 id="zabbix-serverへのアクセス:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのアクセス</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスする。</p>
-
-<p>Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
-
-<h2 id="zabbix-serverへのログイン:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのログイン</h2>
-
-<p>Zabbixの初期設定が完了するとログイン画面が表示されるので、デフォルトアカウント(<code>Admin/zabbix</code>)でログインする。
-ログイン後は画面右上のProfileを開き、パスワードを変更しておく。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/">Raspbianをバックアップ・リストアする</a></h1>
-                  <p>
-                    <span class="label label-primary">Sun Aug 7, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/backup">backup</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>RaspbianをSDカード丸ごとバックアップ・リストアするメモです。
-今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。</p>
-
-<h2 id="バックアップ:6cd0cb3f4c453418b61672dbcf967693">バックアップ</h2>
-
-<p>SDカードデバイスを確認する。</p>
-
-<pre><code>$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
-   2:                      Linux                         32.2 GB    disk1s2
-</code></pre>
-
-<p>SDカードデバイスをアンマウントする。</p>
-
-<pre><code>$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-</code></pre>
-
-<p>SDカードのディスクイメージをバックアップする。</p>
-
-<pre><code>$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img
-Password:
-30735+0 records in
-30735+0 records out
-32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)
-</code></pre>
-
-<p>SDカードデバイスを取り出す。</p>
-
-<pre><code>$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-</code></pre>
-
-<h2 id="リストア:6cd0cb3f4c453418b61672dbcf967693">リストア</h2>
-
-<p>SDカードデバイスを確認する。</p>
-
-<pre><code>$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
-   2:                      Linux                         32.2 GB    disk1s2
-</code></pre>
-
-<p>SDカードデバイスをアンマウントする。</p>
-
-<pre><code>$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-</code></pre>
-
-<p>ディスクイメージをSDカードにリストアする。</p>
-
-<pre><code>$ sudo dd bs=1m if=~/Desktop/raspi_backup.img of=/dev/rdisk1
-Password:
-30735+0 records in
-30735+0 records out
-32227983360 bytes transferred in 2153.545392 secs (14965082 bytes/sec)
-</code></pre>
-
-<p>SDカードデバイスを取り出す。</p>
-
-<pre><code>$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 2</li>
+  <li>Page 1 of 3</li>
   
   <li class="next"><a href="/page/2/">Older &rarr;</a></li>
   
@@ -1847,6 +1869,10 @@ Disk /dev/disk1 ejected
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
@@ -1863,10 +1889,6 @@ Disk /dev/disk1 ejected
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Serverをインストール [ 2016-08-10 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">Raspbianをバックアップ・リストアする [ 2016-08-07 ]</a>
-      
     
   </div>
 </section>
@@ -1880,7 +1902,7 @@ Disk /dev/disk1 ejected
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">17</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
     
   </div>
 </section>
@@ -1894,6 +1916,10 @@ Disk /dev/disk1 ejected
     
     
     <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
     
     
     
@@ -1921,7 +1947,7 @@ Disk /dev/disk1 ejected
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (12)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
     
     
     
@@ -1933,11 +1959,15 @@ Disk /dev/disk1 ejected
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (13)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
     
     
     
     <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
     
     
     

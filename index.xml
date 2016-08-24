@@ -7,8 +7,326 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sun, 21 Aug 2016 11:05:38 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
+      <link>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</link>
+      <pubDate>Wed, 24 Aug 2016 19:15:14 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
+Raspbianの基本的な設定は完了している前提です。&lt;/p&gt;
+
+&lt;h2 id=&#34;bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;bind9のインストール&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install bind9 dnsutils
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cat /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &amp;quot;/etc/bind/rndc.key&amp;quot;;
+
+acl &amp;quot;internal-network&amp;quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &amp;quot;unknown&amp;quot;;
+
+	directory &amp;quot;/var/cache/bind&amp;quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &amp;quot;log_default&amp;quot; {
+		file &amp;quot;/var/log/bind/named.log&amp;quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &amp;quot;alert&amp;quot; {
+		file &amp;quot;/var/log/bind/alert.log&amp;quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &amp;quot;query&amp;quot; {
+		file &amp;quot;/var/log/bind/query.log&amp;quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &amp;quot;log_default&amp;quot;; };
+	category security { &amp;quot;alert&amp;quot;; };
+	category queries { &amp;quot;query&amp;quot;; };
+	category lame-servers { null; };
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;コンフィグの不備を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo named-checkconf /etc/bind/named.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ログ保存先のディレクトリを作成する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9を再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart bind9
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;iptablesの設定&lt;/h2&gt;
+
+&lt;p&gt;iptablesでfirewallを設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+
+$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
+$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;dnsの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;DNSの設定&lt;/h2&gt;
+
+&lt;p&gt;キャッシュDNSを使用するように設定変更を行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$ sudo systemctl reload dhcpcd
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspbian(Jessie)にSquidをインストールする</title>
+      <link>http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/</link>
+      <pubDate>Mon, 22 Aug 2016 22:24:35 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/</guid>
+      <description>
+
+&lt;p&gt;Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspbianの初期設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Raspbianの初期設定&lt;/h2&gt;
+
+&lt;p&gt;過去のブログ記事を参考に初期設定を実施する。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;パッケージの最新化&lt;/li&gt;
+&lt;li&gt;パッケージのインストール
+&amp;ndash; chkconfig
+&amp;ndash; tcpdump
+&amp;ndash; telnet
+&amp;ndash; dnsutils&lt;/li&gt;
+&lt;li&gt;IPアドレスの固定化&lt;/li&gt;
+&lt;li&gt;NTP設定&lt;/li&gt;
+&lt;li&gt;rpi-configの設定
+&amp;ndash; ディスク拡張
+&amp;ndash; 文字コード設定
+&amp;ndash; タイムゾーン設定
+&amp;ndash; Wifiの国設定
+&amp;ndash; ホスト名変更&lt;/li&gt;
+&lt;li&gt;公開鍵認証方式の設定&lt;/li&gt;
+&lt;li&gt;IPv6の無効化&lt;/li&gt;
+&lt;li&gt;SELinuxの無効化&lt;/li&gt;
+&lt;li&gt;iptablesの設定&lt;/li&gt;
+&lt;li&gt;logwatchのインストール&lt;/li&gt;
+&lt;li&gt;Zabbix Agentのインストール・監視登録&lt;/li&gt;
+&lt;li&gt;SNMPDのインストール・Cacti登録&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;squidのインストール:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Squidのインストール&lt;/h2&gt;
+
+&lt;p&gt;Squidをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install squid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidを設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&amp;lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&amp;lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&amp;gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&amp;gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&amp;gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&amp;gt; acl localnet src 192.168.10.0/24
+&amp;gt; acl localnet src 192.168.20.0/24
+&amp;gt; acl localnet src 192.168.30.0/24
+&amp;gt; acl localnet src 192.168.40.0/24
+&amp;gt; 
+676c681
+&amp;lt; #http_access allow localnet
+---
+&amp;gt; http_access allow localnet
+1738a1744
+&amp;gt; cache_mem 256 MB
+1747a1754
+&amp;gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&amp;gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&amp;gt; maximum_object_size 20480 KB
+2097a2107
+&amp;gt; logformat combined %&amp;gt;a %ui %un [%tl] &amp;quot;%rm %ru HTTP/%rv&amp;quot; %Hs %&amp;lt;st &amp;quot;%{Referer}&amp;gt;h&amp;quot; &amp;quot;%{User-Agent}&amp;gt;h&amp;quot; %Ss:%Sh
+2121c2131,2132
+&amp;lt; access_log /var/log/squid/access.log squid
+---
+&amp;gt; #access_log /var/log/squid/access.log squid
+&amp;gt; access_log /var/log/squid/access.log combined
+2217a2229
+&amp;gt; emulate_httpd_log off
+2751c2763,2768
+&amp;lt; refresh_pattern .		0	20%	4320
+---
+&amp;gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&amp;gt; refresh_pattern . 45 20% 4320
+2944a2962
+&amp;gt; via off
+3100a3119,3122
+&amp;gt; header_access Referer deny all
+&amp;gt; header_access X-Forwarded-For deny all
+&amp;gt; header_access Via deny all
+&amp;gt; header_access Cache-Control deny all
+3392a3415
+&amp;gt; visible_hostname unknown
+4699a4723
+&amp;gt; forwarded_for off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidの設定に不備がないか確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo squid -k parse
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidの設定を有効にする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl reload squid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/squid.html&#34;&gt;CentOS Squidの設定&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://tech.ckme.co.jp/proxy.shtml&#34;&gt;Proxyサーバの設定（squid）：tech.ckme.co.jp&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid&#34;&gt;Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.asial.co.jp/1076&#34;&gt;Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;iptablesの通信許可設定&lt;/h2&gt;
+
+&lt;p&gt;内部NWからSquidへの通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 3128 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ブラウザのプロキシ設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;ブラウザのプロキシ設定&lt;/h2&gt;
+
+&lt;p&gt;ブラウザ使用するプロキシ設定をSquidに変更する。&lt;/p&gt;
+
+&lt;p&gt;Squidのログを確認してSquid経由でWebアクセスができていることを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cat /var/log/squid/access.log
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;raspbianのプロキシ設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Raspbianのプロキシ設定&lt;/h2&gt;
+
+&lt;p&gt;起動時にプロキシを使用するように設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&amp;quot;192.168.20.10:3128&amp;quot;
+export http_proxy=&amp;quot;http://${PROXY}&amp;quot;
+export https_proxy=&amp;quot;http://${PROXY}&amp;quot;
+export no_proxy=&amp;quot;localhost,127.0.0.1,192.168.*&amp;quot;
+
+export HTTP_PROXY=&amp;quot;${http_proxy}&amp;quot;
+export HTTPS_PROXY=&amp;quot;${https_proxy}&amp;quot;
+export NO_PROXY=&amp;quot;${no_proxy}&amp;quot;
+$source /etc/profile.d/proxy.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には&lt;code&gt;-E&lt;/code&gt;オプションを指定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Cactiにデバイスを登録する</title>
@@ -110,6 +428,10 @@ $ sudo systemctl start snmpd
 
 &lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&#34;iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;iptablesの通信許可&lt;/h2&gt;
 
@@ -948,7 +1270,7 @@ Your identification has been saved in /home/pi/.ssh/id_rsa.
 Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
 
 $ cd ~/.ssh/
-$ cat id_rsa.pub &amp;gt; authorized_keys
+$ cat id_rsa.pub &amp;gt;&amp;gt; authorized_keys
 $ chmod 600 authorized_keys
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1793,259 +2115,6 @@ $ ifconfig wlan0
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbianの初期設定</title>
-      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</link>
-      <pubDate>Sat, 09 Jul 2016 21:43:58 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</guid>
-      <description>
-
-&lt;p&gt;こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;前提:29d369a29c800517b14390fe39a79e9d&#34;&gt;前提&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。&lt;/p&gt;
-
-&lt;h2 id=&#34;パッケージ更新:29d369a29c800517b14390fe39a79e9d&#34;&gt;パッケージ更新&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ipアドレス固定化:29d369a29c800517b14390fe39a79e9d&#34;&gt;IPアドレス固定化&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3のIPアドレスを固定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.40.10/24
-static routers=192.168.40.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
-
-&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
-#Add the following line
-max_usb_current=1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ntp設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;NTP設定&lt;/h2&gt;
-
-&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ntpq -p
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;chkconfigのインストール:29d369a29c800517b14390fe39a79e9d&#34;&gt;chkconfigのインストール&lt;/h2&gt;
-
-&lt;p&gt;Raspbian起動時のサービスを管理するためにchkconfigをインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install chkconfig
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ディスク拡張:29d369a29c800517b14390fe39a79e9d&#34;&gt;ディスク拡張&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「1 Expand Filesystem」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
-&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
-&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
-&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;wifiの国設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;Wifiの国設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
-&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;ホスト名変更:29d369a29c800517b14390fe39a79e9d&#34;&gt;ホスト名変更&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「9 Advanced Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;raspi-config終了:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config終了&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
-&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbianのインストール</title>
-      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</link>
-      <pubDate>Sat, 09 Jul 2016 15:55:37 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</guid>
-      <description>
-
-&lt;p&gt;何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
-&lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
-&lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
-&lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
-&lt;li&gt;LANケーブル(Raspberry Pi 3の有線LAN接続用)&lt;/li&gt;
-&lt;li&gt;Mac(作業用)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbianダウンロード&lt;/h2&gt;
-
-&lt;p&gt;公式サイトからRaspbianをダウンロードする。
-2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/downloads/raspbian/&#34;&gt;Download Raspbian for Raspberry Pi&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian書き込み&lt;/h2&gt;
-
-&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
-
-&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
-Password:
-958+1 records in
-958+1 records out
-4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian起動&lt;/h2&gt;
-
-&lt;p&gt;Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
-Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian接続&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3のIPアドレスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ arp -a
-? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHでRaspberry Pi 3に接続する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh pi@192.168.1.10
-pi@192.168.1.10&#39;s password:
-※piユーザのデフォルトパスワードは「raspberry」
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/installation/installing-images/mac.md&#34;&gt;Installing operating system images on Mac OS - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;

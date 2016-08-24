@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>Raspbian(Jessie)にSquidをインストールする</h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 22, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/squid">squid</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#raspbianの初期設定:b44e2973592bad70879d3cac4bdad4df">Raspbianの初期設定</a></li>
+<li><a href="#squidのインストール:b44e2973592bad70879d3cac4bdad4df">Squidのインストール</a></li>
+<li><a href="#iptablesの通信許可設定:b44e2973592bad70879d3cac4bdad4df">iptablesの通信許可設定</a></li>
+<li><a href="#ブラウザのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">ブラウザのプロキシ設定</a></li>
+<li><a href="#raspbianのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">Raspbianのプロキシ設定</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。</p>
+
+<h2 id="raspbianの初期設定:b44e2973592bad70879d3cac4bdad4df">Raspbianの初期設定</h2>
+
+<p>過去のブログ記事を参考に初期設定を実施する。</p>
+
+<ul>
+<li>パッケージの最新化</li>
+<li>パッケージのインストール
+&ndash; chkconfig
+&ndash; tcpdump
+&ndash; telnet
+&ndash; dnsutils</li>
+<li>IPアドレスの固定化</li>
+<li>NTP設定</li>
+<li>rpi-configの設定
+&ndash; ディスク拡張
+&ndash; 文字コード設定
+&ndash; タイムゾーン設定
+&ndash; Wifiの国設定
+&ndash; ホスト名変更</li>
+<li>公開鍵認証方式の設定</li>
+<li>IPv6の無効化</li>
+<li>SELinuxの無効化</li>
+<li>iptablesの設定</li>
+<li>logwatchのインストール</li>
+<li>Zabbix Agentのインストール・監視登録</li>
+<li>SNMPDのインストール・Cacti登録</li>
+</ul>
+
+<h2 id="squidのインストール:b44e2973592bad70879d3cac4bdad4df">Squidのインストール</h2>
+
+<p>Squidをインストールする。</p>
+
+<pre><code>$ sudo apt-get install squid
+</code></pre>
+
+<p>Squidを設定する。</p>
+
+<pre><code>$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&gt; acl localnet src 192.168.10.0/24
+&gt; acl localnet src 192.168.20.0/24
+&gt; acl localnet src 192.168.30.0/24
+&gt; acl localnet src 192.168.40.0/24
+&gt; 
+676c681
+&lt; #http_access allow localnet
+---
+&gt; http_access allow localnet
+1738a1744
+&gt; cache_mem 256 MB
+1747a1754
+&gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&gt; maximum_object_size 20480 KB
+2097a2107
+&gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh
+2121c2131,2132
+&lt; access_log /var/log/squid/access.log squid
+---
+&gt; #access_log /var/log/squid/access.log squid
+&gt; access_log /var/log/squid/access.log combined
+2217a2229
+&gt; emulate_httpd_log off
+2751c2763,2768
+&lt; refresh_pattern .		0	20%	4320
+---
+&gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&gt; refresh_pattern . 45 20% 4320
+2944a2962
+&gt; via off
+3100a3119,3122
+&gt; header_access Referer deny all
+&gt; header_access X-Forwarded-For deny all
+&gt; header_access Via deny all
+&gt; header_access Cache-Control deny all
+3392a3415
+&gt; visible_hostname unknown
+4699a4723
+&gt; forwarded_for off
+</code></pre>
+
+<p>Squidの設定に不備がないか確認する。</p>
+
+<pre><code>$ sudo squid -k parse
+</code></pre>
+
+<p>Squidの設定を有効にする。</p>
+
+<pre><code>$ sudo systemctl reload squid
+</code></pre>
+
+<ul>
+<li><a href="http://www.unix-power.net/linux/squid.html">CentOS Squidの設定</a></li>
+<li><a href="http://tech.ckme.co.jp/proxy.shtml">Proxyサーバの設定（squid）：tech.ckme.co.jp</a></li>
+<li><a href="http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid">Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき</a></li>
+<li><a href="http://blog.asial.co.jp/1076">Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ</a></li>
+</ul>
+
+<h2 id="iptablesの通信許可設定:b44e2973592bad70879d3cac4bdad4df">iptablesの通信許可設定</h2>
+
+<p>内部NWからSquidへの通信を許可する。</p>
+
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 3128 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<h2 id="ブラウザのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">ブラウザのプロキシ設定</h2>
+
+<p>ブラウザ使用するプロキシ設定をSquidに変更する。</p>
+
+<p>Squidのログを確認してSquid経由でWebアクセスができていることを確認する。</p>
+
+<pre><code>$ sudo cat /var/log/squid/access.log
+</code></pre>
+
+<h2 id="raspbianのプロキシ設定:b44e2973592bad70879d3cac4bdad4df">Raspbianのプロキシ設定</h2>
+
+<p>起動時にプロキシを使用するように設定する。</p>
+
+<pre><code>$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&quot;192.168.20.10:3128&quot;
+export http_proxy=&quot;http://${PROXY}&quot;
+export https_proxy=&quot;http://${PROXY}&quot;
+export no_proxy=&quot;localhost,127.0.0.1,192.168.*&quot;
+
+export HTTP_PROXY=&quot;${http_proxy}&quot;
+export HTTPS_PROXY=&quot;${https_proxy}&quot;
+export NO_PROXY=&quot;${no_proxy}&quot;
+$source /etc/profile.d/proxy.sh
+</code></pre>
+
+<p>上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には<code>-E</code>オプションを指定する。</p>
+
+<pre><code>$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+</code></pre>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/">Cactiにデバイスを登録する</a></li>
+                  
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2016 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

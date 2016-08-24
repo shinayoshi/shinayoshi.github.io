@@ -588,7 +588,7 @@ Your identification has been saved in /home/pi/.ssh/id_rsa.
 Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
 
 $ cd ~/.ssh/
-$ cat id_rsa.pub &amp;gt; authorized_keys
+$ cat id_rsa.pub &amp;gt;&amp;gt; authorized_keys
 $ chmod 600 authorized_keys
 &lt;/code&gt;&lt;/pre&gt;
 
