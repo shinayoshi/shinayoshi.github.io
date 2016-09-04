@@ -74,30 +74,6 @@
               <h1>Server</h1>
               <div class="list-group">
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/26/setting-file-server/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)をファイルサーバにする</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Fri Aug 26, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                     , 
-                    raid
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspberry Pi 3をファイルサーバにします。 USB HDD 2台接続してRAID構成を組みます。 手順とか整理できていないのでコマンドの羅列となりますがご了承ください。 時間があるときに整理します。 mdadmのインストール $ sudo apt-get install mdadm all RAID構成の情報を削除 $ sudo mdadm --misc --zero-superblock /dev/sda1 $ sudo mdadm --misc --zero-superblock /dev/sdb1 ディスクのフォーマット $ sudo fdisk /dev/sda p d p n (Enter) (Enter) (Enter) (Enter) p t fd p w $ sudo fdisk /dev/sda p d p n (Enter) (Enter) (Enter) (Enter) p t fd p w ディスクのUUIDを確認 $ sudo ls -l /dev/disk/by-id/ 合計 0 lrwxrwxrwx 1 root root 13 5月 27 21:58 mmc-USDU1_0x0630017e -&gt; ../../mmcblk0 lrwxrwxrwx 1 root root 15 5月 27 21:58 mmc-USDU1_0x0630017e-part1 -&gt; ../../mmcblk0p1 lrwxrwxrwx 1 root root 15 5月 27 21:58 mmc-USDU1_0x0630017e-part2 -&gt; ../../mmcblk0p2 lrwxrwxrwx 1 root root 9 8月 26 00:12 usb-WD_My_Passport_0741_575831314136333736353632-0:0 -&gt; ../../sdb lrwxrwxrwx 1 root root 10 8月 26 00:12 usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1 -&gt; ../../sdb1 lrwxrwxrwx 1 root root 9 8月 26 00:12 usb-WD_My_Passport_0820_57583231413734354A554A46-0:0 -&gt; ../../sda lrwxrwxrwx 1 root root 10 8月 26 00:12 usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 -&gt; ../../sda1 mdadmでraidを構築 $ sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 /dev/disk/by-id/usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1 mdadm: /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 appears to contain an ext2fs file system size=976728000K mtime=Mon Aug 3 00:40:00 2015 mdadm: /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 appears to be part of a raid array: level=raid1 devices=2 ctime=Mon Aug 3 00:54:59 2015 mdadm: Note: this array has metadata at the start and may not be suitable as a boot device.
-                  </p>
-                </a>
-                
                 <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbian(Jessie)でキャッシュDNSを構築する</h2>
                   <p class="list-group-item-text">
@@ -311,6 +287,30 @@
                   </p>
                 </a>
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Agentをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。 パッケージの更新 Raspbianのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール $ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。 $ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。 ホスト名の設定やテンプレートの選択を行い、保存を選択する。 以上
+                  </p>
+                </a>
+                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -377,8 +377,6 @@
   <div id="recent_posts" class="list-group">
     
       
-      <a href="http://www.shinayoshi.net/post/2016/08/26/setting-file-server/" class="list-group-item">Raspbian(Jessie)をファイルサーバにする [ 2016-08-26 ]</a>
-      
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
@@ -397,6 +395,8 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
       
+      <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
+      
     
   </div>
 </section>
@@ -410,7 +410,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">20</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
     
   </div>
 </section>
@@ -455,7 +455,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (15)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
     
     
     
@@ -467,11 +467,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raid" >raid (1)</a>
-    
-    
-    
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (16)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
     
     
     
