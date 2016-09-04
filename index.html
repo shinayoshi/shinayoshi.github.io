@@ -74,6 +74,287 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/26/setting-file-server/">Raspbian(Jessie)をファイルサーバにする</a></h1>
+                  <p>
+                    <span class="label label-primary">Fri Aug 26, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/raid">raid</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 3をファイルサーバにします。
+USB HDD 2台接続してRAID構成を組みます。</p>
+
+<p>手順とか整理できていないのでコマンドの羅列となりますがご了承ください。
+時間があるときに整理します。</p>
+
+<h2 id="mdadmのインストール:69e8e0751d383930d692b0b4fd3868b0">mdadmのインストール</h2>
+
+<pre><code>$ sudo apt-get install mdadm
+all
+</code></pre>
+
+<h2 id="raid構成の情報を削除:69e8e0751d383930d692b0b4fd3868b0">RAID構成の情報を削除</h2>
+
+<pre><code>$ sudo mdadm --misc --zero-superblock /dev/sda1
+$ sudo mdadm --misc --zero-superblock /dev/sdb1
+</code></pre>
+
+<h2 id="ディスクのフォーマット:69e8e0751d383930d692b0b4fd3868b0">ディスクのフォーマット</h2>
+
+<pre><code>$ sudo fdisk /dev/sda
+p
+d
+p
+n
+(Enter)
+(Enter)
+(Enter)
+(Enter)
+p
+t
+fd
+p
+w
+
+$ sudo fdisk /dev/sda
+p
+d
+p
+n
+(Enter)
+(Enter)
+(Enter)
+(Enter)
+p
+t
+fd
+p
+w
+</code></pre>
+
+<h2 id="ディスクのuuidを確認:69e8e0751d383930d692b0b4fd3868b0">ディスクのUUIDを確認</h2>
+
+<pre><code>$ sudo ls -l /dev/disk/by-id/
+合計 0
+lrwxrwxrwx 1 root root 13  5月 27 21:58 mmc-USDU1_0x0630017e -&gt; ../../mmcblk0
+lrwxrwxrwx 1 root root 15  5月 27 21:58 mmc-USDU1_0x0630017e-part1 -&gt; ../../mmcblk0p1
+lrwxrwxrwx 1 root root 15  5月 27 21:58 mmc-USDU1_0x0630017e-part2 -&gt; ../../mmcblk0p2
+lrwxrwxrwx 1 root root  9  8月 26 00:12 usb-WD_My_Passport_0741_575831314136333736353632-0:0 -&gt; ../../sdb
+lrwxrwxrwx 1 root root 10  8月 26 00:12 usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1 -&gt; ../../sdb1
+lrwxrwxrwx 1 root root  9  8月 26 00:12 usb-WD_My_Passport_0820_57583231413734354A554A46-0:0 -&gt; ../../sda
+lrwxrwxrwx 1 root root 10  8月 26 00:12 usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 -&gt; ../../sda1
+</code></pre>
+
+<h2 id="mdadmでraidを構築:69e8e0751d383930d692b0b4fd3868b0">mdadmでraidを構築</h2>
+
+<pre><code>$ sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 /dev/disk/by-id/usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1
+mdadm: /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 appears to contain an ext2fs file system
+       size=976728000K  mtime=Mon Aug  3 00:40:00 2015
+mdadm: /dev/disk/by-id/usb-WD_My_Passport_0820_57583231413734354A554A46-0:0-part1 appears to be part of a raid array:
+       level=raid1 devices=2 ctime=Mon Aug  3 00:54:59 2015
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+mdadm: /dev/disk/by-id/usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1 appears to contain an ext2fs file system
+       size=976728000K  mtime=Mon Aug  3 00:40:00 2015
+mdadm: /dev/disk/by-id/usb-WD_My_Passport_0741_575831314136333736353632-0:0-part1 appears to be part of a raid array:
+       level=raid1 devices=2 ctime=Mon Aug  3 00:54:59 2015
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+</code></pre>
+
+<pre><code>sudo cat /proc/mdstat
+sudo mdadm --detail /dev/md0
+</code></pre>
+
+<pre><code>#これ不要？
+$ sudo sh -c &quot;mdadm --detail --scan &gt;&gt; /etc/mdadm/mdadm.conf&quot;
+$ sudo update-initramfs -u
+</code></pre>
+
+<h2 id="フォーマット:69e8e0751d383930d692b0b4fd3868b0">フォーマット</h2>
+
+<p>md0をext4でフォーマットする。</p>
+
+<pre><code>$ sudo mkfs.ext4 /dev/md0
+y
+</code></pre>
+
+<h2 id="raidディスクをマウント:69e8e0751d383930d692b0b4fd3868b0">raidディスクをマウント</h2>
+
+<pre><code>$ sudo mkdir /mnt/raid
+$ sudo mount -t ext4 /dev/md0 /mnt/raid
+$ sudo chmod 775 /mnt/raid
+$ sudo chown root:adm /mnt/raid
+</code></pre>
+
+<pre><code>$ sudo blkid
+$ sudo cp -p /etc/fstab{,.org}
+$ sudo vi /etc/fstab
+UUID=640572ce-3999-4cb3-84a0-eeeb2ce1d97d /mnt/raid ext4 defaults,noatime 0 0
+</code></pre>
+
+<h2 id="起動を少し遅延させる:69e8e0751d383930d692b0b4fd3868b0">起動を少し遅延させる</h2>
+
+<pre><code>$ sudo cp -p /boot/cmdline.txt{,.org}
+$ sudo vi /boot/cmdline.txt
+dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait rootdelay=5
+</code></pre>
+
+<pre><code>$ sudo reboot
+$ df
+$ sudo mdadm --detail /dev/md0
+$ sudo cat /proc/mdstat
+</code></pre>
+
+<h2 id="ディスクの同期速度を変更する:69e8e0751d383930d692b0b4fd3868b0">ディスクの同期速度を変更する</h2>
+
+<pre><code>$ cat /proc/sys/dev/raid/speed_limit_min 
+1000
+$ sudo sh -c &quot;echo 50000 &gt; /proc/sys/dev/raid/speed_limit_min&quot;
+$ cat /proc/sys/dev/raid/speed_limit_min 
+50000
+</code></pre>
+
+<h2 id="raidの停止:69e8e0751d383930d692b0b4fd3868b0">raidの停止</h2>
+
+<pre><code>$ sudo mdadm --misc --stop /dev/md0
+</code></pre>
+
+<h2 id="nfsサーバ構築:69e8e0751d383930d692b0b4fd3868b0">NFSサーバ構築</h2>
+
+<pre><code>$ sudo apt-get install nfs-kernel-server
+$ sudo cp -p /etc/exports{,.org}
+$ sudo vi /etc/exports
+/mnt/raid       192.168.40.0/255.255.255.0(rw,insecure,all_squash,sync,no_subtree_check)
+$ sudo systemctl restart nfs-kernel-server
+$ sudo exportfs -v
+</code></pre>
+
+<h3 id="sambaサーバ構築:69e8e0751d383930d692b0b4fd3868b0">Sambaサーバ構築</h3>
+
+<pre><code>$ sudo apt-get install samba
+$ sudo cp -p /etc/samba/smb.conf{,.org}
+$ sudo vi /etc/samba/smb.conf
+$ diff /etc/samba/smb.conf.org /etc/samba/smb.conf
+24a25,31
+&gt;    unix charset = UTF-8
+&gt;    dos charset = CP932
+&gt;    hosts allow = 192.168.40.
+&gt; 
+&gt;    load printers = no
+&gt;    printing = bsd
+&gt;    printcap name = /dev/null
+117c124
+&lt;    map to guest = bad user
+---
+&gt;    map to guest = Never
+183c190
+&lt;    usershare allow guests = yes
+---
+&gt;    usershare allow guests = no
+187,189c194,196
+&lt; [homes]
+&lt;    comment = Home Directories
+&lt;    browseable = no
+---
+&gt; ;[homes]
+&gt; ;   comment = Home Directories
+&gt; ;   browseable = no
+193c200
+&lt;    read only = yes
+---
+&gt; ;   read only = yes
+197c204
+&lt;    create mask = 0700
+---
+&gt; ;   create mask = 0700
+201c208
+&lt;    directory mask = 0700
+---
+&gt; ;   directory mask = 0700
+208c215
+&lt;    valid users = %S
+---
+&gt; ;   valid users = %S
+231,238c238,245
+&lt; [printers]
+&lt;    comment = All Printers
+&lt;    browseable = no
+&lt;    path = /var/spool/samba
+&lt;    printable = yes
+&lt;    guest ok = no
+&lt;    read only = yes
+&lt;    create mask = 0700
+---
+&gt; ;[printers]
+&gt; ;   comment = All Printers
+&gt; ;   browseable = no
+&gt; ;   path = /var/spool/samba
+&gt; ;   printable = yes
+&gt; ;   guest ok = no
+&gt; ;   read only = yes
+&gt; ;   create mask = 0700
+242,247c249,254
+&lt; [print$]
+&lt;    comment = Printer Drivers
+&lt;    path = /var/lib/samba/printers
+&lt;    browseable = yes
+&lt;    read only = yes
+&lt;    guest ok = no
+---
+&gt; ;[print$]
+&gt; ;   comment = Printer Drivers
+&gt; ;   path = /var/lib/samba/printers
+&gt; ;   browseable = yes
+&gt; ;   read only = yes
+&gt; ;   guest ok = no
+254a262,269
+&gt; [share]
+&gt;    path = /mnt/raid
+&gt;    writable = yes
+&gt;    valid users = @sambashare
+&gt;    force user = root
+&gt;    force group = adm
+&gt;    create mask = 0664
+&gt;    directory mask = 0775
+$ testparm /etc/samba/smb.conf
+$ sudo systemctl restart smbd
+$ sudo systemctl restart nmbd
+</code></pre>
+
+<h3 id="samba用のユーザを作成する:69e8e0751d383930d692b0b4fd3868b0">Samba用のユーザを作成する</h3>
+
+<pre><code>$ sudo useradd samba -u 1100 -g sambashare -s /bin/false
+$ sudo passwd samba
+$ sudo pdbedit -a -u samba
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
                   <p>
                     <span class="label label-primary">Wed Aug 24, 2016</span> in
@@ -1737,73 +2018,6 @@ $ sudo apt-get upgrade
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Thu Aug 11, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
-Zabbix Serverのインストールは別のメモになります。</p>
-
-<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
-
-<p>Raspbianのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
-
-<p>Zabbix Agentのインストール</p>
-
-<pre><code>$ sudo apt-get install zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
-
-<p>Zabbix Agentを設定する。</p>
-
-<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
-Server=(Zabbix server IP address)
-ServerActive=(Zabbix server IP address)
-Hostname=(Hostname)
-
-$ sudo systemctl restart zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
-
-<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
-
-<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1869,6 +2083,8 @@ $ sudo systemctl restart zabbix-agent
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/08/26/setting-file-server/" class="list-group-item">Raspbian(Jessie)をファイルサーバにする [ 2016-08-26 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
@@ -1887,8 +2103,6 @@ $ sudo systemctl restart zabbix-agent
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
-      
     
   </div>
 </section>
@@ -1902,7 +2116,7 @@ $ sudo systemctl restart zabbix-agent
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">20</span>server</a>
     
   </div>
 </section>
@@ -1947,7 +2161,7 @@ $ sudo systemctl restart zabbix-agent
     
     
     
-    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (15)</a>
     
     
     
@@ -1959,7 +2173,11 @@ $ sudo systemctl restart zabbix-agent
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
+    <a href="http://www.shinayoshi.net//tags/raid" >raid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (16)</a>
     
     
     
