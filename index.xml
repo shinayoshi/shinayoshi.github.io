@@ -7,8 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 22 Oct 2016 19:59:16 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その1</title>
+      <link>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</link>
+      <pubDate>Sat, 22 Oct 2016 19:59:16 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</guid>
+      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;具体的な構築内容は次回から記載します。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
@@ -2039,82 +2054,6 @@ $ cat /etc/xrdp/sesman.ini
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 3でWiFi設定</title>
-      <link>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</link>
-      <pubDate>Sun, 10 Jul 2016 09:37:19 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</guid>
-      <description>
-
-&lt;p&gt;Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
-今回はWiFi設定を行う。&lt;/p&gt;
-
-&lt;h2 id=&#34;wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiネットワークのスキャン&lt;/h2&gt;
-
-&lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iwlist wlan0 scan
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
-
-&lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
-$ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
-country=JP
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-network={
-    ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot;
-    #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot;
-    psk=暗号化されたパスワード
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
-
-&lt;p&gt;WiFiを有効化する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
-
-&lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface wlan0
-static ip_address=192.168.100.10⁄24
-static routers=192.168.100.1
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;

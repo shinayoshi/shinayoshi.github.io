@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/bind/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/bind/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,41 +71,65 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Bind</h1>
-              <div class="list-group">
-                
-                <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)でキャッシュDNSを構築する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+              <article>
+                <div class="title">
+                  <h1>家庭内インターネット接続環境を構築する その1</h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
                     
                     
-                    server
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    raspberrypi
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
                     
                      , 
-                    jessie
-                    
-                     , 
-                    bind
+                    <a href="http://www.shinayoshi.net//tags/fortigate">fortigate</a>
                     
                   </p>
-                  <p class="list-group-item-text">
-                    Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。 bind9のインストール $ sudo apt-get install bind9 dnsutils bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。 $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &quot;/etc/bind/rndc.key&quot;; acl &quot;internal-network&quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &quot;unknown&quot;; directory &quot;/var/cache/bind&quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl 300; max-cache-ttl
-                  </p>
-                </a>
-                
-              </div>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    
+                  </div>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>具体的な構築内容は次回から記載します。</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
               <div class="pagination">
                 <ul class="pager">
-  
-  <li>Page 1 of 1</li>
-  
-</ul>
-
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></li>
+                  
+                  
+                </ul>
               </div>
             </div>
             <div class="sidebar col-md-3">

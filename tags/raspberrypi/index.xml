@@ -7,8 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 22 Oct 2016 19:59:16 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その1</title>
+      <link>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</link>
+      <pubDate>Sat, 22 Oct 2016 19:59:16 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</guid>
+      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;具体的な構築内容は次回から記載します。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
@@ -1782,100 +1797,6 @@ server ntp.jst.mfeed.ad.jp iburst
 &lt;li&gt;「Finish」を選択する。&lt;/li&gt;
 &lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
 &lt;/ol&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbianのインストール</title>
-      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</link>
-      <pubDate>Sat, 09 Jul 2016 15:55:37 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/</guid>
-      <description>
-
-&lt;p&gt;何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;使用したもの&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Raspberry Pi 3 Model B&lt;/li&gt;
-&lt;li&gt;micro SDカード(32GB)&lt;/li&gt;
-&lt;li&gt;USB ACアダプタ(Raspberry Pi 3の電源用)&lt;/li&gt;
-&lt;li&gt;USBケーブル(Raspberry Pi 3の電源用)&lt;/li&gt;
-&lt;li&gt;LANケーブル(Raspberry Pi 3の有線LAN接続用)&lt;/li&gt;
-&lt;li&gt;Mac(作業用)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbianダウンロード&lt;/h2&gt;
-
-&lt;p&gt;公式サイトからRaspbianをダウンロードする。
-2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/downloads/raspbian/&#34;&gt;Download Raspbian for Raspberry Pi&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian書き込み&lt;/h2&gt;
-
-&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
-
-&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードにRaspbianのイメージを書き込む。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
-Password:
-958+1 records in
-958+1 records out
-4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian起動&lt;/h2&gt;
-
-&lt;p&gt;Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
-Raspberry Pi 3には有線LANも接続しておく。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;Raspbian接続&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3のIPアドレスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ arp -a
-? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHでRaspberry Pi 3に接続する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh pi@192.168.1.10
-pi@192.168.1.10&#39;s password:
-※piユーザのデフォルトパスワードは「raspberry」
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;参考:b6f02b3d9579b63dd4fc7d440d3b8ed6&#34;&gt;参考&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/installation/installing-images/mac.md&#34;&gt;Installing operating system images on Mac OS - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

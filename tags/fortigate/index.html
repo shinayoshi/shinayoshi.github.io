@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/bind/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/tags/fortigate/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/bind/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/fortigate/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,13 +71,13 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Bind</h1>
+              <h1>Fortigate</h1>
               <div class="list-group">
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)でキャッシュDNSを構築する</h2>
+                <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その1</h2>
                   <p class="list-group-item-text">
-                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
                     
                     
                     server
@@ -87,14 +87,11 @@
                     raspberrypi
                     
                      , 
-                    jessie
-                    
-                     , 
-                    bind
+                    fortigate
                     
                   </p>
                   <p class="list-group-item-text">
-                    Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。 bind9のインストール $ sudo apt-get install bind9 dnsutils bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。 $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &quot;/etc/bind/rndc.key&quot;; acl &quot;internal-network&quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &quot;unknown&quot;; directory &quot;/var/cache/bind&quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl 300; max-cache-ttl
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 具体的な構築内容は次回から記載します。
                   </p>
                 </a>
                 

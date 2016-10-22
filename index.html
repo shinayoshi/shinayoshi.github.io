@@ -74,6 +74,35 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/">家庭内インターネット接続環境を構築する その1</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/fortigate">fortigate</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>具体的な構築内容は次回から記載します。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
                   <p>
                     <span class="label label-primary">Wed Aug 24, 2016</span> in
@@ -1737,73 +1766,6 @@ $ sudo apt-get upgrade
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Thu Aug 11, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
-Zabbix Serverのインストールは別のメモになります。</p>
-
-<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
-
-<p>Raspbianのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
-
-<p>Zabbix Agentのインストール</p>
-
-<pre><code>$ sudo apt-get install zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
-
-<p>Zabbix Agentを設定する。</p>
-
-<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
-Server=(Zabbix server IP address)
-ServerActive=(Zabbix server IP address)
-Hostname=(Hostname)
-
-$ sudo systemctl restart zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
-
-<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
-
-<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1869,6 +1831,8 @@ $ sudo systemctl restart zabbix-agent
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
@@ -1887,8 +1851,6 @@ $ sudo systemctl restart zabbix-agent
       
       <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">Raspbian(Jessie)にZabbix Agentをインストール [ 2016-08-11 ]</a>
-      
     
   </div>
 </section>
@@ -1902,7 +1864,7 @@ $ sudo systemctl restart zabbix-agent
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">19</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">20</span>server</a>
     
   </div>
 </section>
@@ -1943,6 +1905,10 @@ $ sudo systemctl restart zabbix-agent
     
     
     
+    <a href="http://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
     
     
@@ -1959,7 +1925,7 @@ $ sudo systemctl restart zabbix-agent
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (15)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (16)</a>
     
     
     
