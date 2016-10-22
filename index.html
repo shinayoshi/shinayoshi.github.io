@@ -74,6 +74,177 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/">家庭内インターネット接続環境を構築する その2</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<h2 id="raspberry-pi-2共通初期設定:4734a81b60315110a1536277d531cee2">Raspberry Pi 2共通初期設定</h2>
+
+<p>家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。</p>
+
+<h2 id="前提:4734a81b60315110a1536277d531cee2">前提</h2>
+
+<p>Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。
+セキュリティ関連の設定は個別に行いますので、ここでは省略します。</p>
+
+<h2 id="パッケージ更新:4734a81b60315110a1536277d531cee2">パッケージ更新</h2>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<ul>
+<li><a href="https://www.raspberrypi.org/documentation/raspbian/updating.md">Updating and Upgrading Raspbian - Raspberry Pi Documentation</a></li>
+</ul>
+
+<h2 id="ipアドレス固定化:4734a81b60315110a1536277d531cee2">IPアドレス固定化</h2>
+
+<p>Raspberry Pi 2のIPアドレスを固定する。</p>
+
+<pre><code>$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org
+$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+
+interface eth1
+static ip_address=172.31.10.110/24
+static routers=
+static domain_name_servers=
+#static domain_name=
+#static domain_search=
+</code></pre>
+
+<ul>
+<li>&ldquo;man dhcpcd.conf&rdquo;</li>
+</ul>
+
+<h2 id="usbポートの電流供給増加:4734a81b60315110a1536277d531cee2">USBポートの電流供給増加</h2>
+
+<p>USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。</p>
+
+<pre><code>$ sudo cp -p /boot/config.txt /boot/config.txt.org
+$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+</code></pre>
+
+<ul>
+<li><a href="http://elinux.org/RPiconfig">RPiconfig - eLinux.org</a></li>
+</ul>
+
+<h2 id="ntp設定:4734a81b60315110a1536277d531cee2">NTP設定</h2>
+
+<p>NTP同期先を設定する。</p>
+
+<pre><code>$ sudo cp -p /etc/ntp.conf /etc/ntp.conf.org
+$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre>
+
+<p>NTPサーバを再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>時刻同期の状態を確認する。</p>
+
+<pre><code>$ ntpq -p
+</code></pre>
+
+<ul>
+<li><a href="http://vogel.at.webry.info/201501/article_5.html">NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ</a></li>
+</ul>
+
+<h2 id="raspi-config関連:4734a81b60315110a1536277d531cee2">raspi-config関連</h2>
+
+<pre><code>$ sudo raspi-config
+</code></pre>
+
+<h3 id="文字コード設定:4734a81b60315110a1536277d531cee2">文字コード設定</h3>
+
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I1 Change Locale」を選択する。</li>
+<li>「en_GB.UTF-8 UTF-8」の選択を外す。</li>
+<li>「ja_JP.UTF-8 UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>「ja_JP.UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="タイムゾーン設定:4734a81b60315110a1536277d531cee2">タイムゾーン設定</h3>
+
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I2 Change Timezone」を選択する。</li>
+<li>「Asia」を選択する。</li>
+<li>「Tokyo」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="wifiの国設定:4734a81b60315110a1536277d531cee2">Wifiの国設定</h3>
+
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I4 Change Wi-fi Country」を選択する。</li>
+<li>「JP Japan」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="ホスト名変更:4734a81b60315110a1536277d531cee2">ホスト名変更</h3>
+
+<ol>
+<li>「7 Advanced Options」を選択する。</li>
+<li>「A2 Hostname」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>ホスト名を設定する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+
+<h3 id="raspi-config終了:4734a81b60315110a1536277d531cee2">raspi-config終了</h3>
+
+<ol>
+<li>「Finish」を選択する。</li>
+<li>リブートの確認が求められるため、「Yes」を選択する。</li>
+</ol>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/">家庭内インターネット接続環境を構築する その1</a></h1>
                   <p>
                     <span class="label label-primary">Sat Oct 22, 2016</span> in
@@ -88,13 +259,30 @@
                      , 
                     <a href="http://www.shinayoshi.net//tags/fortigate">fortigate</a>
                     
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
                   </p>
                 </div>
                 <div class="contents">
-                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
 最終的には以下のような構成を想定しています。</p>
 
 <p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<h2 id="機材:e8a70867bb0ccfe3cfd50643695a747c">機材</h2>
+
+<p>本環境を構築するために以下の機材を用意しました。</p>
+
+<ul>
+<li>FortiGate 60D : 1台</li>
+<li>Raspberry Pi 2 : 5台</li>
+<li>USB LANアダプタ : 5個</li>
+<li>Switching HUB : 3台</li>
+<li>WANルータ : 1台</li>
+</ul>
 
 <p>具体的な構築内容は次回から記載します。</p>
 
@@ -1657,115 +1845,6 @@ FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/">ZabbixでSNMPデバイスの監視を行う</a></h1>
-                  <p>
-                    <span class="label label-primary">Thu Aug 11, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。</p>
-
-<p>とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。</p>
-
-<h2 id="パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</h2>
-
-<p>Zabbix Serverのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</h2>
-
-<p>Zabbix ServerにSNMP関連のパッケージをインストールする。</p>
-
-<pre><code>$ sudo apt-get install snmp snmp-mibs-downloader
-</code></pre>
-
-<!-- $ sudo apt-get install snmpd -->
-
-<!-- $ sudo apt-get install snmptrapd snmptt -->
-
-<h2 id="snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</h2>
-
-<p><code>/usr/bin/download-mibs</code>でダウンロードしたMIBSを読み込めるように設定する。</p>
-
-<pre><code>$ sudo vi /etc/snmp/snmp.conf
-#mibs :
-</code></pre>
-
-<p>メモ：デフォルトでは以下のディレクトリを検索する。<code>snmpstatus --help</code>の出力で確認。</p>
-
-<pre><code>${HOME}/.snmp/mibs
-/usr/share/snmp/mibs
-/usr/share/snmp/mibs/iana
-/usr/share/snmp/mibs/ietf
-/usr/share/mibs/site
-/usr/share/snmp/mibs
-/usr/share/mibs/iana
-/usr/share/mibs/ietf
-/usr/share/mibs/netsnmp
-</code></pre>
-
-<h2 id="zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</h2>
-
-<p>Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。</p>
-
-<pre><code>$ sudo systemctl restart zabbix-server
-</code></pre>
-
-<h2 id="zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
-
-<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
-
-<p>ホストの設定画面が表示されるので最低限以下を設定する。</p>
-
-<p>&ldquo;ホスト&rdquo;タブ</p>
-
-<ul>
-<li>ホスト名：監視対象機器のホスト名。</li>
-<li>グループ：所属するグループ。適切なグループがなければ新規作成。</li>
-<li>エージェントのインターフェース：削除。</li>
-<li>SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。</li>
-</ul>
-
-<p>&ldquo;テンプレート&rdquo;タブ</p>
-
-<ul>
-<li>テンプレートとのリンク：&rdquo;Template SNMP Device&rdquo;を追加。</li>
-</ul>
-
-<p>&ldquo;マクロ&rdquo;タブ</p>
-
-<ul>
-<li>マクロ：<code>{$SNMP_COMMUNITY}</code> ⇒ 値：<code>監視対象機器のコミュニティ名</code></li>
-</ul>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1831,6 +1910,8 @@ $ sudo apt-get upgrade
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
@@ -1849,8 +1930,6 @@ $ sudo apt-get upgrade
       
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
-      
     
   </div>
 </section>
@@ -1864,7 +1943,7 @@ $ sudo apt-get upgrade
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">20</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">21</span>server</a>
     
   </div>
 </section>
@@ -1909,6 +1988,10 @@ $ sudo apt-get upgrade
     
     
     
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
     
     
@@ -1925,7 +2008,7 @@ $ sudo apt-get upgrade
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (16)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (17)</a>
     
     
     

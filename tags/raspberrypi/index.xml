@@ -7,8 +7,165 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 22 Oct 2016 19:59:16 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 22 Oct 2016 22:43:46 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その2</title>
+      <link>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</link>
+      <pubDate>Sat, 22 Oct 2016 22:43:46 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</guid>
+      <description>
+
+&lt;h2 id=&#34;raspberry-pi-2共通初期設定:4734a81b60315110a1536277d531cee2&#34;&gt;Raspberry Pi 2共通初期設定&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。&lt;/p&gt;
+
+&lt;h2 id=&#34;前提:4734a81b60315110a1536277d531cee2&#34;&gt;前提&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。
+セキュリティ関連の設定は個別に行いますので、ここでは省略します。&lt;/p&gt;
+
+&lt;h2 id=&#34;パッケージ更新:4734a81b60315110a1536277d531cee2&#34;&gt;パッケージ更新&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ipアドレス固定化:4734a81b60315110a1536277d531cee2&#34;&gt;IPアドレス固定化&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 2のIPアドレスを固定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org
+$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+
+interface eth1
+static ip_address=172.31.10.110/24
+static routers=
+static domain_name_servers=
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;usbポートの電流供給増加:4734a81b60315110a1536277d531cee2&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
+
+&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /boot/config.txt /boot/config.txt.org
+$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ntp設定:4734a81b60315110a1536277d531cee2&#34;&gt;NTP設定&lt;/h2&gt;
+
+&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf /etc/ntp.conf.org
+$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ntpq -p
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;raspi-config関連:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config関連&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;文字コード設定:4734a81b60315110a1536277d531cee2&#34;&gt;文字コード設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
+&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;タイムゾーン設定:4734a81b60315110a1536277d531cee2&#34;&gt;タイムゾーン設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
+&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
+&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;wifiの国設定:4734a81b60315110a1536277d531cee2&#34;&gt;Wifiの国設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
+&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;ホスト名変更:4734a81b60315110a1536277d531cee2&#34;&gt;ホスト名変更&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「7 Advanced Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;raspi-config終了:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config終了&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
+&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その1</title>
@@ -16,10 +173,24 @@
       <pubDate>Sat, 22 Oct 2016 19:59:16 +0900</pubDate>
       
       <guid>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</guid>
-      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
 最終的には以下のような構成を想定しています。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;機材:e8a70867bb0ccfe3cfd50643695a747c&#34;&gt;機材&lt;/h2&gt;
+
+&lt;p&gt;本環境を構築するために以下の機材を用意しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;FortiGate 60D : 1台&lt;/li&gt;
+&lt;li&gt;Raspberry Pi 2 : 5台&lt;/li&gt;
+&lt;li&gt;USB LANアダプタ : 5個&lt;/li&gt;
+&lt;li&gt;Switching HUB : 3台&lt;/li&gt;
+&lt;li&gt;WANルータ : 1台&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;具体的な構築内容は次回から記載します。&lt;/p&gt;
 </description>
@@ -1638,165 +1809,6 @@ $ ifconfig wlan0
 &lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbianの初期設定</title>
-      <link>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</link>
-      <pubDate>Sat, 09 Jul 2016 21:43:58 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</guid>
-      <description>
-
-&lt;p&gt;こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;前提:29d369a29c800517b14390fe39a79e9d&#34;&gt;前提&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。&lt;/p&gt;
-
-&lt;h2 id=&#34;パッケージ更新:29d369a29c800517b14390fe39a79e9d&#34;&gt;パッケージ更新&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ipアドレス固定化:29d369a29c800517b14390fe39a79e9d&#34;&gt;IPアドレス固定化&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 3のIPアドレスを固定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.40.10/24
-static routers=192.168.40.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;usbポートの電流供給増加:29d369a29c800517b14390fe39a79e9d&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
-
-&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
-#Add the following line
-max_usb_current=1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ntp設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;NTP設定&lt;/h2&gt;
-
-&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ntpq -p
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;chkconfigのインストール:29d369a29c800517b14390fe39a79e9d&#34;&gt;chkconfigのインストール&lt;/h2&gt;
-
-&lt;p&gt;Raspbian起動時のサービスを管理するためにchkconfigをインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install chkconfig
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;raspi-config関連:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config関連&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ディスク拡張:29d369a29c800517b14390fe39a79e9d&#34;&gt;ディスク拡張&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「1 Expand Filesystem」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;文字コード設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;文字コード設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
-&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;タイムゾーン設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;タイムゾーン設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
-&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
-&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;wifiの国設定:29d369a29c800517b14390fe39a79e9d&#34;&gt;Wifiの国設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「5 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
-&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;ホスト名変更:29d369a29c800517b14390fe39a79e9d&#34;&gt;ホスト名変更&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「9 Advanced Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;raspi-config終了:29d369a29c800517b14390fe39a79e9d&#34;&gt;raspi-config終了&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
-&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
-&lt;/ol&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

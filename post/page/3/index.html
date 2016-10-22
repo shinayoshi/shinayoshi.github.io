@@ -74,6 +74,24 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jan 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    centos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~\]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig \-o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum \-y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/" class="list-group-item">
                   <h2 class="list-group-item-heading">囲碁・将棋の思考エンジンの覚え書き</h2>
                   <p class="list-group-item-text">
@@ -179,6 +197,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
@@ -197,8 +217,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">ZabbixでSNMPデバイスの監視を行う [ 2016-08-11 ]</a>
-      
     
   </div>
 </section>
@@ -212,7 +230,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">20</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">21</span>server</a>
     
   </div>
 </section>
@@ -257,6 +275,10 @@
     
     
     
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (2)</a>
+    
+    
+    
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
     
     
@@ -273,7 +295,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (16)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (17)</a>
     
     
     

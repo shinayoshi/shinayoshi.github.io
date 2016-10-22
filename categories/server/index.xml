@@ -7,8 +7,165 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 22 Oct 2016 19:59:16 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 22 Oct 2016 22:43:46 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その2</title>
+      <link>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</link>
+      <pubDate>Sat, 22 Oct 2016 22:43:46 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</guid>
+      <description>
+
+&lt;h2 id=&#34;raspberry-pi-2共通初期設定:4734a81b60315110a1536277d531cee2&#34;&gt;Raspberry Pi 2共通初期設定&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。&lt;/p&gt;
+
+&lt;h2 id=&#34;前提:4734a81b60315110a1536277d531cee2&#34;&gt;前提&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。
+セキュリティ関連の設定は個別に行いますので、ここでは省略します。&lt;/p&gt;
+
+&lt;h2 id=&#34;パッケージ更新:4734a81b60315110a1536277d531cee2&#34;&gt;パッケージ更新&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ipアドレス固定化:4734a81b60315110a1536277d531cee2&#34;&gt;IPアドレス固定化&lt;/h2&gt;
+
+&lt;p&gt;Raspberry Pi 2のIPアドレスを固定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org
+$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+
+interface eth1
+static ip_address=172.31.10.110/24
+static routers=
+static domain_name_servers=
+#static domain_name=
+#static domain_search=
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;usbポートの電流供給増加:4734a81b60315110a1536277d531cee2&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
+
+&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /boot/config.txt /boot/config.txt.org
+$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ntp設定:4734a81b60315110a1536277d531cee2&#34;&gt;NTP設定&lt;/h2&gt;
+
+&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf /etc/ntp.conf.org
+$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ntpq -p
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;raspi-config関連:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config関連&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;文字コード設定:4734a81b60315110a1536277d531cee2&#34;&gt;文字コード設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
+&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;タイムゾーン設定:4734a81b60315110a1536277d531cee2&#34;&gt;タイムゾーン設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
+&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
+&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;wifiの国設定:4734a81b60315110a1536277d531cee2&#34;&gt;Wifiの国設定&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
+&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;ホスト名変更:4734a81b60315110a1536277d531cee2&#34;&gt;ホスト名変更&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「7 Advanced Options」を選択する。&lt;/li&gt;
+&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
+&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
+&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;raspi-config終了:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config終了&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
+&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その1</title>
@@ -16,10 +173,24 @@
       <pubDate>Sat, 22 Oct 2016 19:59:16 +0900</pubDate>
       
       <guid>http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/</guid>
-      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
 最終的には以下のような構成を想定しています。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;機材:e8a70867bb0ccfe3cfd50643695a747c&#34;&gt;機材&lt;/h2&gt;
+
+&lt;p&gt;本環境を構築するために以下の機材を用意しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;FortiGate 60D : 1台&lt;/li&gt;
+&lt;li&gt;Raspberry Pi 2 : 5台&lt;/li&gt;
+&lt;li&gt;USB LANアダプタ : 5個&lt;/li&gt;
+&lt;li&gt;Switching HUB : 3台&lt;/li&gt;
+&lt;li&gt;WANルータ : 1台&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;具体的な構築内容は次回から記載します。&lt;/p&gt;
 </description>
@@ -1972,89 +2143,6 @@ $ python main.py
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Raspberry Pi 7&amp;rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。&lt;/p&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</title>
-      <link>http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</link>
-      <pubDate>Tue, 12 Jul 2016 21:16:20 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</guid>
-      <description>
-
-&lt;p&gt;Raspberry Pi 3のディスプレイとして「Official 7&amp;rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。
-Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。&lt;/p&gt;
-
-&lt;h2 id=&#34;接続:2020837d634538f02be0a31ea2dca63e&#34;&gt;接続&lt;/h2&gt;
-
-&lt;p&gt;以下のWebサイトを参考に接続する。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://raspberry-pi.ksyic.com/page/page/pgp.id/4&#34;&gt;Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY:&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/blog/the-eagerly-awaited-raspberry-pi-display/&#34;&gt;The Eagerly Awaited Raspberry Pi Display - Raspberry Pi&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;天地逆転を直す:2020837d634538f02be0a31ea2dca63e&#34;&gt;天地逆転を直す&lt;/h2&gt;
-
-&lt;p&gt;購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /boot/config.txt
-#Add the following line
-lcd_rotate=2
-$ sudo reboot
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://learn.pimoroni.com/tutorial/pi-lcd/getting-started-with-raspberry-pi-7-touchscreen-lcd&#34;&gt;Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;日本語環境の整備:2020837d634538f02be0a31ea2dca63e&#34;&gt;日本語環境の整備&lt;/h2&gt;
-
-&lt;p&gt;日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install task-japanese task-japanese-desktop
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;スクリーンキーボードのインストール:2020837d634538f02be0a31ea2dca63e&#34;&gt;スクリーンキーボードのインストール&lt;/h2&gt;
-
-&lt;p&gt;Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install florence
-$ sudo apt-get install at-spi2-core
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ログイン画面でもOn Screen Keyboardを使用できるように設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/lightdm/lightdm-gtk-greeter.conf
-show-indicators=~language;~a11y;~session;~power
-keyboard=florence --focus
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://xmodulo.com/onscreen-virtual-keyboard-linux.html&#34;&gt;How to use on-screen virtual keyboard on Linux - Xmodulo&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/forums/viewtopic.php?f=108&amp;amp;t=123189&#34;&gt;Raspberry Pi • View topic - Solution for Jessie and Florence virtual keyboard crash&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/forums/viewtopic.php?f=63&amp;amp;t=113526&#34;&gt;Raspberry Pi • View topic - Virtual Keyboard on Login Screen&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;リモートデスクトップ接続:2020837d634538f02be0a31ea2dca63e&#34;&gt;リモートデスクトップ接続&lt;/h2&gt;
-
-&lt;p&gt;xrdp接続でRaspberry Pi 3にリモートデスクトップ接続する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install xrdp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Firewall等でリモートデスクトップ接続に必要なポートを開ける。ポートの確認は以下のファイルを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cat /etc/xrdp/xrdp.ini
-$ cat /etc/xrdp/sesman.ini
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>
