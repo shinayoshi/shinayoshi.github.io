@@ -1154,7 +1154,7 @@ $ diff play.php.org play.php
 
 &lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1/include
 $ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
-$ sudo chown www-data /home/cowrie/cowrie/log/tty/
+$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
 $ sudo chmod g+s /home/cowrie/cowrie/log/tty/
 &lt;/code&gt;&lt;/pre&gt;
 
