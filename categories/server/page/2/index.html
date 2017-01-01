@@ -74,6 +74,30 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Aug 13, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    FGT-60D
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。 MIBファイルのアップロード FortiGateのプライベートMIB(FORTINET-CORE-MIB.mib、FORTINET-FORTIGATE-MIB.mib)を/home/pi直下にアップロードします。 プライベートMIBの設定 プライベートMIBファイルを/usr/share/snmp/mibs/vendorに移動する。 $ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-* プライベートMIBを使用するようにsnmp.confを設定する。 $ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。 $ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29 以上
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">
                   <h2 class="list-group-item-heading">ZabbixでSNMPデバイスの監視を行う</h2>
                   <p class="list-group-item-text">
@@ -272,24 +296,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun May 15, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    centos
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -358,6 +364,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
@@ -376,8 +384,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
-      
     
   </div>
 </section>
@@ -391,7 +397,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">21</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">22</span>server</a>
     
   </div>
 </section>
@@ -436,7 +442,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (2)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (3)</a>
     
     
     
@@ -456,7 +462,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (17)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (18)</a>
     
     
     

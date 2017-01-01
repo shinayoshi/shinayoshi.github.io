@@ -74,6 +74,65 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Aug 13, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/fgt-60d">FGT-60D</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。</p>
+
+<h2 id="mibファイルのアップロード:7017348ad71b7a4303759dd4acee2115">MIBファイルのアップロード</h2>
+
+<p>FortiGateのプライベートMIB(<code>FORTINET-CORE-MIB.mib</code>、<code>FORTINET-FORTIGATE-MIB.mib</code>)を<code>/home/pi</code>直下にアップロードします。</p>
+
+<h2 id="プライベートmibの設定:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定</h2>
+
+<p>プライベートMIBファイルを<code>/usr/share/snmp/mibs/vendor</code>に移動する。</p>
+
+<pre><code>$ sudo mkdir /usr/share/snmp/mibs/vendor
+$ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/
+$ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*
+</code></pre>
+
+<p>プライベートMIBを使用するように<code>snmp.conf</code>を設定する。</p>
+
+<pre><code>$ sudo vi /etc/snmp/snmp.conf
+mibdirs +/usr/share/snmp/mibs/vendor
+mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB
+</code></pre>
+
+<h2 id="プライベートmibの設定確認:7017348ad71b7a4303759dd4acee2115">プライベートMIBの設定確認</h2>
+
+<p>FortiGateのMIBフィールド名が表示されることを確認する。</p>
+
+<pre><code>$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4
+FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/">ZabbixでSNMPデバイスの監視を行う</a></h1>
                   <p>
                     <span class="label label-primary">Thu Aug 11, 2016</span> in
@@ -1148,102 +1207,6 @@ pi@192.168.1.10's password:
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/">ApacheでWebサイトを公開する</a></h1>
-                  <p>
-                    <span class="label label-primary">Sun May 15, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
-
-<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
-
-<p>Webサーバ(Apache)とPHPをインストールします。</p>
-
-<pre><code># yum install httpd php php-mbstring
-</code></pre>
-
-<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
-
-<p>Apacheを設定します。</p>
-
-<pre><code># vi /etc/httpd/conf/httpd.conf
-#ServerName www.example.com:80
-↓変更
-ServerName www.example.com:80
-
-#
-# AllowOverride controls what directives may be placed in .htaccess files.
-# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
-#   Options FileInfo AuthConfig Limit
-#
-    AllowOverride None
-    ↓変更
-    AllowOverride All
-
-AddDefaultCharset UTF-8
-↓変更
-#AddDefaultCharset UTF-8
-</code></pre>
-
-<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
-
-<p>Apacheを起動します。</p>
-
-<pre><code>$ sudo systemctl start httpd
-$ sudo systemctl enable httpd
-</code></pre>
-
-<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
-
-<p>FirewallでWeb通信を許可します。</p>
-
-<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
-</code></pre>
-
-<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
-
-<p>外部からWebサイトにアクセスできるか確認します。</p>
-
-<pre><code>$ sudo vi /var/www/html/index.php
-&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;ja&quot;&gt;
-  &lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot; /&gt;
-    &lt;title&gt;net-tools&lt;/title&gt;
-    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
-    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
-正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
-
-<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
-
-<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1311,6 +1274,8 @@ $ sudo firewall-cmd \-\-list-all-zones
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
@@ -1329,8 +1294,6 @@ $ sudo firewall-cmd \-\-list-all-zones
       
       <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する [ 2016-08-13 ]</a>
-      
     
   </div>
 </section>
@@ -1344,7 +1307,7 @@ $ sudo firewall-cmd \-\-list-all-zones
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">21</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">22</span>server</a>
     
   </div>
 </section>
@@ -1389,7 +1352,7 @@ $ sudo firewall-cmd \-\-list-all-zones
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (2)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (3)</a>
     
     
     
@@ -1409,7 +1372,7 @@ $ sudo firewall-cmd \-\-list-all-zones
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (17)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (18)</a>
     
     
     

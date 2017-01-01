@@ -7,8 +7,750 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 22 Oct 2016 22:43:46 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 01 Jan 2017 18:28:38 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その3</title>
+      <link>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</link>
+      <pubDate>Sun, 01 Jan 2017 18:28:38 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</guid>
+      <description>
+
+&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;Raspberry Pi 2でファイルサーバ構築&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境で使用するファイルサーバを構築します。
+ファイルサーバの利用目的は以下の3つです。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;LAN内のファイル共有&lt;/li&gt;
+&lt;li&gt;Raspberry Piバックアップ&lt;/li&gt;
+&lt;li&gt;Syslog等のログ保管&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;今回はUSB Storageを使用する準備までを行います。
+次回はNFSやSambaの設定を行っていきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;用意したもの:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;用意したもの&lt;/h2&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;品名&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;台数&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;Raspberry Pi 2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1台&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;USB Storage 1TB&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3台&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;USB Hub&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1台&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;物理構成:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;物理構成&lt;/h2&gt;
+
+&lt;p&gt;物理構成は以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170101_01/physical_composition.png&#34; alt=&#34;physical composition&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;設定:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;設定&lt;/h2&gt;
+
+&lt;h3 id=&#34;mdadmのインストール:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;mdadmのインストール&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install mdadm
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light liblockfile-bin
+  liblockfile1
+提案パッケージ:
+  mail-reader eximon4 exim4-doc-html exim4-doc-info spf-tools-perl swaks
+推奨パッケージ:
+  mailx default-mta mail-transport-agent
+以下のパッケージが新たにインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light liblockfile-bin
+  liblockfile1 mdadm
+アップグレード: 0 個、新規インストール: 7 個、削除: 0 個、保留: 1 個。
+2,630 kB のアーカイブを取得する必要があります。
+この操作後に追加で 4,960 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile-bin armhf 1.09-6 [18.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile1 armhf 1.09-6 [14.7 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-config all 4.84.2-2+deb8u2 [503 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-base armhf 4.84.2-2+deb8u2 [1,046 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-daemon-light armhf 4.84.2-2+deb8u2 [578 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main bsd-mailx armhf 8.1.2-0.20141216cvs-2 [74.3 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main mdadm armhf 3.3.2-5+deb8u1 [397 kB]
+2,630 kB を 5秒 で取得しました (467 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ liblockfile-bin を選択しています。
+(データベースを読み込んでいます ... 現在 31247 個のファイルとディレクトリがインストールされています。)
+.../liblockfile-bin_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile-bin (1.09-6) を展開しています...
+以前に未選択のパッケージ liblockfile1:armhf を選択しています。
+.../liblockfile1_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile1:armhf (1.09-6) を展開しています...
+以前に未選択のパッケージ exim4-config を選択しています。
+.../exim4-config_4.84.2-2+deb8u2_all.deb を展開する準備をしています ...
+exim4-config (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-base を選択しています。
+.../exim4-base_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-base (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-daemon-light を選択しています。
+.../exim4-daemon-light_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-daemon-light (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ bsd-mailx を選択しています。
+.../bsd-mailx_8.1.2-0.20141216cvs-2_armhf.deb を展開する準備をしています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を展開しています...
+以前に未選択のパッケージ mdadm を選択しています。
+.../mdadm_3.3.2-5+deb8u1_armhf.deb を展開する準備をしています ...
+mdadm (3.3.2-5+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblockfile-bin (1.09-6) を設定しています ...
+liblockfile1:armhf (1.09-6) を設定しています ...
+exim4-config (4.84.2-2+deb8u2) を設定しています ...
+Adding system-user for exim (v4)
+exim4-base (4.84.2-2+deb8u2) を設定しています ...
+exim: DB upgrade, deleting hints-db
+exim4-daemon-light (4.84.2-2+deb8u2) を設定しています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を設定しています ...
+update-alternatives: /usr/bin/mailx (mailx) を提供するために自動モードで /usr/bin/bsd-mailx を使います
+mdadm (3.3.2-5+deb8u1) を設定しています ...
+ ┌────────────────────────┤ mdadm を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ あなたのシステムのルートファイルシステムが MD アレイ (RAID) 上に配置され  | 
+ │ ているならば、ブートシーケンスの初期段階で MD アレイを開始する必要があり  | 
+ │ ます。ルートファイルシステムが MD のような論理ボリューム (LVM) 上にある   | 
+ │ 場合は、構成しているアレイ全ての開始が必要です。                          | 
+ │                                                                           | 
+ │ どのアレイがルートファイルシステムの立ち上げに必要かを正確に知っており、  | 
+ │ ブートシーケンスの後の時点まで意図しているもの以外全てのアレイ起動を遅ら  | 
+ │ せたい場合、ここで最初に起動するアレイを入力してください。そうでない場合  | 
+ │ 、&#39;all&#39; と入力して単に全ての利用可能なアレイを最初に立ち上げてください。  | 
+ │                                                                           | 
+ │ ルートファイルシステムのために、どのアレイも必要ない、あるいはどのアレイ  | 
+ │ も起動したくは無いという場合は、空白のままに (あるいは &#39;none&#39; と入力) し  | 
+ │ てください。これは、カーネルで自動的に起動される場合や起動時にはアレイは  | 
+ │ 不要であるという場合です。                                                | 
+ │                                                                           | 
+ │                                  &amp;lt;了解&amp;gt;                                   | 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+ ┌─────────┤ mdadm を設定しています ├─────────┐
+ │ ルートファイルシステムに必要な MD アレイ:  │ 
+ │                                            │ 
+ │ all_______________________________________ │ 
+ │                                            │ 
+ │                   &amp;lt;了解&amp;gt;                   │ 
+ │                                            │ 
+ └────────────────────────────────────────────┘ 
+Generating mdadm.conf... done.
+update-initramfs: deferring update (trigger activated)
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+initramfs-tools (0.120+deb8u2) のトリガを処理しています ...
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;usbストレージの初期化:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;USBストレージの初期化&lt;/h3&gt;
+
+&lt;p&gt;1つ目のUSBストレージを接続して、フォーマットを行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[ 8792.405426] sd 0:0:0:0: [sda] Spinning up disk...
+[ 8792.412833] sd 0:0:0:0: Attached scsi generic sg0 type 0
+[ 8798.460733] sd 0:0:0:0: [sda] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[ 8798.461289] sd 0:0:0:0: [sda] Write Protect is off
+[ 8798.461313] sd 0:0:0:0: [sda] Mode Sense: 47 00 10 08
+[ 8798.461831] sd 0:0:0:0: [sda] No Caching mode page found
+[ 8798.461853] sd 0:0:0:0: [sda] Assuming drive cache: write through
+[ 8798.526543] sd 0:0:0:0: [sda] Attached SCSI disk
+$ sudo fdisk /dev/sda
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0x21f377b8.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): +838860800
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 400 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (2-4, default 2): 
+First sector (838862848-1953458175, default 838862848):  
+Last sector, +sectors or +size{K,M,G,T,P} (838862848-1953458175, default 1953458175): +692060160
+
+Created a new partition 2 of type &#39;Linux&#39; and of size 330 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (3,4, default 3): 
+First sector (1530923008-1953458175, default 1530923008): 
+Last sector, +sectors or +size{K,M,G,T,P} (1530923008-1953458175, default 1953458175): +419430400
+
+Created a new partition 3 of type &#39;Linux&#39; and of size 200 GiB.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sda1             2048  838862847 838860800  400G 83 Linux
+/dev/sda2        838862848 1530923007 692060160  330G 83 Linux
+/dev/sda3       1530923008 1950353407 419430400  200G 83 Linux
+
+
+Command (m for help): t
+Partition number (1-3, default 3): 1
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 2
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 3
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sda1             2048  838862847 838860800  400G fd Linux raid autodetect
+/dev/sda2        838862848 1530923007 692060160  330G fd Linux raid autodetect
+/dev/sda3       1530923008 1950353407 419430400  200G fd Linux raid autodetect
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2つ目のUSBストレージを接続して、フォーマットを行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[11121.958187] sd 1:0:0:0: Attached scsi generic sg1 type 0
+[11121.959776] sd 1:0:0:0: [sdb] Spinning up disk...
+[11128.015762] sd 1:0:0:0: [sdb] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[11128.016326] sd 1:0:0:0: [sdb] Write Protect is off
+[11128.016352] sd 1:0:0:0: [sdb] Mode Sense: 47 00 10 08
+[11128.016885] sd 1:0:0:0: [sdb] No Caching mode page found
+[11128.016907] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[11128.078805] sd 1:0:0:0: [sdb] Attached SCSI disk
+$ sudo fdisk /dev/sdb
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0x09c6efcf.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): +838860800
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 400 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (2-4, default 2): 
+First sector (838862848-1953458175, default 838862848): 
+Last sector, +sectors or +size{K,M,G,T,P} (838862848-1953458175, default 1953458175): +692060160
+
+Created a new partition 2 of type &#39;Linux&#39; and of size 330 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (3,4, default 3): 
+First sector (1530923008-1953458175, default 1530923008): 
+Last sector, +sectors or +size{K,M,G,T,P} (1530923008-1953458175, default 1953458175): +419430400
+
+Created a new partition 3 of type &#39;Linux&#39; and of size 200 GiB.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sdb1             2048  838862847 838860800  400G 83 Linux
+/dev/sdb2        838862848 1530923007 692060160  330G 83 Linux
+/dev/sdb3       1530923008 1950353407 419430400  200G 83 Linux
+
+
+Command (m for help): t
+Partition number (1-3, default 3): 1
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 2
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 3
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sdb1             2048  838862847 838860800  400G fd Linux raid autodetect
+/dev/sdb2        838862848 1530923007 692060160  330G fd Linux raid autodetect
+/dev/sdb3       1530923008 1950353407 419430400  200G fd Linux raid autodetect
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;mdadmでraid1の構築:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;mdadmでraid1の構築&lt;/h3&gt;
+
+&lt;p&gt;デバイスIDを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ls -l /dev/disk/by-id/
+合計 0
+lrwxrwxrwx 1 root root 13 12月 31 18:34 mmc-USDU1_0x66f01af2 -&amp;gt; ../../mmcblk0
+lrwxrwxrwx 1 root root 15 12月 31 18:34 mmc-USDU1_0x66f01af2-part1 -&amp;gt; ../../mmcblk0p1
+lrwxrwxrwx 1 root root 15 12月 31 18:34 mmc-USDU1_0x66f01af2-part2 -&amp;gt; ../../mmcblk0p2
+lrwxrwxrwx 1 root root  9 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0 -&amp;gt; ../../sdb
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part1 -&amp;gt; ../../sdb1
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part2 -&amp;gt; ../../sdb2
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part3 -&amp;gt; ../../sdb3
+lrwxrwxrwx 1 root root  9 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0 -&amp;gt; ../../sda
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part1 -&amp;gt; ../../sda1
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part2 -&amp;gt; ../../sda2
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part3 -&amp;gt; ../../sda3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;mdadmコマンドでraid1を構築する&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part1 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part1 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+$ sudo mdadm --create /dev/md1 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part2 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part2 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md1 started.
+$ sudo mdadm --create /dev/md2 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part3 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part3 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md2 started.
+$
+$ sudo cat /proc/mdstat 
+Personalities : [raid1] 
+md2 : active raid1 sdb3[1] sda3[0]
+      209584128 blocks super 1.2 [2/2] [UU]
+      	resync=DELAYED
+      bitmap: 2/2 pages [8KB], 65536KB chunk
+
+md1 : active raid1 sdb2[1] sda2[0]
+      345899008 blocks super 1.2 [2/2] [UU]
+      	resync=DELAYED
+      bitmap: 3/3 pages [12KB], 65536KB chunk
+
+md0 : active raid1 sdb1[1] sda1[0]
+      419299328 blocks super 1.2 [2/2] [UU]
+      [&amp;gt;....................]  resync =  0.5% (2202240/419299328) finish=403.4min speed=17230K/sec
+      bitmap: 4/4 pages [16KB], 65536KB chunk
+
+unused devices: &amp;lt;none&amp;gt;
+$
+$ sudo mdadm --detail /dev/md*
+mdadm: /dev/md does not appear to be an md device
+/dev/md0:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:50:28 2016
+     Raid Level : raid1
+     Array Size : 419299328 (399.88 GiB 429.36 GB)
+  Used Dev Size : 419299328 (399.88 GiB 429.36 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:53:07 2016
+          State : clean, resyncing 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+  Resync Status : 0% complete
+
+           Name : homenas1:0  (local to host homenas1)
+           UUID : ff0b51a1:559b9e27:476e5946:50ee7174
+         Events : 31
+
+    Number   Major   Minor   RaidDevice State
+       0       8        1        0      active sync   /dev/sda1
+       1       8       17        1      active sync   /dev/sdb1
+/dev/md1:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:51:17 2016
+     Raid Level : raid1
+     Array Size : 345899008 (329.88 GiB 354.20 GB)
+  Used Dev Size : 345899008 (329.88 GiB 354.20 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:51:17 2016
+          State : clean, resyncing (DELAYED) 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : homenas1:1  (local to host homenas1)
+           UUID : 8ae07a1b:967f0164:d564ec68:7e77c145
+         Events : 0
+
+    Number   Major   Minor   RaidDevice State
+       0       8        2        0      active sync   /dev/sda2
+       1       8       18        1      active sync   /dev/sdb2
+/dev/md2:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:51:43 2016
+     Raid Level : raid1
+     Array Size : 209584128 (199.88 GiB 214.61 GB)
+  Used Dev Size : 209584128 (199.88 GiB 214.61 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:51:43 2016
+          State : clean, resyncing (DELAYED) 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : homenas1:2  (local to host homenas1)
+           UUID : 3cb34c46:3ace2238:e6c98f2e:6aa29e8e
+         Events : 0
+
+    Number   Major   Minor   RaidDevice State
+       0       8        3        0      active sync   /dev/sda3
+       1       8       19        1      active sync   /dev/sdb3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1のフォーマット:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;raid1のフォーマット&lt;/h3&gt;
+
+&lt;p&gt;raid1デバイスをext4でフォーマットする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkfs -t ext4 /dev/md0 
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 104824832 4k blocks and 26206208 inodes
+Filesystem UUID: 29e7e530-5125-48b9-a0c7-539e285dbac3
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+	102400000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$ sudo mkfs -t ext4 /dev/md1
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 86474752 4k blocks and 21618688 inodes
+Filesystem UUID: 3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$ sudo mkfs -t ext4 /dev/md2
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 52396032 4k blocks and 13099008 inodes
+Filesystem UUID: 2968a01e-1116-4895-b06c-c70208ecd6a4
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1デバイスをマウント:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;raid1デバイスをマウント&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /mnt/nas
+$ sudo mount -t ext4 /dev/md0 /mnt/nas
+$ sudo chmod 777 /mnt/nas
+$ 
+$ sudo mkdir /mnt/rpibackup
+$ sudo mount -t ext4 /dev/md1 /mnt/rpibackup
+$ sudo chmod 777 /mnt/rpibackup
+$ 
+$ sudo mkdir /mnt/syslog
+$ sudo mount -t ext4 /dev/md2 /mnt/syslog
+$ sudo chmod 777 /mnt/syslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;起動時にraid1デバイスをマウントする:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;起動時にraid1デバイスをマウントする&lt;/h3&gt;
+
+&lt;p&gt;起動時にraid1デバイスをマウントするためにfstabを設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo blkid
+/dev/md0: UUID=&amp;quot;29e7e530-5125-48b9-a0c7-539e285dbac3&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+/dev/md1: UUID=&amp;quot;3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+/dev/md2: UUID=&amp;quot;2968a01e-1116-4895-b06c-c70208ecd6a4&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+$
+$ sudo cp -p /etc/fstab{,.org}
+$ ls -l /etc/fstab*
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab.org
+$ sudo vi /etc/fstab
+UUID=&amp;quot;29e7e530-5125-48b9-a0c7-539e285dbac3&amp;quot;     /mnt/nas        ext4    defaults,nofail 0       0
+UUID=&amp;quot;3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e&amp;quot;     /mnt/rpibackup  ext4    defaults,nofail 0       0
+UUID=&amp;quot;2968a01e-1116-4895-b06c-c70208ecd6a4&amp;quot;     /mnt/syslog     ext4    defaults,nofail 0       0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;USBストレージのUUIDが判明するまでマウント作業を遅延させる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /boot/cmdline.txt{,.org}
+$ ls -l /boot/cmdline.txt*
+-rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt
+-rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt.org
+$ sudo vi /boot/cmdline.txt
+dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait rootdelay=10
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1-backup用ストレージの設定:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;RAID1 Backup用ストレージの設定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[ 7875.564180] sd 2:0:0:0: Attached scsi generic sg2 type 0
+[ 7875.571270] sd 2:0:0:0: [sdc] Spinning up disk...
+[ 7880.622204] sd 2:0:0:0: [sdc] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[ 7880.622788] sd 2:0:0:0: [sdc] Write Protect is off
+[ 7880.622813] sd 2:0:0:0: [sdc] Mode Sense: 47 00 10 08
+[ 7880.623346] sd 2:0:0:0: [sdc] No Caching mode page found
+[ 7880.623368] sd 2:0:0:0: [sdc] Assuming drive cache: write through
+[ 7880.638880] sd 2:0:0:0: [sdc] Attached SCSI disk
+$
+$ sudo fdisk /dev/sdc 
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): p
+Disk /dev/sdc: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x6c9f0b39
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): 
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 931.5 GiB.
+
+Command (m for help): p
+Disk /dev/sdc: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x6c9f0b39
+
+Device     Boot Start        End    Sectors   Size Id Type
+/dev/sdc1        2048 1953458175 1953456128 931.5G 83 Linux
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+$
+$ sudo mkfs -t ext4 /dev/sdc1 
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 244182016 4k blocks and 61046784 inodes
+Filesystem UUID: 80e310e4-44d9-4de2-a3b7-a71915318f29
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+	102400000, 214990848
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$
+$ sudo mkdir /backup
+$ sudo mount -t ext4 /dev/sdc1 /backup/
+$ sudo chmod 777 /backup/
+$
+$ sudo blkid
+/dev/sdc1: UUID=&amp;quot;80e310e4-44d9-4de2-a3b7-a71915318f29&amp;quot; TYPE=&amp;quot;ext4&amp;quot; PARTUUID=&amp;quot;6c9f0b39-01&amp;quot;
+$
+$ sudo vi /etc/fstab
+UUID=&amp;quot;80e310e4-44d9-4de2-a3b7-a71915318f29&amp;quot;     /backup ext4    defaults,nofail 0       0
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その2</title>
@@ -1732,82 +2474,6 @@ $ cat /etc/xrdp/sesman.ini
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://www.tapun.net/raspi/raspberry-pi-xrdp&#34;&gt;Raspberry Pi | RDPで接続してみたいxrdpでWindows端末に画面転送します – たぷん日記&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 3でWiFi設定</title>
-      <link>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</link>
-      <pubDate>Sun, 10 Jul 2016 09:37:19 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</guid>
-      <description>
-
-&lt;p&gt;Raspberry Pi 3には標準でWiFiモジュールが搭載されている。
-今回はWiFi設定を行う。&lt;/p&gt;
-
-&lt;h2 id=&#34;wifiネットワークのスキャン:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiネットワークのスキャン&lt;/h2&gt;
-
-&lt;p&gt;接続するWiFiネットワークを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iwlist wlan0 scan
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;アクセスポイントの設定:366b0c30f1d198568510d56bfae90a97&#34;&gt;アクセスポイントの設定&lt;/h2&gt;
-
-&lt;p&gt;アクセスポイントを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org}
-$ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot;
-$ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
-country=JP
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-network={
-    ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot;
-    #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot;
-    psk=暗号化されたパスワード
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;wifiの有効化:366b0c30f1d198568510d56bfae90a97&#34;&gt;WiFiの有効化&lt;/h2&gt;
-
-&lt;p&gt;WiFiを有効化する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ipアドレスの固定化:366b0c30f1d198568510d56bfae90a97&#34;&gt;IPアドレスの固定化&lt;/h2&gt;
-
-&lt;p&gt;IPアドレスを固定化する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface wlan0
-static ip_address=192.168.100.10⁄24
-static routers=192.168.100.1
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;WiFiデバイスを再起動する。IPアドレスが固定化されていることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo ifdown wlan0
-$ sudo ifup wlan0
-$ ifconfig wlan0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;参考:366b0c30f1d198568510d56bfae90a97&#34;&gt;参考&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md&#34;&gt;Setting WiFi up via the command line - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://move0tofu.hatenablog.jp/entry/2016/04/30/215517&#34;&gt;Raspberry Pi 3 Model B環境構築 その3(WiFi設定) - @0tofuの備忘録&amp;hellip;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
