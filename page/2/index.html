@@ -74,6 +74,229 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/">Raspbian(Jessie)にCowrieをインストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 15, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
+はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。</p>
+
+<p>個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。</p>
+
+<h2 id="raspbianの初期設定:4c0925631b42437e2f8c229197506152">Raspbianの初期設定</h2>
+
+<p>Raspbianの初期設定として以下を行いました。</p>
+
+<h3 id="パッケージの最新化:4c0925631b42437e2f8c229197506152">パッケージの最新化</h3>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h3 id="ipアドレスの固定化:4c0925631b42437e2f8c229197506152">IPアドレスの固定化</h3>
+
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.10.10/24
+static routers=192.168.10.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre>
+
+<h3 id="ntp設定:4c0925631b42437e2f8c229197506152">NTP設定</h3>
+
+<p>NTP同期先を設定する。</p>
+
+<pre><code>$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre>
+
+<p>NTPサーバを再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>時刻同期の状態を確認する。</p>
+
+<pre><code>$ ntpq -p
+</code></pre>
+
+<h3 id="raspi-config関連:4c0925631b42437e2f8c229197506152">raspi-config関連</h3>
+
+<pre><code>$ sudo raspi-config
+</code></pre>
+
+<ul>
+<li>ディスク拡張</li>
+<li>文字コード設定</li>
+<li>タイムゾーン設定</li>
+<li>Wifiの国設定</li>
+<li>ホスト名変更</li>
+</ul>
+
+<h2 id="公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152">公開鍵認証方式の設定</h2>
+
+<pre><code>$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
+Created directory '/home/pi/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/pi/.ssh/id_rsa.
+Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
+
+$ cd ~/.ssh/
+$ cat id_rsa.pub &gt;&gt; authorized_keys
+$ chmod 600 authorized_keys
+</code></pre>
+
+<p>Raspbianで作成した秘密鍵をローカルPCにコピーする。</p>
+
+<pre><code>$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
+</code></pre>
+
+<p>公開鍵認証方式でsshログインできることを確認する。</p>
+
+<pre><code>$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
+</code></pre>
+
+<h2 id="sshサーバの設定:4c0925631b42437e2f8c229197506152">SSHサーバの設定</h2>
+
+<p>Cowrieで<code>22/tcp</code>を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。</p>
+
+<pre><code>$ sudo vi /etc/ssh/sshd_config
+#Port 22
+Port 20022
+
+#PermitRootLogin without-password
+PermitRootLogin no
+
+ChallengeResponseAuthentication no
+
+#PasswordAuthentication yes
+PasswordAuthentication no
+</code></pre>
+
+<p>SSHサーバの設定を再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ssh
+</code></pre>
+
+<p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
+
+<pre><code>$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
+</code></pre>
+
+<h2 id="ユーザ設定:4c0925631b42437e2f8c229197506152">ユーザ設定</h2>
+
+<p>rootユーザが無効化されていることを確認する(2列目が<code>L</code>であることを確認)。</p>
+
+<pre><code>$ sudo passwd -S root
+root L 05/27/2016 0 99999 7 -1
+</code></pre>
+
+<p>Cowrieユーザを作成する。</p>
+
+<pre><code>$ sudo adduser --disabled-password cowrie
+ユーザ `cowrie' を追加しています...
+新しいグループ `cowrie' (1001) を追加しています...
+新しいユーザ `cowrie' (1001) をグループ `cowrie' として追加しています...
+ホームディレクトリ `/home/cowrie' を作成しています...
+`/etc/skel' からファイルをコピーしています...
+cowrie のユーザ情報を変更中
+新しい値を入力してください。標準設定値を使うならリターンを押してください
+	フルネーム []: 
+	部屋番号 []: 
+	職場電話番号 []: 
+	自宅電話番号 []: 
+	その他 []: 
+以上で正しいですか? [Y/n] y
+</code></pre>
+
+<h2 id="cowrieのインストール:4c0925631b42437e2f8c229197506152">Cowrieのインストール</h2>
+
+<p>Cowrienの公式サイトの<a href="https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md">INSTALL.md</a>を参考にインストールを行う。</p>
+
+<pre><code>$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
+
+$ sudo su - cowrie
+$ git clone http://github.com/micheloosterhof/cowrie
+$ cd cowrie/
+$ cp cowrie.cfg.dist cowrie.cfg
+</code></pre>
+
+<h2 id="cowrieの設定:4c0925631b42437e2f8c229197506152">Cowrieの設定</h2>
+
+<pre><code>$ vi cowrie.cfg
+#sensor_name=myhostname
+sensor_name=rpicowrie
+
+#hostname = svr04
+hostname = cowrie01
+</code></pre>
+
+<h2 id="cowrieの起動と終了:4c0925631b42437e2f8c229197506152">Cowrieの起動と終了</h2>
+
+<p>起動するときは以下のコマンドを実行する。</p>
+
+<pre><code>$ ./start.sh
+</code></pre>
+
+<p>終了するときは以下のコマンドを実行する。</p>
+
+<pre><code>$ ./stop.sh
+</code></pre>
+
+<h2 id="cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152">Cowrieポートのポートフォワード</h2>
+
+<p>Cowrieでは<code>2222/tcp</code>でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。</p>
+
+<pre><code>$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+$ sudo iptables -t nat -n -L
+</code></pre>
+
+<h2 id="iptables設定の保存:4c0925631b42437e2f8c229197506152">iptables設定の保存</h2>
+
+<p>再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。</p>
+
+<pre><code>$ sudo apt-get install iptables-persistent
+$ sudo systemctl enable netfilter-persistent
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></h1>
                   <p>
                     <span class="label label-primary">Sat Aug 13, 2016</span> in
@@ -1099,114 +1322,6 @@ server ntp.jst.mfeed.ad.jp iburst
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Jul 9, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。</p>
-
-<h2 id="使用したもの:b6f02b3d9579b63dd4fc7d440d3b8ed6">使用したもの</h2>
-
-<ul>
-<li>Raspberry Pi 3 Model B</li>
-<li>micro SDカード(32GB)</li>
-<li>USB ACアダプタ(Raspberry Pi 3の電源用)</li>
-<li>USBケーブル(Raspberry Pi 3の電源用)</li>
-<li>LANケーブル(Raspberry Pi 3の有線LAN接続用)</li>
-<li>Mac(作業用)</li>
-</ul>
-
-<h2 id="raspbianダウンロード:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbianダウンロード</h2>
-
-<p>公式サイトからRaspbianをダウンロードする。
-2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。</p>
-
-<ul>
-<li><a href="https://www.raspberrypi.org/downloads/raspbian/">Download Raspbian for Raspberry Pi</a></li>
-</ul>
-
-<h2 id="raspbian書き込み:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian書き込み</h2>
-
-<p>SDカードにRaspbianのイメージを書き込む。</p>
-
-<p>SDカードデバイスを確認する。</p>
-
-<pre><code>$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 NO NAME                 32.2 GB    disk1s1
-</code></pre>
-
-<p>SDカードデバイスをアンマウントする。</p>
-
-<pre><code>$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-</code></pre>
-
-<p>SDカードにRaspbianのイメージを書き込む。</p>
-
-<pre><code>$ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1
-Password:
-958+1 records in
-958+1 records out
-4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec)
-</code></pre>
-
-<p>SDカードデバイスを取り出す。</p>
-
-<pre><code>$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-</code></pre>
-
-<h2 id="raspbian起動:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian起動</h2>
-
-<p>Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。
-Raspberry Pi 3には有線LANも接続しておく。</p>
-
-<h2 id="raspbian接続:b6f02b3d9579b63dd4fc7d440d3b8ed6">Raspbian接続</h2>
-
-<p>Raspberry Pi 3のIPアドレスを確認する。</p>
-
-<pre><code>$ arp -a
-? (192.168.1.10) at b8:27:eb:xx:xx:xx on en0 ifscope [ethernet]
-</code></pre>
-
-<p>SSHでRaspberry Pi 3に接続する。</p>
-
-<pre><code>$ ssh pi@192.168.1.10
-pi@192.168.1.10's password:
-※piユーザのデフォルトパスワードは「raspberry」
-</code></pre>
-
-<h2 id="参考:b6f02b3d9579b63dd4fc7d440d3b8ed6">参考</h2>
-
-<ul>
-<li><a href="https://www.raspberrypi.org/documentation/installation/installing-images/mac.md">Installing operating system images on Mac OS - Raspberry Pi Documentation</a></li>
-</ul>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1274,6 +1389,8 @@ pi@192.168.1.10's password:
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
@@ -1292,8 +1409,6 @@ pi@192.168.1.10's password:
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
-      
     
   </div>
 </section>
@@ -1307,7 +1422,7 @@ pi@192.168.1.10's password:
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">22</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">23</span>server</a>
     
   </div>
 </section>
@@ -1352,7 +1467,7 @@ pi@192.168.1.10's password:
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (3)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (4)</a>
     
     
     
@@ -1372,7 +1487,7 @@ pi@192.168.1.10's password:
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (18)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (19)</a>
     
     
     

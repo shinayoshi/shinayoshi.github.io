@@ -111,6 +111,7 @@
 <li><a href="#起動時にraid1デバイスをマウントする:edd1b43dbf3196488adbf69244ff43d1">起動時にraid1デバイスをマウントする</a></li>
 <li><a href="#raid1-backup用ストレージの設定:edd1b43dbf3196488adbf69244ff43d1">RAID1 Backup用ストレージの設定</a></li>
 </ul></li>
+<li><a href="#参考url:edd1b43dbf3196488adbf69244ff43d1">参考URL</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -689,6 +690,7 @@ Writing inode tables: done
 Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done     
 
+$
 $ sudo mkfs -t ext4 /dev/md1
 mke2fs 1.42.12 (29-Aug-2014)
 Creating filesystem with 86474752 4k blocks and 21618688 inodes
@@ -702,6 +704,7 @@ Writing inode tables: done
 Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done     
 
+$
 $ sudo mkfs -t ext4 /dev/md2
 mke2fs 1.42.12 (29-Aug-2014)
 Creating filesystem with 52396032 4k blocks and 13099008 inodes
@@ -721,15 +724,18 @@ Writing superblocks and filesystem accounting information: done
 
 <pre><code>$ sudo mkdir /mnt/nas
 $ sudo mount -t ext4 /dev/md0 /mnt/nas
-$ sudo chmod 777 /mnt/nas
+$ sudo chmod 775 /mnt/nas
+$ sudo chown root:adm /mnt/nas
 $ 
 $ sudo mkdir /mnt/rpibackup
 $ sudo mount -t ext4 /dev/md1 /mnt/rpibackup
-$ sudo chmod 777 /mnt/rpibackup
+$ sudo chmod 775 /mnt/rpibackup
+$ sudo chown root:adm /mnt/rpibackup
 $ 
 $ sudo mkdir /mnt/syslog
 $ sudo mount -t ext4 /dev/md2 /mnt/syslog
-$ sudo chmod 777 /mnt/syslog
+$ sudo chmod 775 /mnt/syslog
+$ sudo chown root:adm /mnt/syslog
 </code></pre>
 
 <h3 id="起動時にraid1デバイスをマウントする:edd1b43dbf3196488adbf69244ff43d1">起動時にraid1デバイスをマウントする</h3>
@@ -745,6 +751,7 @@ $ sudo cp -p /etc/fstab{,.org}
 $ ls -l /etc/fstab*
 -rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab
 -rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab.org
+$
 $ sudo vi /etc/fstab
 UUID=&quot;29e7e530-5125-48b9-a0c7-539e285dbac3&quot;     /mnt/nas        ext4    defaults,nofail 0       0
 UUID=&quot;3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e&quot;     /mnt/rpibackup  ext4    defaults,nofail 0       0
@@ -757,8 +764,27 @@ UUID=&quot;2968a01e-1116-4895-b06c-c70208ecd6a4&quot;     /mnt/syslog     ext4  
 $ ls -l /boot/cmdline.txt*
 -rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt
 -rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt.org
+$
 $ sudo vi /boot/cmdline.txt
 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait rootdelay=10
+$
+</code></pre>
+
+<p>RAID1デバイスの同期速度を変更する</p>
+
+<pre><code>$ cat /proc/sys/dev/raid/speed_limit_min 
+1000
+$ sudo sh -c &quot;echo 50000 &gt; /proc/sys/dev/raid/speed_limit_min&quot;
+$ cat /proc/sys/dev/raid/speed_limit_min
+50000
+$
+$ sudo cp -p /etc/sysctl.conf{,.org}
+$ ls -l /etc/sysctl.conf*
+-rw-r--r-- 1 root root 2084  3月  7  2015 /etc/sysctl.conf
+-rw-r--r-- 1 root root 2084  3月  7  2015 /etc/sysctl.conf.org
+$ sudo vi /etc/sysctl.conf
+dev.raid.speed_limit_min = 50000
+dev.raid.speed_limit_max = 200000
 $
 </code></pre>
 
@@ -839,7 +865,8 @@ Writing superblocks and filesystem accounting information: done
 $
 $ sudo mkdir /backup
 $ sudo mount -t ext4 /dev/sdc1 /backup/
-$ sudo chmod 777 /backup/
+$ sudo chmod 775 /backup/
+$ sudo chown root:adm /backup/
 $
 $ sudo blkid
 /dev/sdc1: UUID=&quot;80e310e4-44d9-4de2-a3b7-a71915318f29&quot; TYPE=&quot;ext4&quot; PARTUUID=&quot;6c9f0b39-01&quot;
@@ -848,6 +875,12 @@ $ sudo vi /etc/fstab
 UUID=&quot;80e310e4-44d9-4de2-a3b7-a71915318f29&quot;     /backup ext4    defaults,nofail 0       0
 $
 </code></pre>
+
+<h2 id="参考url:edd1b43dbf3196488adbf69244ff43d1">参考URL</h2>
+
+<ul>
+<li><a href="http://projpi.com/diy-home-projects-with-a-raspberry-pi/raspberry-pi-raid-array-with-usb-hdds/">Raspberry Pi raid array with USB HDDs</a></li>
+</ul>
 
 <p>以上</p>
 
@@ -874,6 +907,8 @@ $
                   
                   <li class="next"><a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/">家庭内インターネット接続環境を構築する その2</a></li>
                   
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/">家庭内インターネット接続環境を構築する その4</a></li>
                   
                 </ul>
               </div>
@@ -932,6 +967,8 @@ $
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
@@ -950,8 +987,6 @@ $
       
       <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">Raspbian(Jessie)にCowrieをインストールする [ 2016-08-15 ]</a>
-      
     
   </div>
 </section>
@@ -965,7 +1000,7 @@ $
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">22</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">23</span>server</a>
     
   </div>
 </section>
@@ -1010,7 +1045,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (3)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (4)</a>
     
     
     
@@ -1030,7 +1065,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (18)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (19)</a>
     
     
     
