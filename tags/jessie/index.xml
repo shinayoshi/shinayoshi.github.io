@@ -151,7 +151,7 @@ $ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
 
 &lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
 static domain_name_servers=127.0.0.1
-$ sudo systemctl reload dhcpcd
+$ sudo systemctl restart dhcpcd
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上&lt;/p&gt;

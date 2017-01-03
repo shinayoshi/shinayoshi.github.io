@@ -74,6 +74,489 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/">家庭内インターネット接続環境を構築する その6</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<h2 id="raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282">Raspberry Pi 2でプロキシサーバ構築</h2>
+
+<p>家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+今回はプロキシサーバを構築していきます。</p>
+
+<h3 id="squidの設定:4d2b653e7f73799c1b8de9cc6a404282">Squidの設定</h3>
+
+<p>squidのインストール</p>
+
+<pre><code>$ sudo apt-get install squid
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  squid-common squid-langpack
+提案パッケージ:
+  squidclient squid-cgi logcheck-database smbclient winbind
+以下のパッケージが新たにインストールされます:
+  squid squid-common squid-langpack
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+1,106 kB のアーカイブを取得する必要があります。
+この操作後に追加で 3,882 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-langpack all 20140506-1 [150 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-common all 2.7.STABLE9-4.1 [352 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid armhf 2.7.STABLE9-4.1+b1 [604 kB]
+1,106 kB を 4秒 で取得しました (267 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ squid-langpack を選択しています。
+(データベースを読み込んでいます ... 現在 31342 個のファイルとディレクトリがインストールされています。)
+.../squid-langpack_20140506-1_all.deb を展開する準備をしています ...
+squid-langpack (20140506-1) を展開しています...
+以前に未選択のパッケージ squid-common を選択しています。
+.../squid-common_2.7.STABLE9-4.1_all.deb を展開する準備をしています ...
+squid-common (2.7.STABLE9-4.1) を展開しています...
+以前に未選択のパッケージ squid を選択しています。
+.../squid_2.7.STABLE9-4.1+b1_armhf.deb を展開する準備をしています ...
+squid (2.7.STABLE9-4.1+b1) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+squid-langpack (20140506-1) を設定しています ...
+squid-common (2.7.STABLE9-4.1) を設定しています ...
+squid (2.7.STABLE9-4.1+b1) を設定しています ...
+Creating squid spool directory structure
+2017/01/03 23:26:35| Creating Swap Directories
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre>
+
+<p>Squidの設定</p>
+
+<pre><code>$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ ls -l /etc/squid/squid.conf*
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf.org
+$
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&gt; acl localnet src 192.168.10.0/24
+&gt; acl localnet src 192.168.20.0/24
+&gt; acl localnet src 192.168.30.0/24
+&gt; acl localnet src 192.168.40.0/24
+&gt; 
+676c681
+&lt; #http_access allow localnet
+---
+&gt; http_access allow localnet
+1738a1744
+&gt; cache_mem 256 MB
+1747a1754
+&gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&gt; maximum_object_size 20480 KB
+2097a2107
+&gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh
+2121c2131,2132
+&lt; access_log /var/log/squid/access.log squid
+---
+&gt; #access_log /var/log/squid/access.log squid
+&gt; access_log /var/log/squid/access.log combined
+2217a2229
+&gt; emulate_httpd_log off
+2751c2763,2768
+&lt; refresh_pattern .		0	20%	4320
+---
+&gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&gt; refresh_pattern . 45 20% 4320
+2944a2962
+&gt; via off
+3100a3119,3122
+&gt; header_access Referer deny all
+&gt; header_access X-Forwarded-For deny all
+&gt; header_access Via deny all
+&gt; header_access Cache-Control deny all
+3392a3415
+&gt; visible_hostname unknown
+4699a4723
+&gt; forwarded_for off
+$
+</code></pre>
+
+<p>Squidの設定不備を確認</p>
+
+<pre><code>$ sudo squid -k parse
+</code></pre>
+
+<p>Squidの起動</p>
+
+<pre><code>$ sudo systemctl restart squid
+$ sudo systemctl enable squid
+Synchronizing state for squid.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d squid defaults
+Executing /usr/sbin/update-rc.d squid enable
+$
+</code></pre>
+
+<ul>
+<li><a href="http://www.unix-power.net/linux/squid.html">CentOS Squidの設定</a></li>
+<li><a href="http://tech.ckme.co.jp/proxy.shtml">Proxyサーバの設定（squid）：tech.ckme.co.jp</a></li>
+<li><a href="http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid">Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき</a></li>
+<li><a href="http://blog.asial.co.jp/1076">Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ</a></li>
+</ul>
+
+<h3 id="ブラウザのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">ブラウザのプロキシ設定</h3>
+
+<p>ブラウザ使用するプロキシ設定をSquidに変更する。</p>
+
+<p>Squidのログを確認してSquid経由でWebアクセスができていることを確認する。</p>
+
+<pre><code>$ sudo cat /var/log/squid/access.log
+</code></pre>
+
+<h3 id="raspbianのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">Raspbianのプロキシ設定</h3>
+
+<p>起動時にプロキシを使用するように設定する。</p>
+
+<pre><code>$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&quot;192.168.20.10:3128&quot;
+export http_proxy=&quot;http://${PROXY}&quot;
+export https_proxy=&quot;http://${PROXY}&quot;
+export no_proxy=&quot;localhost,127.0.0.1,192.168.*&quot;
+
+export HTTP_PROXY=&quot;${http_proxy}&quot;
+export HTTPS_PROXY=&quot;${https_proxy}&quot;
+export NO_PROXY=&quot;${no_proxy}&quot;
+$ source /etc/profile.d/proxy.sh
+</code></pre>
+
+<p>上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には<code>-E</code>オプションを指定する。</p>
+
+<pre><code>$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+</code></pre>
+
+<ul>
+<li><a href="http://karaage.hatenadiary.jp/entry/2015/11/26/073000">Mac/Linux/Raspberry Piでプロキシサーバを手軽に設定する方法 - karaage. [からあげ]</a></li>
+</ul>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/">家庭内インターネット接続環境を構築する その5</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<h2 id="raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7">Raspberry Pi 2でキャッシュDNSサーバ構築</h2>
+
+<p>家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+まずはキャッシュDNSサーバを構築していきます。</p>
+
+<h3 id="bind9の設定:a3b948e685fd47b3236875750b0610c7">bind9の設定</h3>
+
+<p>bind9のインストール</p>
+
+<pre><code>$ sudo apt-get install bind9 dnsutils
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bind9utils
+提案パッケージ:
+  bind9-doc ufw rblcheck
+以下のパッケージが新たにインストールされます:
+  bind9 bind9utils dnsutils
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+562 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,620 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.9.5.dfsg-9+deb8u8 [292 kB]
+562 kB を 2秒 で取得しました (229 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ dnsutils を選択しています。
+(データベースを読み込んでいます ... 現在 31244 個のファイルとディレクトリがインストールされています。)
+.../dnsutils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9utils を選択しています。
+.../bind9utils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9 を選択しています。
+.../bind9_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+グループ `bind' (グループ ID 114) を追加しています...
+完了。
+システムユーザ `bind' (UID 109) を追加しています...
+新しいユーザ `bind' (UID 109) をグループ `bind' に追加しています...
+ホームディレクトリ `/var/cache/bind' は作成しません。
+wrote key file &quot;/etc/bind/rndc.key&quot;
+#
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre>
+
+<p>bind9の設定</p>
+
+<p>※変更箇所が多いため、変更箇所ではなく変更後のコンフィグを記載します。</p>
+
+<pre><code>$ sudo cp -p /etc/bind/named.conf.options{,.org}
+$ ls -l /etc/bind/named.conf.options*
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options.org
+$
+$ sudo vi /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &quot;/etc/bind/rndc.key&quot;;
+
+acl &quot;internal-network&quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &quot;unknown&quot;;
+
+	directory &quot;/var/cache/bind&quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &quot;log_default&quot; {
+		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &quot;alert&quot; {
+		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &quot;query&quot; {
+		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &quot;log_default&quot;; };
+	category security { &quot;alert&quot;; };
+	category queries { &quot;query&quot;; };
+	category lame-servers { null; };
+};
+$
+</code></pre>
+
+<p>bind9のコンフィグ不備を確認</p>
+
+<pre><code>$ sudo named-checkconf /etc/bind/named.conf
+</code></pre>
+
+<p>ログ保存先のディレクトリ作成</p>
+
+<pre><code>$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+$ ls -ld /var/log/bind
+drwxr-xr-x 2 bind bind 4096  1月  3 22:39 /var/log/bind
+$
+</code></pre>
+
+<p>bind9の起動</p>
+
+<pre><code>$ sudo systemctl restart bind9
+$ sudo systemctl enable bind9
+Synchronizing state for bind9.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d bind9 defaults
+Executing /usr/sbin/update-rc.d bind9 enable
+$
+</code></pre>
+
+<p>dnsクライアントの設定</p>
+
+<pre><code>$ sudo cp -p /etc/dhcpcd.conf{,.backup20160103}
+$ ls -l /etc/dhcpcd.conf*
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf.backup20160103
+-rw-rw-r-- 1 root netdev 1247 10月 17  2015 /etc/dhcpcd.conf.org
+$
+$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$
+$ diff /etc/dhcpcd.conf.backup20160103 /etc/dhcpcd.conf
+46c46
+&lt; static domain_name_servers=192.168.100.1
+---
+&gt; static domain_name_servers=127.0.0.1
+$
+$ sudo systemctl restart dhcpcd
+$ cat /etc/resolv.conf 
+# Generated by resolvconf
+nameserver 127.0.0.1
+$
+</code></pre>
+
+<p>bind9による名前解決の確認</p>
+
+<pre><code>$ dig www.google.co.jp
+
+; &lt;&lt;&gt;&gt; DiG 9.9.5-9+deb8u8-Raspbian &lt;&lt;&gt;&gt; www.google.co.jp
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 455
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;www.google.co.jp.		IN	A
+
+;; ANSWER SECTION:
+www.google.co.jp.	187	IN	A	172.217.26.99
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:55:14 JST 2017
+;; MSG SIZE  rcvd: 61
+
+$ dig -x 8.8.8.8
+
+; &lt;&lt;&gt;&gt; DiG 9.9.5-9+deb8u8-Raspbian &lt;&lt;&gt;&gt; -x 8.8.8.8
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 3656
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 13, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;8.8.8.8.in-addr.arpa.		IN	PTR
+
+;; ANSWER SECTION:
+8.8.8.8.in-addr.arpa.	3600	IN	PTR	google-public-dns-a.google.com.
+
+;; AUTHORITY SECTION:
+.			3449	IN	NS	h.root-servers.net.
+.			3449	IN	NS	m.root-servers.net.
+.			3449	IN	NS	c.root-servers.net.
+.			3449	IN	NS	l.root-servers.net.
+.			3449	IN	NS	b.root-servers.net.
+.			3449	IN	NS	f.root-servers.net.
+.			3449	IN	NS	g.root-servers.net.
+.			3449	IN	NS	k.root-servers.net.
+.			3449	IN	NS	e.root-servers.net.
+.			3449	IN	NS	d.root-servers.net.
+.			3449	IN	NS	a.root-servers.net.
+.			3449	IN	NS	j.root-servers.net.
+.			3449	IN	NS	i.root-servers.net.
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:57:45 JST 2017
+;; MSG SIZE  rcvd: 304
+
+$
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/">家庭内インターネット接続環境を構築する その4</a></h1>
                   <p>
                     <span class="label label-primary">Mon Jan 2, 2017</span> in
@@ -1766,7 +2249,7 @@ $ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
 
 <pre><code>$ sudo vi /etc/dhcpcd.conf
 static domain_name_servers=127.0.0.1
-$ sudo systemctl reload dhcpcd
+$ sudo systemctl restart dhcpcd
 </code></pre>
 
 <p>以上</p>
@@ -2359,530 +2842,6 @@ $
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/">Cowrieのセキュリティ設定</a></h1>
-                  <p>
-                    <span class="label label-primary">Tue Aug 16, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
-Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。</p>
-
-<h2 id="ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7">IPv6の無効化</h2>
-
-<p>IPv6は使用しないため、IPv6を無効化する。</p>
-
-<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-$ sudo sysctl -a | grep disable_ipv6
-</code></pre>
-
-<p>再起動後もIPv6が無効化するように設定する。</p>
-
-<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
-net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6=1
-</code></pre>
-
-<h2 id="selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7">SELinuxの無効化</h2>
-
-<p>Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。</p>
-
-<h2 id="iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7">iptablesの設定</h2>
-
-<p>iptablesでfirewallを設定する。</p>
-
-<pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
-#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-
-##INPUTチェーン
-#IPスプーフィング対策
-$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
-
-#セッションハイジャック対策
-$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
-
-#不正なパケット拒否
-$ sudo iptables -A INPUT -m state --state INVALID -j DROP
-
-#内部からの通信を始めた場合のパケットは許可
-$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#ループバックからの通信は通す
-$ sudo iptables -A INPUT -i lo -j ACCEPT
-
-#ICMPパケットは許可
-$ sudo iptables -A INPUT -p icmp -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
-
-#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
-
-#HTTPは許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
-
-#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
-$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
-
-#Zabbix-Agentへの通信は許可
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
-
-##OUTPUTチェーン
-#ループバックへの通信は通す
-$ sudo iptables -A OUTPUT -o lo -j ACCEPT
-
-#ICMP応答のパケットは通す
-$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#外部からの通信を始めた場合のパケットを許可
-$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#tcp-resetの通信は通す
-$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
-
-#ユーザrootが発したパケットは許可
-$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
-
-#NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
-
-#Zabbix-Serverへの通信は許可
-$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
-
-#外部からの通信は拒否。外部への通信も拒否。
-$ sudo iptables -P INPUT DROP
-$ sudo iptables -P FORWARD DROP
-$ sudo iptables -P OUTPUT DROP
-</code></pre>
-
-<p>iptablesの設定を保存する。</p>
-
-<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
-</code></pre>
-
-<ul>
-<li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
-<li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
-<li><a href="http://kassyjp.ninja-web.net/ras/jessie/iptables.htm">2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋</a></li>
-</ul>
-
-<h2 id="ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7">ログ出力先をsyslogに変更</h2>
-
-<p>twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。</p>
-
-<p>ログ保管用のディレクトリ作成。</p>
-
-<pre><code>$ sudo mkdir /var/log/cowrie
-$ sudo chown cowrie:adm /var/log/cowrie/
-</code></pre>
-
-<p>rsyslogの設定。</p>
-
-<pre><code>$ sudo vi /etc/rsyslog.d/cowrie.conf
-if $programname == 'cowrie' then /var/log/cowrie/cowrie.log
-&amp; ~
-</code></pre>
-
-<p>rsyslogの再起動。</p>
-
-<pre><code>$ sudo systemctl restart rsyslog
-</code></pre>
-
-<p>Cowrieのログ出力先変更。</p>
-
-<pre><code>$ sudo su - cowrie
-$ cd ${COWRIE_INSTALL_DIR}
-$ vi start.sh
-$ diff ./start.sh.back20160818 ./start.sh
-31c31
-&lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
----
-&gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
-33c33
-&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
----
-&gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
-</code></pre>
-
-<h2 id="logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7">logrotateの設定</h2>
-
-<p>logrotateをインストールする(通常はインストール済みのはず)。</p>
-
-<pre><code>$ sudo apt-get install logrotate
-</code></pre>
-
-<p>Cowrie用のlogrotate設定を作成する。</p>
-
-<pre><code>$ sudo vi /etc/logrotate.d/cowrie
-/var/log/cowrie/cowrie.log
-{
-        daily
-        rotate 92
-        dateext
-        create 0640 cowrie adm
-        missingok
-        ifempty
-        compress
-        postrotate
-                invoke-rc.d rsyslog rotate &gt; /dev/null
-        endscript
-}
-</code></pre>
-
-<p>logrotateをテスト実行し、エラーがないことを確認する。</p>
-
-<pre><code>$ sudo logrotate -d /etc/logrotate.d/cowrie
-</code></pre>
-
-<ul>
-<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
-<li><a href="https://open-groove.net/linux/logrotate-test/">logrotate（ログローテート）の動作確認 | OpenGroove</a></li>
-</ul>
-
-<h2 id="logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7">logwatchのインストール</h2>
-
-<p>logwatchをインストールする。</p>
-
-<pre><code>$ sudo apt-get install logwatch
-</code></pre>
-
-<p>logwatchの実行結果を確認する。</p>
-
-<pre><code>$ sudo logwatch --output stdout
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></h1>
-                  <p>
-                    <span class="label label-primary">Tue Aug 16, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/kippo-graph">kippo-graph</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Kippo-Graphの公式(<a href="http://bruteforce.gr/kippo-graph">Kippo-Graph - BruteForce Lab&rsquo;s Blog</a>)を参考にKippo-Graphをインストールするまでのメモです。</p>
-
-<h2 id="mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899">MySQLのインストールと初期設定</h2>
-
-<p>MySQLをインストールする。</p>
-
-<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get install mysql-server
-</code></pre>
-
-<p>MySQLのセキュア設定</p>
-
-<pre><code>$ mysql_secure_installation
-
-
-
-
-NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
-      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
-
-
-In order to log into MySQL to secure it, we'll need the current
-password for the root user.  If you've just installed MySQL, and
-you haven't set the root password yet, the password will be blank,
-so you should just press enter here.
-
-Enter current password for root (enter for none): 
-OK, successfully used password, moving on...
-
-Setting the root password ensures that nobody can log into the MySQL
-root user without the proper authorisation.
-
-You already have a root password set, so you can safely answer 'n'.
-
-Change the root password? [Y/n] n
- ... skipping.
-
-By default, a MySQL installation has an anonymous user, allowing anyone
-to log into MySQL without having to have a user account created for
-them.  This is intended only for testing, and to make the installation
-go a bit smoother.  You should remove them before moving into a
-production environment.
-
-Remove anonymous users? [Y/n] Y
- ... Success!
-
-Normally, root should only be allowed to connect from 'localhost'.  This
-ensures that someone cannot guess at the root password from the network.
-
-Disallow root login remotely? [Y/n] Y
- ... Success!
-
-By default, MySQL comes with a database named 'test' that anyone can
-access.  This is also intended only for testing, and should be removed
-before moving into a production environment.
-
-Remove test database and access to it? [Y/n] Y
- - Dropping test database...
-ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
- ... Failed!  Not critical, keep moving...
- - Removing privileges on test database...
- ... Success!
-
-Reloading the privilege tables will ensure that all changes made so far
-will take effect immediately.
-
-Reload privilege tables now? [Y/n] Y
- ... Success!
-
-Cleaning up...
-
-
-
-All done!  If you've completed all of the above steps, your MySQL
-installation should now be secure.
-
-Thanks for using MySQL!
-</code></pre>
-
-<p>MySQLの初期設定</p>
-
-<pre><code>$ sudo vi /etc/mysql/my.cnf
-[mysqld]
-character-set-server=utf8
-collation-server=utf8_general_ci
-skip-character-set-client-handshake
-default-storage-engine=InnoDB
-innodb_file_per_table
-innodb_buffer_pool_size=256M
-skip-name-resolve
-
-[mysqldump]
-default-character-set=utf8
-
-[mysql]
-default-character-set=utf8
-</code></pre>
-
-<ul>
-<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
-</ul>
-
-<p>MySQLの再起動</p>
-
-<pre><code>$ sudo systemctl restart mysql
-</code></pre>
-
-<h2 id="cowrieのログ出力先を変更:d89df975e87a1641818c282be53c7899">Cowrieのログ出力先を変更</h2>
-
-<p>Cowrie用データベースの作成</p>
-
-<pre><code>$ mysql -uroot -p
-Enter password:
-mysql&gt; create database cowrie character set utf8 collate utf8_bin;
-mysql&gt; grant all privileges on cowrie.* to cowrie@localhost identified by 'cowrie_password';
-mysql&gt; quit
-
-$ cd ${COWRIE_INSTALL_DIR}
-$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
-</code></pre>
-
-<p>CowrieのログをMySQLのデータベースに出力する。</p>
-
-<pre><code>$ cd ${COWRIE_INSTALL_DIR}
-$ vi cowrie.cfg
-↓コメントアウト
-#[iutput_jsonloi]
-#logfile = log/cowrie.json
-
-#[output_mysql]
-#host = localhost
-#database = cowrie
-#username = cowrie
-#password = secret
-#port = 3306
-[output_mysql]
-host = localhost
-database = cowrie
-username = cowrie
-password = cowrie_password
-port = 3306
-</code></pre>
-
-<p>Cowrieの再起動</p>
-
-<pre><code>$ ./stop.sh
-$ ./start.sh
-</code></pre>
-
-<h2 id="apache2のインストール:d89df975e87a1641818c282be53c7899">Apache2のインストール</h2>
-
-<p>Apache2をインストールする。</p>
-
-<pre><code>$ sudo apt-get install apache2
-</code></pre>
-
-<p>Apache2のセキュリティ設定。</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
-ServerTokens Prod
-ServerSignature Off
-</code></pre>
-
-<p>Apache2の文字コード設定。</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
-#AddDefaultCharset UTF-8
-</code></pre>
-
-<p>Apache2のServerName設定。</p>
-
-<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
-$ sudo a2enconf fqdn
-</code></pre>
-
-<p>Apache2の再起動。</p>
-
-<pre><code>$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<h2 id="kippo-graphのインストール:d89df975e87a1641818c282be53c7899">Kippo-Graphのインストール</h2>
-
-<p>関連パッケージのインストール。</p>
-
-<pre><code>$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
-$ sudo apt-get install dnsutils
-$ sudo systemctl restart apache2
-</code></pre>
-
-<p>Kippo-Graphのインストール。</p>
-
-<pre><code>$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
-$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
-$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
-&lt;IfModule mod_alias.c&gt;
-    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
-&lt;/IfModule&gt;
-$ sudo a2enconf kippo-graph
-$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<p>Kippo-Graphの設定。</p>
-
-<pre><code>$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
-$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
-$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'cowrie');
-define('DB_PASS', 'cowrie_password');
-define('DB_NAME', 'cowrie');
-define('DB_PORT', '3306');
-</code></pre>
-
-<h2 id="kippo-graphの修正:d89df975e87a1641818c282be53c7899">Kippo-Graphの修正</h2>
-
-<p>KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。</p>
-
-<p>PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。</p>
-
-<p><code>class/KippoPlayLog.class.php</code>の修正</p>
-
-<pre><code>$ cd /usr/share/kippo-graph-1.5.1
-$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
-$ sudo vi class/KippoPlayLog.class.php
-$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
-21c21
-&lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
----
-&gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
-</code></pre>
-
-<p><code>include/play.php</code>の修正</p>
-
-<pre><code>$ cd /usr/share/kippo-graph-1.5.1
-$ sudo cp -p include/play.php include/play.php.org
-$ sudo vi include/play.php
-$ diff play.php.org play.php
-70c70
-&lt;                 $log = base64_encode($row['ttylog']);
----
-&gt;                 $log = base64_encode(file_get_contents($row['ttylog']));
-</code></pre>
-
-<p>ttylogへのシンボリックリンク作成</p>
-
-<pre><code>$ cd /usr/share/kippo-graph-1.5.1/include
-$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
-$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
-$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
-</code></pre>
-
-<p>Cowrie起動スクリプトの修正</p>
-
-<pre><code>$ sudo su - cowrie
-$ cd ${COWRIE_INSTALL_DIR}/
-$ cp -p start.sh start.sh.org
-$ vi start.sh
-$ diff start.sh.org start.sh
-31c31
-&lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
----
-&gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
-33c33
-&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
----
-&gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
-</code></pre>
-
-<p>Cowrieの再起動</p>
-
-<pre><code>$ ./stop.sh
-$ ./start.sh
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -2948,6 +2907,10 @@ $ ./start.sh
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
@@ -2964,10 +2927,6 @@ $ ./start.sh
       
       <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
-      
     
   </div>
 </section>
@@ -2981,7 +2940,7 @@ $ ./start.sh
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">23</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">25</span>server</a>
     
   </div>
 </section>
@@ -3026,7 +2985,7 @@ $ ./start.sh
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (4)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (6)</a>
     
     
     
@@ -3046,7 +3005,7 @@ $ ./start.sh
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (19)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (21)</a>
     
     
     

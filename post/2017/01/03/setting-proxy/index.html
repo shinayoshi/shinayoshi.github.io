@@ -73,16 +73,19 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>ApacheでWebサイトを公開する</h1>
+                  <h1>家庭内インターネット接続環境を構築する その6</h1>
                   <p>
-                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
                     
                     
                     <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
                     
                   </p>
                 </div>
@@ -95,12 +98,12 @@
 <ul>
 <li>
 <ul>
-<li><a href="#apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</a></li>
-<li><a href="#apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</a></li>
-<li><a href="#apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</a></li>
-<li><a href="#firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</a></li>
-<li><a href="#動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</a></li>
-<li><a href="#その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</a></li>
+<li><a href="#raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282">Raspberry Pi 2でプロキシサーバ構築</a>
+<ul>
+<li><a href="#squidの設定:4d2b653e7f73799c1b8de9cc6a404282">Squidの設定</a></li>
+<li><a href="#ブラウザのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">ブラウザのプロキシ設定</a></li>
+<li><a href="#raspbianのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">Raspbianのプロキシ設定</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>
@@ -109,80 +112,179 @@
                 <div class="contents">
                   
 
-<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
+<h2 id="raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282">Raspberry Pi 2でプロキシサーバ構築</h2>
 
-<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
+<p>家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+今回はプロキシサーバを構築していきます。</p>
 
-<p>Webサーバ(Apache)とPHPをインストールします。</p>
+<h3 id="squidの設定:4d2b653e7f73799c1b8de9cc6a404282">Squidの設定</h3>
 
-<pre><code># yum install httpd php php-mbstring
+<p>squidのインストール</p>
+
+<pre><code>$ sudo apt-get install squid
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  squid-common squid-langpack
+提案パッケージ:
+  squidclient squid-cgi logcheck-database smbclient winbind
+以下のパッケージが新たにインストールされます:
+  squid squid-common squid-langpack
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+1,106 kB のアーカイブを取得する必要があります。
+この操作後に追加で 3,882 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-langpack all 20140506-1 [150 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-common all 2.7.STABLE9-4.1 [352 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid armhf 2.7.STABLE9-4.1+b1 [604 kB]
+1,106 kB を 4秒 で取得しました (267 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ squid-langpack を選択しています。
+(データベースを読み込んでいます ... 現在 31342 個のファイルとディレクトリがインストールされています。)
+.../squid-langpack_20140506-1_all.deb を展開する準備をしています ...
+squid-langpack (20140506-1) を展開しています...
+以前に未選択のパッケージ squid-common を選択しています。
+.../squid-common_2.7.STABLE9-4.1_all.deb を展開する準備をしています ...
+squid-common (2.7.STABLE9-4.1) を展開しています...
+以前に未選択のパッケージ squid を選択しています。
+.../squid_2.7.STABLE9-4.1+b1_armhf.deb を展開する準備をしています ...
+squid (2.7.STABLE9-4.1+b1) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+squid-langpack (20140506-1) を設定しています ...
+squid-common (2.7.STABLE9-4.1) を設定しています ...
+squid (2.7.STABLE9-4.1+b1) を設定しています ...
+Creating squid spool directory structure
+2017/01/03 23:26:35| Creating Swap Directories
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
 </code></pre>
 
-<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
+<p>Squidの設定</p>
 
-<p>Apacheを設定します。</p>
-
-<pre><code># vi /etc/httpd/conf/httpd.conf
-#ServerName www.example.com:80
-↓変更
-ServerName www.example.com:80
-
-#
-# AllowOverride controls what directives may be placed in .htaccess files.
-# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
-#   Options FileInfo AuthConfig Limit
-#
-    AllowOverride None
-    ↓変更
-    AllowOverride All
-
-AddDefaultCharset UTF-8
-↓変更
-#AddDefaultCharset UTF-8
+<pre><code>$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ ls -l /etc/squid/squid.conf*
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf.org
+$
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&gt; acl localnet src 192.168.10.0/24
+&gt; acl localnet src 192.168.20.0/24
+&gt; acl localnet src 192.168.30.0/24
+&gt; acl localnet src 192.168.40.0/24
+&gt; 
+676c681
+&lt; #http_access allow localnet
+---
+&gt; http_access allow localnet
+1738a1744
+&gt; cache_mem 256 MB
+1747a1754
+&gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&gt; maximum_object_size 20480 KB
+2097a2107
+&gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh
+2121c2131,2132
+&lt; access_log /var/log/squid/access.log squid
+---
+&gt; #access_log /var/log/squid/access.log squid
+&gt; access_log /var/log/squid/access.log combined
+2217a2229
+&gt; emulate_httpd_log off
+2751c2763,2768
+&lt; refresh_pattern .		0	20%	4320
+---
+&gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&gt; refresh_pattern . 45 20% 4320
+2944a2962
+&gt; via off
+3100a3119,3122
+&gt; header_access Referer deny all
+&gt; header_access X-Forwarded-For deny all
+&gt; header_access Via deny all
+&gt; header_access Cache-Control deny all
+3392a3415
+&gt; visible_hostname unknown
+4699a4723
+&gt; forwarded_for off
+$
 </code></pre>
 
-<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
+<p>Squidの設定不備を確認</p>
 
-<p>Apacheを起動します。</p>
-
-<pre><code>$ sudo systemctl start httpd
-$ sudo systemctl enable httpd
+<pre><code>$ sudo squid -k parse
 </code></pre>
 
-<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
+<p>Squidの起動</p>
 
-<p>FirewallでWeb通信を許可します。</p>
-
-<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
+<pre><code>$ sudo systemctl restart squid
+$ sudo systemctl enable squid
+Synchronizing state for squid.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d squid defaults
+Executing /usr/sbin/update-rc.d squid enable
+$
 </code></pre>
 
-<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
+<ul>
+<li><a href="http://www.unix-power.net/linux/squid.html">CentOS Squidの設定</a></li>
+<li><a href="http://tech.ckme.co.jp/proxy.shtml">Proxyサーバの設定（squid）：tech.ckme.co.jp</a></li>
+<li><a href="http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid">Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき</a></li>
+<li><a href="http://blog.asial.co.jp/1076">Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ</a></li>
+</ul>
 
-<p>外部からWebサイトにアクセスできるか確認します。</p>
+<h3 id="ブラウザのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">ブラウザのプロキシ設定</h3>
 
-<pre><code>$ sudo vi /var/www/html/index.php
-&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;ja&quot;&gt;
-  &lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot; /&gt;
-    &lt;title&gt;net-tools&lt;/title&gt;
-    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
-    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
+<p>ブラウザ使用するプロキシ設定をSquidに変更する。</p>
+
+<p>Squidのログを確認してSquid経由でWebアクセスができていることを確認する。</p>
+
+<pre><code>$ sudo cat /var/log/squid/access.log
 </code></pre>
 
-<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
-正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
+<h3 id="raspbianのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282">Raspbianのプロキシ設定</h3>
 
-<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
+<p>起動時にプロキシを使用するように設定する。</p>
 
-<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。</p>
+<pre><code>$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&quot;192.168.20.10:3128&quot;
+export http_proxy=&quot;http://${PROXY}&quot;
+export https_proxy=&quot;http://${PROXY}&quot;
+export no_proxy=&quot;localhost,127.0.0.1,192.168.*&quot;
+
+export HTTP_PROXY=&quot;${http_proxy}&quot;
+export HTTPS_PROXY=&quot;${https_proxy}&quot;
+export NO_PROXY=&quot;${no_proxy}&quot;
+$ source /etc/profile.d/proxy.sh
+</code></pre>
+
+<p>上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には<code>-E</code>オプションを指定する。</p>
+
+<pre><code>$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+</code></pre>
+
+<ul>
+<li><a href="http://karaage.hatenadiary.jp/entry/2015/11/26/073000">Mac/Linux/Raspberry Piでプロキシサーバを手軽に設定する方法 - karaage. [からあげ]</a></li>
+</ul>
+
+<p>以上</p>
 
                   
 <div id="disqus_thread"></div>
@@ -205,10 +307,8 @@ $ sudo firewall-cmd \-\-list-all-zones
               <div class="pagination">
                 <ul class="pager">
                   
-                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></li>
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/">家庭内インターネット接続環境を構築する その5</a></li>
                   
-                  
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></li>
                   
                 </ul>
               </div>

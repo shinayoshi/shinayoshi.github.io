@@ -74,6 +74,48 @@
               <h1>Home Network</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その6</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 2でプロキシサーバ構築 家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。 今回はプロキシサーバを構築していきます。 Squidの設定 squidのインストール $ sudo apt-get install squid パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: squid-common squid-langpack 提案パッケージ: squidclient squid-cgi logcheck-database smbclient winbind 以下のパッケージが新たにインストールされます: squid squid-common squid-langpack アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 1,106 kB のアーカイブを取得する必要があります。 この操作後に追加で 3,882 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-langpack all 20140506-1 [150 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-common all 2.7.STABLE9-4.1 [352 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid armhf 2.7.STABLE9-4.1+b1 [604 kB] 1,106 kB を 4秒 で取得しました (267 kB/s) パッケージを事前設定しています ...
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その5</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 2でキャッシュDNSサーバ構築 家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。 まずはキャッシュDNSサーバを構築していきます。 bind9の設定 bind9のインストール $ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.9.5.dfsg-9+deb8u8 [292 kB] 562 kB を 2秒 で取得しました (229 kB/s) パッケージを事前設定しています ...
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">
                   <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その4</h2>
                   <p class="list-group-item-text">
@@ -225,6 +267,10 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
@@ -241,10 +287,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">Raspbian(Jessie)にCactiをインストールする [ 2016-08-20 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/" class="list-group-item">Cowrieのセキュリティ設定 [ 2016-08-16 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">Kippo-GraphをインストールしてCowrieのログを可視化する [ 2016-08-16 ]</a>
-      
     
   </div>
 </section>
@@ -258,7 +300,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">23</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">25</span>server</a>
     
   </div>
 </section>
@@ -303,7 +345,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (4)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (6)</a>
     
     
     
@@ -323,7 +365,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (19)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (21)</a>
     
     
     

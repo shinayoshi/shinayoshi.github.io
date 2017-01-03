@@ -73,16 +73,19 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>ApacheでWebサイトを公開する</h1>
+                  <h1>家庭内インターネット接続環境を構築する その5</h1>
                   <p>
-                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    <span class="label label-primary">Tue Jan 3, 2017</span> in
                     
                     
                     <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
-                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
                     
                   </p>
                 </div>
@@ -95,12 +98,10 @@
 <ul>
 <li>
 <ul>
-<li><a href="#apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</a></li>
-<li><a href="#apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</a></li>
-<li><a href="#apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</a></li>
-<li><a href="#firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</a></li>
-<li><a href="#動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</a></li>
-<li><a href="#その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</a></li>
+<li><a href="#raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7">Raspberry Pi 2でキャッシュDNSサーバ構築</a>
+<ul>
+<li><a href="#bind9の設定:a3b948e685fd47b3236875750b0610c7">bind9の設定</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>
@@ -109,80 +110,266 @@
                 <div class="contents">
                   
 
-<p>ApacheでWebサイトを公開するまでの手順のメモです。</p>
+<h2 id="raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7">Raspberry Pi 2でキャッシュDNSサーバ構築</h2>
 
-<h2 id="apacheとphpのインストール:cb5d764d8c08bb095f7a6ed7bff2ff04">ApacheとPHPのインストール</h2>
+<p>家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+まずはキャッシュDNSサーバを構築していきます。</p>
 
-<p>Webサーバ(Apache)とPHPをインストールします。</p>
+<h3 id="bind9の設定:a3b948e685fd47b3236875750b0610c7">bind9の設定</h3>
 
-<pre><code># yum install httpd php php-mbstring
-</code></pre>
+<p>bind9のインストール</p>
 
-<h2 id="apacheの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの設定</h2>
-
-<p>Apacheを設定します。</p>
-
-<pre><code># vi /etc/httpd/conf/httpd.conf
-#ServerName www.example.com:80
-↓変更
-ServerName www.example.com:80
-
+<pre><code>$ sudo apt-get install bind9 dnsutils
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bind9utils
+提案パッケージ:
+  bind9-doc ufw rblcheck
+以下のパッケージが新たにインストールされます:
+  bind9 bind9utils dnsutils
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+562 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,620 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.9.5.dfsg-9+deb8u8 [292 kB]
+562 kB を 2秒 で取得しました (229 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ dnsutils を選択しています。
+(データベースを読み込んでいます ... 現在 31244 個のファイルとディレクトリがインストールされています。)
+.../dnsutils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9utils を選択しています。
+.../bind9utils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9 を選択しています。
+.../bind9_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+グループ `bind' (グループ ID 114) を追加しています...
+完了。
+システムユーザ `bind' (UID 109) を追加しています...
+新しいユーザ `bind' (UID 109) をグループ `bind' に追加しています...
+ホームディレクトリ `/var/cache/bind' は作成しません。
+wrote key file &quot;/etc/bind/rndc.key&quot;
 #
-# AllowOverride controls what directives may be placed in .htaccess files.
-# It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords:
-#   Options FileInfo AuthConfig Limit
-#
-    AllowOverride None
-    ↓変更
-    AllowOverride All
-
-AddDefaultCharset UTF-8
-↓変更
-#AddDefaultCharset UTF-8
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
 </code></pre>
 
-<h2 id="apacheの起動:cb5d764d8c08bb095f7a6ed7bff2ff04">Apacheの起動</h2>
+<p>bind9の設定</p>
 
-<p>Apacheを起動します。</p>
+<p>※変更箇所が多いため、変更箇所ではなく変更後のコンフィグを記載します。</p>
 
-<pre><code>$ sudo systemctl start httpd
-$ sudo systemctl enable httpd
+<pre><code>$ sudo cp -p /etc/bind/named.conf.options{,.org}
+$ ls -l /etc/bind/named.conf.options*
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options.org
+$
+$ sudo vi /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &quot;/etc/bind/rndc.key&quot;;
+
+acl &quot;internal-network&quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &quot;unknown&quot;;
+
+	directory &quot;/var/cache/bind&quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &quot;log_default&quot; {
+		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &quot;alert&quot; {
+		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &quot;query&quot; {
+		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &quot;log_default&quot;; };
+	category security { &quot;alert&quot;; };
+	category queries { &quot;query&quot;; };
+	category lame-servers { null; };
+};
+$
 </code></pre>
 
-<h2 id="firewallの設定:cb5d764d8c08bb095f7a6ed7bff2ff04">Firewallの設定</h2>
+<p>bind9のコンフィグ不備を確認</p>
 
-<p>FirewallでWeb通信を許可します。</p>
-
-<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
+<pre><code>$ sudo named-checkconf /etc/bind/named.conf
 </code></pre>
 
-<h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
+<p>ログ保存先のディレクトリ作成</p>
 
-<p>外部からWebサイトにアクセスできるか確認します。</p>
-
-<pre><code>$ sudo vi /var/www/html/index.php
-&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;ja&quot;&gt;
-  &lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot; /&gt;
-    &lt;title&gt;net-tools&lt;/title&gt;
-    &lt;meta name=&quot;description&quot; content=&quot;shinayoshi shinayoshi.net&quot; /&gt;
-    &lt;meta name=&quot;author&quot; content=&quot;shinayoshi&quot; /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;p&gt;&lt;?php echo $_SERVER[&quot;REMOTE_ADDR&quot;]; ?&gt;&lt;/p&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
+<pre><code>$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+$ ls -ld /var/log/bind
+drwxr-xr-x 2 bind bind 4096  1月  3 22:39 /var/log/bind
+$
 </code></pre>
 
-<p>Webブラウザ等でWebサーバにアクセスできることを確認します。
-正常にアクセスできていれば接続元のIPアドレスが表示されているはずです。</p>
+<p>bind9の起動</p>
 
-<h2 id="その他:cb5d764d8c08bb095f7a6ed7bff2ff04">その他</h2>
+<pre><code>$ sudo systemctl restart bind9
+$ sudo systemctl enable bind9
+Synchronizing state for bind9.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d bind9 defaults
+Executing /usr/sbin/update-rc.d bind9 enable
+$
+</code></pre>
 
-<p>実際にWebサイトを公開するには、DNSの設定や素敵なコンテンツを作成する必要がありますが割愛します。</p>
+<p>dnsクライアントの設定</p>
+
+<pre><code>$ sudo cp -p /etc/dhcpcd.conf{,.backup20160103}
+$ ls -l /etc/dhcpcd.conf*
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf.backup20160103
+-rw-rw-r-- 1 root netdev 1247 10月 17  2015 /etc/dhcpcd.conf.org
+$
+$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$
+$ diff /etc/dhcpcd.conf.backup20160103 /etc/dhcpcd.conf
+46c46
+&lt; static domain_name_servers=192.168.100.1
+---
+&gt; static domain_name_servers=127.0.0.1
+$
+$ sudo systemctl restart dhcpcd
+$ cat /etc/resolv.conf 
+# Generated by resolvconf
+nameserver 127.0.0.1
+$
+</code></pre>
+
+<p>bind9による名前解決の確認</p>
+
+<pre><code>$ dig www.google.co.jp
+
+; &lt;&lt;&gt;&gt; DiG 9.9.5-9+deb8u8-Raspbian &lt;&lt;&gt;&gt; www.google.co.jp
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 455
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;www.google.co.jp.		IN	A
+
+;; ANSWER SECTION:
+www.google.co.jp.	187	IN	A	172.217.26.99
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:55:14 JST 2017
+;; MSG SIZE  rcvd: 61
+
+$ dig -x 8.8.8.8
+
+; &lt;&lt;&gt;&gt; DiG 9.9.5-9+deb8u8-Raspbian &lt;&lt;&gt;&gt; -x 8.8.8.8
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 3656
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 13, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;8.8.8.8.in-addr.arpa.		IN	PTR
+
+;; ANSWER SECTION:
+8.8.8.8.in-addr.arpa.	3600	IN	PTR	google-public-dns-a.google.com.
+
+;; AUTHORITY SECTION:
+.			3449	IN	NS	h.root-servers.net.
+.			3449	IN	NS	m.root-servers.net.
+.			3449	IN	NS	c.root-servers.net.
+.			3449	IN	NS	l.root-servers.net.
+.			3449	IN	NS	b.root-servers.net.
+.			3449	IN	NS	f.root-servers.net.
+.			3449	IN	NS	g.root-servers.net.
+.			3449	IN	NS	k.root-servers.net.
+.			3449	IN	NS	e.root-servers.net.
+.			3449	IN	NS	d.root-servers.net.
+.			3449	IN	NS	a.root-servers.net.
+.			3449	IN	NS	j.root-servers.net.
+.			3449	IN	NS	i.root-servers.net.
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:57:45 JST 2017
+;; MSG SIZE  rcvd: 304
+
+$
+</code></pre>
+
+<p>以上</p>
 
                   
 <div id="disqus_thread"></div>
@@ -205,10 +392,10 @@ $ sudo firewall-cmd \-\-list-all-zones
               <div class="pagination">
                 <ul class="pager">
                   
-                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></li>
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/">家庭内インターネット接続環境を構築する その4</a></li>
                   
                   
-                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/">Raspbianのインストール</a></li>
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/">家庭内インターネット接続環境を構築する その6</a></li>
                   
                 </ul>
               </div>

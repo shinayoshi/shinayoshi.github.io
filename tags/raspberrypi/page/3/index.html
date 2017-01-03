@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/squid/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/squid/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,13 +71,13 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Squid</h1>
+              <h1>Raspberrypi</h1>
               <div class="list-group">
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)にSquidをインストールする</h2>
+                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
                   <p class="list-group-item-text">
-                    <span class="label label-primary">Mon Aug 22, 2016</span> in
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
                     
                     
                     server
@@ -89,12 +89,9 @@
                      , 
                     jessie
                     
-                     , 
-                    squid
-                    
                   </p>
                   <p class="list-group-item-text">
-                    Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。 Raspbianの初期設定 過去のブログ記事を参考に初期設定を実施する。 パッケージの最新化 パッケージのインストール &ndash; chkconfig &ndash; tcpdump &ndash; telnet &ndash; dnsutils IPアドレスの固定化 NTP設定 rpi-configの設定 &ndash; ディスク拡張 &ndash; 文字コード設定 &ndash; タイムゾーン設定 &ndash; Wifiの国設定 &ndash; ホスト名変更 公開鍵認証方式の設定 IPv6の無効化 SELinuxの無効化 iptablesの設定 logwatchのインストール Zabbix Agentのインストール・監視登録 SNMPDのインストール・Cacti登録 Squidのインストール Squidをインストールする。 $ sudo apt-get install squid Squidを設定する。 $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf 609,611c609,616 &lt; acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &lt; acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &lt; acl localnet src 192.168.0.0/16 # RFC1918 possible internal network --- &gt; #acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &gt; #acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &gt; #acl localnet src 192.168.0.0/16 # RFC1918 possible internal network &gt; acl localnet src 192.168.10.0/24 &gt; acl localnet src 192.168.20.0/24 &gt; acl localnet src 192.168.30.0/24 &gt; acl localnet src 192.168.40.0/24 &gt; 676c681 &lt; #http_access allow localnet --- &gt; http_access allow localnet 1738a1744 &gt; cache_mem 256 MB 1747a1754 &gt; maximum_object_size_in_memory 512 KB 1945a1953 &gt; cache_dir ufs /var/spool/squid 10000 16 256 1988a1997 &gt; maximum_object_size 20480 KB 2097a2107 &gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh 2121c2131,2132 &lt; access_log /var/log/squid/access.log squid --- &gt; #access_log /var/log/squid/access.log squid &gt; access_log /var/log/squid/access.log combined 2217a2229 &gt; emulate_httpd_log off 2751c2763,2768 &lt; refresh_pattern .
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 Password: 958+1 records in 958+1 records out 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 $ arp -a ?
                   </p>
                 </a>
                 
@@ -102,7 +99,9 @@
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 1</li>
+  <li class="previous"><a href="/tags/raspberrypi/page/2/">&larr; Newer</a></li>
+  
+  <li>Page 3 of 3</li>
   
 </ul>
 
