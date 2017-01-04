@@ -18,6 +18,13 @@
       <guid>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</guid>
       <description>
 
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続きは&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
 &lt;h2 id=&#34;raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspberry Pi 2でプロキシサーバ構築&lt;/h2&gt;
 
 &lt;p&gt;家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
@@ -201,6 +208,13 @@ $ sudo -E apt-get upgrade
       
       <guid>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</guid>
       <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
 
 &lt;h2 id=&#34;raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7&#34;&gt;Raspberry Pi 2でキャッシュDNSサーバ構築&lt;/h2&gt;
 
@@ -473,7 +487,14 @@ $
       <guid>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</guid>
       <description>
 
-&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Raspberry Pi 2でファイルサーバ構築&lt;/h2&gt;
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築-nfs-samba:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Raspberry Pi 2でファイルサーバ構築(NFS/Samba)&lt;/h2&gt;
 
 &lt;p&gt;前回はUSB Storageを使用してRAIDデバイスを設定しました。
 今回はNFSやSambaの設定を行っていきます。&lt;/p&gt;
@@ -991,7 +1012,14 @@ $
       <guid>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</guid>
       <description>
 
-&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;Raspberry Pi 2でファイルサーバ構築&lt;/h2&gt;
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築-mdadm:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;Raspberry Pi 2でファイルサーバ構築(mdadm)&lt;/h2&gt;
 
 &lt;p&gt;家庭内インターネット接続環境で使用するファイルサーバを構築します。
 ファイルサーバの利用目的は以下の3つです。&lt;/p&gt;

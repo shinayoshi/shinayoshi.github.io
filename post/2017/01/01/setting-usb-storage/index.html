@@ -98,7 +98,7 @@
 <ul>
 <li>
 <ul>
-<li><a href="#raspberry-pi-2でファイルサーバ構築:edd1b43dbf3196488adbf69244ff43d1">Raspberry Pi 2でファイルサーバ構築</a></li>
+<li><a href="#raspberry-pi-2でファイルサーバ構築-mdadm:edd1b43dbf3196488adbf69244ff43d1">Raspberry Pi 2でファイルサーバ構築(mdadm)</a></li>
 <li><a href="#用意したもの:edd1b43dbf3196488adbf69244ff43d1">用意したもの</a></li>
 <li><a href="#物理構成:edd1b43dbf3196488adbf69244ff43d1">物理構成</a></li>
 <li><a href="#設定:edd1b43dbf3196488adbf69244ff43d1">設定</a>
@@ -120,7 +120,14 @@
                 <div class="contents">
                   
 
-<h2 id="raspberry-pi-2でファイルサーバ構築:edd1b43dbf3196488adbf69244ff43d1">Raspberry Pi 2でファイルサーバ構築</h2>
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>今回は<code>homenas1</code>を構築していきます。</p>
+
+<h2 id="raspberry-pi-2でファイルサーバ構築-mdadm:edd1b43dbf3196488adbf69244ff43d1">Raspberry Pi 2でファイルサーバ構築(mdadm)</h2>
 
 <p>家庭内インターネット接続環境で使用するファイルサーバを構築します。
 ファイルサーバの利用目的は以下の3つです。</p>
