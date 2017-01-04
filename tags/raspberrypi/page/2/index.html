@@ -74,6 +74,30 @@
               <h1>Raspberrypi</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Cactiにデバイスを登録する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Aug 21, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    cacti
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Cactiに新規デバイスを登録するメモです。 SNMPv3を使用してSNMPの値を取得します。 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。 $ sudo apt-get install snmpd snmp snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。 $ snmpconf -g basic_setup The following installed configuration files were found: 1: /etc/snmp/snmp.conf 2: /etc/snmp/snmpd.conf Would you like me to read them in? Their content will be merged with the output files created by this session. Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot; Read in which (default = all): 2 ************************************************ *** Beginning basic system information setup *** ************************************************ Do you want to configure the information returned in the system MIB group (contact info, etc)?
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbian(Jessie)にCactiをインストールする</h2>
                   <p class="list-group-item-text">
@@ -281,27 +305,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun Jul 10, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    WiFi
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。 $ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。 $ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。 $ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -370,6 +373,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
@@ -388,8 +393,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
-      
     
   </div>
 </section>
@@ -403,7 +406,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">26</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">27</span>server</a>
     
   </div>
 </section>
@@ -448,7 +451,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (7)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (8)</a>
     
     
     
@@ -468,7 +471,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (22)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (23)</a>
     
     
     

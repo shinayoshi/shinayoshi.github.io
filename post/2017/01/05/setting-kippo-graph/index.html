@@ -1,0 +1,1387 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>家庭内インターネット接続環境を構築する その8</h1>
+                  <p>
+                    <span class="label label-primary">Thu Jan 5, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#kippo-graphによるsshハニーポット-cowrie-の可視化:05481c997d19830c663ad9e91abca85e">Kippo-GraphによるSSHハニーポット(Cowrie)の可視化</a>
+<ul>
+<li><a href="#mysqlのインストールと初期化:05481c997d19830c663ad9e91abca85e">MySQLのインストールと初期化</a></li>
+<li><a href="#cowrieのログ出力先を変更:05481c997d19830c663ad9e91abca85e">Cowrieのログ出力先を変更</a></li>
+<li><a href="#apache2のインストール:05481c997d19830c663ad9e91abca85e">Apache2のインストール</a></li>
+<li><a href="#kippo-graphのインストール:05481c997d19830c663ad9e91abca85e">Kippo-Graphのインストール</a></li>
+<li><a href="#kippo-graphの修正:05481c997d19830c663ad9e91abca85e">Kippo-Graphの修正</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>前回に引き続きは<code>homepot1</code>を構築していきます。</p>
+
+<h2 id="kippo-graphによるsshハニーポット-cowrie-の可視化:05481c997d19830c663ad9e91abca85e">Kippo-GraphによるSSHハニーポット(Cowrie)の可視化</h2>
+
+<h3 id="mysqlのインストールと初期化:05481c997d19830c663ad9e91abca85e">MySQLのインストールと初期化</h3>
+
+<p>MySQLをインストールします。
+インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定します。</p>
+
+<pre><code>$ sudo -E apt-get install mysql-server
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18
+  libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server-5.5
+  mysql-server-core-5.5
+提案パッケージ:
+  libclone-perl libmldbm-perl libnet-daemon-perl libsql-statement-perl
+  libipc-sharedcache-perl mailx tinyca
+以下のパッケージが新たにインストールされます:
+  libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18
+  libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server
+  mysql-server-5.5 mysql-server-core-5.5
+アップグレード: 0 個、新規インストール: 11 個、削除: 0 個、保留: 0 個。
+8,275 kB のアーカイブを取得する必要があります。
+この操作後に追加で 89.3 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-common all 5.5.53-0+deb8u1 [75.5 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient18 armhf 5.5.53-0+deb8u1 [617 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi-perl armhf 1.631-3+b1 [807 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbd-mysql-perl armhf 4.028-2+deb8u2 [113 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libterm-readkey-perl armhf 2.32-1+b2 [26.1 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-client-5.5 armhf 5.5.53-0+deb8u1 [1,447 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-core-5.5 armhf 5.5.53-0+deb8u1 [3,448 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-5.5 armhf 5.5.53-0+deb8u1 [1,591 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhtml-template-perl all 2.95-1 [66.8 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server all 5.5.53-0+deb8u1 [73.8 kB]
+8,275 kB を 22秒 で取得しました (376 kB/s)                                     
+パッケージを事前設定しています ...
+
+ ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
+ │ 強制ではありませんが、MySQL を管理する &quot;root&quot; ユーザのパスワードを設定す  │ 
+ │ ることを強くお勧めします。                                                │ 
+ │                                                                           │ 
+ │ この値を空のままにしておいた場合は、パスワードは変更されません。          │ 
+ │                                                                           │ 
+ │ MySQL の &quot;root&quot; ユーザに対する新しいパスワード:                           │ 
+ │                                                                           │ 
+ │ _________________________________________________________________________ │ 
+ │                                                                           │ 
+ │                                  &lt;了解&gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+rootアカウントのパスワードを設定します。
+
+
+ ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
+ │                                                  │ 
+ │                                                  │ 
+ │ MySQL の &quot;root&quot; ユーザに対する新しいパスワード:  │ 
+ │                                                  │ 
+ │ ****____________________________________________ │ 
+ │                                                  │ 
+ │                      &lt;了解&gt;                      │ 
+ │                                                  │ 
+ └──────────────────────────────────────────────────┘ 
+再度rootアカウントのパスワードを入力します。
+
+以前に未選択のパッケージ libaio1:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 35107 個のファイルとディレクトリがインストールされています。)
+.../libaio1_0.3.110-1_armhf.deb を展開する準備をしています ...
+libaio1:armhf (0.3.110-1) を展開しています...
+以前に未選択のパッケージ mysql-common を選択しています。
+.../mysql-common_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-common (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libmysqlclient18:armhf を選択しています。
+.../libmysqlclient18_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libdbi-perl を選択しています。
+.../libdbi-perl_1.631-3+b1_armhf.deb を展開する準備をしています ...
+libdbi-perl (1.631-3+b1) を展開しています...
+以前に未選択のパッケージ libdbd-mysql-perl を選択しています。
+.../libdbd-mysql-perl_4.028-2+deb8u2_armhf.deb を展開する準備をしています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を展開しています...
+以前に未選択のパッケージ libterm-readkey-perl を選択しています。
+.../libterm-readkey-perl_2.32-1+b2_armhf.deb を展開する準備をしています ...
+libterm-readkey-perl (2.32-1+b2) を展開しています...
+以前に未選択のパッケージ mysql-client-5.5 を選択しています。
+.../mysql-client-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ mysql-server-core-5.5 を選択しています。
+.../mysql-server-core-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+mysql-common (5.5.53-0+deb8u1) を設定しています ...
+以前に未選択のパッケージ mysql-server-5.5 を選択しています。
+(データベースを読み込んでいます ... 現在 35472 個のファイルとディレクトリがインストールされています。)
+.../mysql-server-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libhtml-template-perl を選択しています。
+.../libhtml-template-perl_2.95-1_all.deb を展開する準備をしています ...
+libhtml-template-perl (2.95-1) を展開しています...
+以前に未選択のパッケージ mysql-server を選択しています。
+.../mysql-server_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-server (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libaio1:armhf (0.3.110-1) を設定しています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を設定しています ...
+libdbi-perl (1.631-3+b1) を設定しています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を設定しています ...
+libterm-readkey-perl (2.32-1+b2) を設定しています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を設定しています ...
+170105  3:45:31 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+170105  3:45:31 [Note] Ignoring --secure-file-priv value as server is running with --bootstrap.
+170105  3:45:31 [Note] /usr/sbin/mysqld (mysqld 5.5.53-0+deb8u1) starting as process 6055 ...
+libhtml-template-perl (2.95-1) を設定しています ...
+mysql-server (5.5.53-0+deb8u1) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre>
+
+<p>MySQLのセキュア設定</p>
+
+<pre><code>$ mysql_secure_installation 
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we'll need the current
+password for the root user.  If you've just installed MySQL, and
+you haven't set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you've completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+
+
+$
+</code></pre>
+
+<p>MySQLの初期設定</p>
+
+<pre><code>$ sudo cp -p /etc/mysql/my.cnf{,.org}
+$ ls -l /etc/mysql/my.cnf*
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf.org
+$
+$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+# Add the following line to last of mysqld section
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+# Add the following line to last of mysqldump section
+default-character-set=utf8
+
+[mysql]
+# Add the following line to last of mysql section
+default-character-set=utf8
+</code></pre>
+
+<ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
+</ul>
+
+<p>MySQLの再起動</p>
+
+<pre><code>$ sudo systemctl restart mysql
+$ sudo systemctl enable mysql
+Synchronizing state for mysql.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d mysql defaults
+Executing /usr/sbin/update-rc.d mysql enable
+$
+</code></pre>
+
+<h3 id="cowrieのログ出力先を変更:05481c997d19830c663ad9e91abca85e">Cowrieのログ出力先を変更</h3>
+
+<p>Cowrie用データベースの作成</p>
+
+<pre><code>$ mysql -uroot -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 37
+Server version: 5.5.53-0+deb8u1 (Raspbian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt; create database cowrie character set utf8 collate utf8_bin;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; grant all privileges on cowrie.* to cowrie@localhost identified by 'cowrie_password';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; quit
+Bye
+$
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
+Enter password:
+$
+$ mysql -ucowrie -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 39
+Server version: 5.5.53-0+deb8u1 (Raspbian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt; use cowrie
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql&gt; show tables;
++------------------+
+| Tables_in_cowrie |
++------------------+
+| auth             |
+| clients          |
+| downloads        |
+| input            |
+| keyfingerprints  |
+| sensors          |
+| sessions         |
+| ttylog           |
++------------------+
+8 rows in set (0.00 sec)
+
+mysql&gt; 
+mysql&gt; quit
+Bye
+$
+</code></pre>
+
+<p>CowrieのログをMySQLのデータベースに出力する。</p>
+
+<pre><code>$ sudo su - cowrie
+$ cd cowrie/
+$ cp -p cowrie.cfg{,.backup20170105}
+$ ls -l cowrie.cfg*
+-rw-r--r-- 1 cowrie cowrie 11597  1月  4 20:16 cowrie.cfg
+-rw-r--r-- 1 cowrie cowrie 11597  1月  4 20:16 cowrie.cfg.backup20170105
+-rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg.dist
+$
+$ vi cowrie.cfg
+# Comment out the following line
+#[output_jsonlog]
+#logfile = log/cowrie.json
+
+# Remove '#'
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
+debug = false
+</code></pre>
+
+<p>Cowrieの再起動</p>
+
+<pre><code>$ sudo supervisorctl restart cowrie
+cowrie: stopped
+cowrie: started
+$
+$ sudo supervisorctl status cowrie
+cowrie                           RUNNING    pid 7848, uptime 0:00:02
+$
+</code></pre>
+
+<h3 id="apache2のインストール:05481c997d19830c663ad9e91abca85e">Apache2のインストール</h3>
+
+<p>Apache2をインストールする。</p>
+
+<pre><code>$ sudo -E apt-get install apache2
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap liblua5.1-0 ssl-cert
+提案パッケージ:
+  www-browser apache2-doc apache2-suexec-pristine apache2-suexec-custom
+  openssl-blacklist
+以下のパッケージが新たにインストールされます:
+  apache2 apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap liblua5.1-0 ssl-cert
+アップグレード: 0 個、新規インストール: 10 個、削除: 0 個、保留: 0 個。
+1,750 kB のアーカイブを取得する必要があります。
+この操作後に追加で 5,241 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapr1 armhf 1.5.1-3 [77.1 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1 armhf 1.5.4-1 [75.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-dbd-sqlite3 armhf 1.5.4-1 [17.7 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-ldap armhf 1.5.4-1 [16.7 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblua5.1-0 armhf 5.1.5-7.1 [83.7 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-bin armhf 2.4.10-10+deb8u7 [893 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-utils armhf 2.4.10-10+deb8u7 [194 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-data all 2.4.10-10+deb8u7 [163 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2 armhf 2.4.10-10+deb8u7 [207 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main ssl-cert all 1.0.35 [20.9 kB]
+1,750 kB を 6秒 で取得しました (256 kB/s)                                      
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libapr1:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 35575 個のファイルとディレクトリがインストールされています。)
+.../libapr1_1.5.1-3_armhf.deb を展開する準備をしています ...
+libapr1:armhf (1.5.1-3) を展開しています...
+以前に未選択のパッケージ libaprutil1:armhf を選択しています。
+.../libaprutil1_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-dbd-sqlite3:armhf を選択しています。
+.../libaprutil1-dbd-sqlite3_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-ldap:armhf を選択しています。
+.../libaprutil1-ldap_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-ldap:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ liblua5.1-0:armhf を選択しています。
+.../liblua5.1-0_5.1.5-7.1_armhf.deb を展開する準備をしています ...
+liblua5.1-0:armhf (5.1.5-7.1) を展開しています...
+以前に未選択のパッケージ apache2-bin を選択しています。
+.../apache2-bin_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-bin (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-utils を選択しています。
+.../apache2-utils_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-utils (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-data を選択しています。
+.../apache2-data_2.4.10-10+deb8u7_all.deb を展開する準備をしています ...
+apache2-data (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2 を選択しています。
+.../apache2_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2 (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ ssl-cert を選択しています。
+.../ssl-cert_1.0.35_all.deb を展開する準備をしています ...
+ssl-cert (1.0.35) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libapr1:armhf (1.5.1-3) を設定しています ...
+libaprutil1:armhf (1.5.4-1) を設定しています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を設定しています ...
+libaprutil1-ldap:armhf (1.5.4-1) を設定しています ...
+liblua5.1-0:armhf (5.1.5-7.1) を設定しています ...
+apache2-bin (2.4.10-10+deb8u7) を設定しています ...
+apache2-utils (2.4.10-10+deb8u7) を設定しています ...
+apache2-data (2.4.10-10+deb8u7) を設定しています ...
+apache2 (2.4.10-10+deb8u7) を設定しています ...
+Enabling module mpm_event.
+Enabling module authz_core.
+Enabling module authz_host.
+Enabling module authn_core.
+Enabling module auth_basic.
+Enabling module access_compat.
+Enabling module authn_file.
+Enabling module authz_user.
+Enabling module alias.
+Enabling module dir.
+Enabling module autoindex.
+Enabling module env.
+Enabling module mime.
+Enabling module negotiation.
+Enabling module setenvif.
+Enabling module filter.
+Enabling module deflate.
+Enabling module status.
+Enabling conf charset.
+Enabling conf localized-error-pages.
+Enabling conf other-vhosts-access-log.
+Enabling conf security.
+Enabling conf serve-cgi-bin.
+Enabling site 000-default.
+ssl-cert (1.0.35) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre>
+
+<p>Apache2のセキュリティ設定</p>
+
+<pre><code>$ sudo cp -p /etc/apache2/conf-available/security.conf{,.org}
+$ ls -l /etc/apache2/conf-available/security.conf*
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+$
+</code></pre>
+
+<p>Apache2の文字コード設定</p>
+
+<pre><code>$ sudo cp -p /etc/apache2/conf-available/charset.conf{,.org}
+$ ls -l /etc/apache2/conf-available/charset.conf*
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+$
+</code></pre>
+
+<p>Apache2のServerName設定</p>
+
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
+$ sudo a2enconf fqdn
+Enabling conf fqdn.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+</code></pre>
+
+<p>Apache2の再起動</p>
+
+<pre><code>$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$ sudo systemctl enable apache2
+Synchronizing state for apache2.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d apache2 defaults
+Executing /usr/sbin/update-rc.d apache2 enable
+$
+</code></pre>
+
+<h3 id="kippo-graphのインストール:05481c997d19830c663ad9e91abca85e">Kippo-Graphのインストール</h3>
+
+<p>Kippo-GraphのWebサイト(<code>https://bruteforce.gr/kippo-graph</code>)を参考にKippo-Graphをインストールする。</p>
+
+<p>関連パッケージのインストール</p>
+
+<pre><code>$ sudo -E apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  fontconfig-config fonts-dejavu-core libfontconfig1 libgd3 libjbig0 libonig2
+  libperl4-corelibs-perl libqdbm14 libtiff5 libvpx1 libxpm4 lsof php5-cli
+  php5-common php5-json php5-readline
+提案パッケージ:
+  php-pear libgd-tools php5-user-cache
+以下のパッケージが新たにインストールされます:
+  fontconfig-config fonts-dejavu-core libapache2-mod-php5 libfontconfig1
+  libgd3 libjbig0 libonig2 libperl4-corelibs-perl libqdbm14 libtiff5 libvpx1
+  libxpm4 lsof php5-cli php5-common php5-curl php5-gd php5-json php5-mysql
+  php5-readline
+アップグレード: 0 個、新規インストール: 20 個、削除: 0 個、保留: 0 個。
+7,989 kB のアーカイブを取得する必要があります。
+この操作後に追加で 26.1 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main fonts-dejavu-core all 2.34-1 [1,047 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main fontconfig-config all 2.11.0-6.3+deb8u1 [274 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfontconfig1 armhf 2.11.0-6.3+deb8u1 [312 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjbig0 armhf 2.1-3.1 [27.5 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtiff5 armhf 4.0.3-12.3+deb8u1 [194 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libvpx1 armhf 1.3.0-3+rvt [783 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxpm4 armhf 1:3.5.11-1 [41.7 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgd3 armhf 2.1.0-5+deb8u8 [127 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libonig2 armhf 5.9.5-3.2 [101 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl4-corelibs-perl all 0.003-1 [43.6 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main lsof armhf 4.86+dfsg-1 [321 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main libqdbm14 armhf 1.8.78-5+b1 [86.0 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-common armhf 5.6.29+dfsg-0+deb8u1 [720 kB]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-json armhf 1.3.6-1 [16.9 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-cli armhf 5.6.29+dfsg-0+deb8u1 [1,904 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapache2-mod-php5 armhf 5.6.29+dfsg-0+deb8u1 [1,879 kB]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-curl armhf 5.6.29+dfsg-0+deb8u1 [24.5 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-gd armhf 5.6.29+dfsg-0+deb8u1 [23.2 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-mysql armhf 5.6.29+dfsg-0+deb8u1 [52.2 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-readline armhf 5.6.29+dfsg-0+deb8u1 [11.2 kB]
+7,989 kB を 19秒 で取得しました (403 kB/s)                                     
+パッケージを事前設定しています ...
+以前に未選択のパッケージ fonts-dejavu-core を選択しています。
+(データベースを読み込んでいます ... 現在 36265 個のファイルとディレクトリがインストールされています。)
+.../fonts-dejavu-core_2.34-1_all.deb を展開する準備をしています ...
+fonts-dejavu-core (2.34-1) を展開しています...
+以前に未選択のパッケージ fontconfig-config を選択しています。
+.../fontconfig-config_2.11.0-6.3+deb8u1_all.deb を展開する準備をしています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libfontconfig1:armhf を選択しています。
+.../libfontconfig1_2.11.0-6.3+deb8u1_armhf.deb を展開する準備をしています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libjbig0:armhf を選択しています。
+.../libjbig0_2.1-3.1_armhf.deb を展開する準備をしています ...
+libjbig0:armhf (2.1-3.1) を展開しています...
+以前に未選択のパッケージ libtiff5:armhf を選択しています。
+.../libtiff5_4.0.3-12.3+deb8u1_armhf.deb を展開する準備をしています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libvpx1:armhf を選択しています。
+.../libvpx1_1.3.0-3+rvt_armhf.deb を展開する準備をしています ...
+libvpx1:armhf (1.3.0-3+rvt) を展開しています...
+以前に未選択のパッケージ libxpm4:armhf を選択しています。
+.../libxpm4_1%3a3.5.11-1_armhf.deb を展開する準備をしています ...
+libxpm4:armhf (1:3.5.11-1) を展開しています...
+以前に未選択のパッケージ libgd3:armhf を選択しています。
+.../libgd3_2.1.0-5+deb8u8_armhf.deb を展開する準備をしています ...
+libgd3:armhf (2.1.0-5+deb8u8) を展開しています...
+以前に未選択のパッケージ libonig2:armhf を選択しています。
+.../libonig2_5.9.5-3.2_armhf.deb を展開する準備をしています ...
+libonig2:armhf (5.9.5-3.2) を展開しています...
+以前に未選択のパッケージ libperl4-corelibs-perl を選択しています。
+.../libperl4-corelibs-perl_0.003-1_all.deb を展開する準備をしています ...
+libperl4-corelibs-perl (0.003-1) を展開しています...
+以前に未選択のパッケージ lsof を選択しています。
+.../lsof_4.86+dfsg-1_armhf.deb を展開する準備をしています ...
+lsof (4.86+dfsg-1) を展開しています...
+以前に未選択のパッケージ libqdbm14 を選択しています。
+.../libqdbm14_1.8.78-5+b1_armhf.deb を展開する準備をしています ...
+libqdbm14 (1.8.78-5+b1) を展開しています...
+以前に未選択のパッケージ php5-common を選択しています。
+.../php5-common_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-json を選択しています。
+.../php5-json_1.3.6-1_armhf.deb を展開する準備をしています ...
+php5-json (1.3.6-1) を展開しています...
+以前に未選択のパッケージ php5-cli を選択しています。
+.../php5-cli_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-cli (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libapache2-mod-php5 を選択しています。
+.../libapache2-mod-php5_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-curl を選択しています。
+.../php5-curl_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-curl (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-gd を選択しています。
+.../php5-gd_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-gd (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-mysql を選択しています。
+.../php5-mysql_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-mysql (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-readline を選択しています。
+.../php5-readline_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-readline (5.6.29+dfsg-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+fonts-dejavu-core (2.34-1) を設定しています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を設定しています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を設定しています ...
+libjbig0:armhf (2.1-3.1) を設定しています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を設定しています ...
+libvpx1:armhf (1.3.0-3+rvt) を設定しています ...
+libxpm4:armhf (1:3.5.11-1) を設定しています ...
+libgd3:armhf (2.1.0-5+deb8u8) を設定しています ...
+libonig2:armhf (5.9.5-3.2) を設定しています ...
+libperl4-corelibs-perl (0.003-1) を設定しています ...
+lsof (4.86+dfsg-1) を設定しています ...
+libqdbm14 (1.8.78-5+b1) を設定しています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/pdo.ini with new version
+php5_invoke: Enable module pdo for apache2 SAPI
+php5_invoke: Enable module pdo for cli SAPI
+
+Creating config file /etc/php5/mods-available/opcache.ini with new version
+php5_invoke: Enable module opcache for apache2 SAPI
+php5_invoke: Enable module opcache for cli SAPI
+php5-json (1.3.6-1) を設定しています ...
+php5_invoke: Enable module json for apache2 SAPI
+php5_invoke: Enable module json for cli SAPI
+php5-cli (5.6.29+dfsg-0+deb8u1) を設定しています ...
+update-alternatives: /usr/bin/php (php) を提供するために自動モードで /usr/bin/php5 を使います
+update-alternatives: /usr/bin/phar (phar) を提供するために自動モードで /usr/bin/phar5 を使います
+
+Creating config file /etc/php5/cli/php.ini with new version
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/apache2/php.ini with new version
+Module mpm_event disabled.
+Enabling module mpm_prefork.
+apache2_switch_mpm Switch to prefork
+apache2_invoke: Enable module php5
+php5-curl (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/curl.ini with new version
+php5_invoke: Enable module curl for apache2 SAPI
+php5_invoke: Enable module curl for cli SAPI
+php5-gd (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/gd.ini with new version
+php5_invoke: Enable module gd for apache2 SAPI
+php5_invoke: Enable module gd for cli SAPI
+php5-mysql (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/mysql.ini with new version
+php5_invoke: Enable module mysql for apache2 SAPI
+php5_invoke: Enable module mysql for cli SAPI
+
+Creating config file /etc/php5/mods-available/mysqli.ini with new version
+php5_invoke: Enable module mysqli for apache2 SAPI
+php5_invoke: Enable module mysqli for cli SAPI
+
+Creating config file /etc/php5/mods-available/pdo_mysql.ini with new version
+php5_invoke: Enable module pdo_mysql for apache2 SAPI
+php5_invoke: Enable module pdo_mysql for cli SAPI
+php5-readline (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/readline.ini with new version
+php5_invoke: Enable module readline for apache2 SAPI
+php5_invoke: Enable module readline for cli SAPI
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+$
+$ sudo systemctl restart apache2
+$
+</code></pre>
+
+<p>Kippo-Graphのインストール</p>
+
+<pre><code>$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+--2017-01-05 04:54:31--  http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+192.168.20.10:3128 に接続しています... 接続しました。
+Proxy による接続要求を送信しました、応答を待っています... 200 OK
+長さ: 17800301 (17M) [application/x-gzip]
+`kippo-graph-1.5.1.tar.gz' に保存中
+
+kippo-graph-1.5.1.t 100%[=====================&gt;]  16.98M   147KB/s 時間 1m 57s 
+
+2017-01-05 04:56:28 (149 KB/s) - `kippo-graph-1.5.1.tar.gz' へ保存完了 [17800301/17800301]
+
+$
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+kippo-graph-1.5.1/
+kippo-graph-1.5.1/.gitignore
+kippo-graph-1.5.1/.htaccess
+kippo-graph-1.5.1/LICENSE.txt
+kippo-graph-1.5.1/README.md
+kippo-graph-1.5.1/TODO.txt
+kippo-graph-1.5.1/class/
+kippo-graph-1.5.1/class/KippoGeo.class.php
+kippo-graph-1.5.1/class/KippoGraph.class.php
+kippo-graph-1.5.1/class/KippoIP.class.php
+kippo-graph-1.5.1/class/KippoInput.class.php
+kippo-graph-1.5.1/class/KippoPlayLog.class.php
+kippo-graph-1.5.1/config.php.dist
+kippo-graph-1.5.1/favicon.ico
+kippo-graph-1.5.1/gallery.php
+kippo-graph-1.5.1/generated-graphs/
+kippo-graph-1.5.1/generated-graphs/index.php
+kippo-graph-1.5.1/gpl.txt
+kippo-graph-1.5.1/images/
+kippo-graph-1.5.1/images/alienvault.ico
+kippo-graph-1.5.1/images/bg.gif
+kippo-graph-1.5.1/images/dshield.ico
+kippo-graph-1.5.1/images/first.png
+kippo-graph-1.5.1/images/fortiguard.ico
+kippo-graph-1.5.1/images/index.php
+kippo-graph-1.5.1/images/ip_tracer.png
+kippo-graph-1.5.1/images/ipvoid.ico
+kippo-graph-1.5.1/images/kippo-graph-img.png
+kippo-graph-1.5.1/images/last.png
+kippo-graph-1.5.1/images/mcafee.ico
+kippo-graph-1.5.1/images/next.png
+kippo-graph-1.5.1/images/novirusthanks.ico
+kippo-graph-1.5.1/images/play.ico
+kippo-graph-1.5.1/images/prev.png
+kippo-graph-1.5.1/images/robtex.ico
+kippo-graph-1.5.1/images/virustotal.ico
+kippo-graph-1.5.1/images/warning.png
+kippo-graph-1.5.1/images/watchguard.ico
+kippo-graph-1.5.1/include/
+kippo-graph-1.5.1/include/export.php
+kippo-graph-1.5.1/include/geoplugin/
+kippo-graph-1.5.1/include/geoplugin/geoplugin.class.php
+kippo-graph-1.5.1/include/index.php
+kippo-graph-1.5.1/include/kippo-ip.ajax.php
+kippo-graph-1.5.1/include/languages/
+kippo-graph-1.5.1/include/languages/lang.ar.php
+kippo-graph-1.5.1/include/languages/lang.cs.php
+kippo-graph-1.5.1/include/languages/lang.de.php
+kippo-graph-1.5.1/include/languages/lang.el.php
+kippo-graph-1.5.1/include/languages/lang.en.php
+kippo-graph-1.5.1/include/languages/lang.es.php
+kippo-graph-1.5.1/include/languages/lang.et.php
+kippo-graph-1.5.1/include/languages/lang.fr.php
+kippo-graph-1.5.1/include/languages/lang.it.php
+kippo-graph-1.5.1/include/languages/lang.nl.php
+kippo-graph-1.5.1/include/languages/lang.pl.php
+kippo-graph-1.5.1/include/languages/lang.sk.php
+kippo-graph-1.5.1/include/languages/lang.sv.php
+kippo-graph-1.5.1/include/libchart/
+kippo-graph-1.5.1/include/libchart/COPYING
+kippo-graph-1.5.1/include/libchart/ChangeLog
+kippo-graph-1.5.1/include/libchart/README
+kippo-graph-1.5.1/include/libchart/classes/
+kippo-graph-1.5.1/include/libchart/classes/libchart.php
+kippo-graph-1.5.1/include/libchart/classes/model/
+kippo-graph-1.5.1/include/libchart/classes/model/ChartConfig.php
+kippo-graph-1.5.1/include/libchart/classes/model/DataSet.php
+kippo-graph-1.5.1/include/libchart/classes/model/Point.php
+kippo-graph-1.5.1/include/libchart/classes/model/XYDataSet.php
+kippo-graph-1.5.1/include/libchart/classes/model/XYSeriesDataSet.php
+kippo-graph-1.5.1/include/libchart/classes/view/
+kippo-graph-1.5.1/include/libchart/classes/view/axis/
+kippo-graph-1.5.1/include/libchart/classes/view/axis/Axis.php
+kippo-graph-1.5.1/include/libchart/classes/view/axis/Bound.php
+kippo-graph-1.5.1/include/libchart/classes/view/caption/
+kippo-graph-1.5.1/include/libchart/classes/view/caption/Caption.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/
+kippo-graph-1.5.1/include/libchart/classes/view/chart/BarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/Chart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/HorizontalBarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/LineChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/PieChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/VerticalBarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/
+kippo-graph-1.5.1/include/libchart/classes/view/color/Color.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/ColorSet.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/Palette.php
+kippo-graph-1.5.1/include/libchart/classes/view/plot/
+kippo-graph-1.5.1/include/libchart/classes/view/plot/Plot.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Padding.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Primitive.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Rectangle.php
+kippo-graph-1.5.1/include/libchart/classes/view/text/
+kippo-graph-1.5.1/include/libchart/classes/view/text/Text.php
+kippo-graph-1.5.1/include/libchart/doc/
+kippo-graph-1.5.1/include/libchart/doc/DEJAVU_LICENSE
+kippo-graph-1.5.1/include/libchart/doc/GNU_GPL_V3
+kippo-graph-1.5.1/include/libchart/fonts/
+kippo-graph-1.5.1/include/libchart/fonts/DejaVuSansCondensed-Bold.ttf
+kippo-graph-1.5.1/include/libchart/fonts/DejaVuSansCondensed.ttf
+kippo-graph-1.5.1/include/libchart/fonts/OpenSans-Bold.ttf
+kippo-graph-1.5.1/include/libchart/fonts/OpenSans-Regular.ttf
+kippo-graph-1.5.1/include/libchart/images/
+kippo-graph-1.5.1/include/libchart/images/PoweredBy.png
+kippo-graph-1.5.1/include/maxmind/
+kippo-graph-1.5.1/include/maxmind/GeoLite2-City.mmdb
+kippo-graph-1.5.1/include/maxmind/geoip2.phar
+kippo-graph-1.5.1/include/misc/
+kippo-graph-1.5.1/include/misc/ip2host.php
+kippo-graph-1.5.1/include/misc/versionCheck.php
+kippo-graph-1.5.1/include/misc/xss_clean.php
+kippo-graph-1.5.1/include/play.php
+kippo-graph-1.5.1/include/qgooglevisualapi/
+kippo-graph-1.5.1/include/qgooglevisualapi/QAnnotatedtimelineGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QApikeyGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QAreachartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QBarchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QColumnchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QConfig.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QGaugeGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QInflector.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QIntensitymapGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QLinechartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMagictableGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMapGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMixupGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMotionchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QOrgchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QPiechartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QScatterchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QTableGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QTool.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QVizualisationGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QWordcloudGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/config.inc.php
+kippo-graph-1.5.1/include/qgooglevisualapi/readme.txt
+kippo-graph-1.5.1/include/rb.php
+kippo-graph-1.5.1/include/sql.php
+kippo-graph-1.5.1/include/tor/
+kippo-graph-1.5.1/include/tor/tor.class.php
+kippo-graph-1.5.1/include/tor/tor_exit_node_list.txt
+kippo-graph-1.5.1/index.php
+kippo-graph-1.5.1/kippo-geo.php
+kippo-graph-1.5.1/kippo-graph.php
+kippo-graph-1.5.1/kippo-input.php
+kippo-graph-1.5.1/kippo-ip.php
+kippo-graph-1.5.1/kippo-playlog.php
+kippo-graph-1.5.1/kippo-scanner.php
+kippo-graph-1.5.1/robots.txt
+kippo-graph-1.5.1/scripts/
+kippo-graph-1.5.1/scripts/BinFileReader.js
+kippo-graph-1.5.1/scripts/fancybox/
+kippo-graph-1.5.1/scripts/fancybox/blank.gif
+kippo-graph-1.5.1/scripts/fancybox/fancy_close.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_loading.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_nav_left.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_nav_right.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_e.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_n.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_ne.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_nw.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_s.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_se.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_sw.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_w.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_left.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_main.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_over.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_right.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox-x.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox-y.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox.png
+kippo-graph-1.5.1/scripts/fancybox/index.php
+kippo-graph-1.5.1/scripts/fancybox/jquery.easing-1.3.pack.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.css
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.pack.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.setup.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.mousewheel-3.0.4.pack.js
+kippo-graph-1.5.1/scripts/hoverIntent.js
+kippo-graph-1.5.1/scripts/index.php
+kippo-graph-1.5.1/scripts/jquery-1.4.1.min.js
+kippo-graph-1.5.1/scripts/jquery-1.4.4.min.js
+kippo-graph-1.5.1/scripts/jquery.getUrlParam.js
+kippo-graph-1.5.1/scripts/jquery.tablesorter.js
+kippo-graph-1.5.1/scripts/jquery.tablesorter.pager.js
+kippo-graph-1.5.1/scripts/jspl.js
+kippo-graph-1.5.1/scripts/superfish.js
+kippo-graph-1.5.1/styles/
+kippo-graph-1.5.1/styles/forms.css
+kippo-graph-1.5.1/styles/gallery.css
+kippo-graph-1.5.1/styles/homepage.css
+kippo-graph-1.5.1/styles/index.php
+kippo-graph-1.5.1/styles/layout.css
+kippo-graph-1.5.1/styles/navi.css
+kippo-graph-1.5.1/styles/playlog.css
+kippo-graph-1.5.1/styles/portfolio.css
+kippo-graph-1.5.1/styles/tables.css
+kippo-graph-1.5.1/styles/tablesorter.css
+$
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&lt;IfModule mod_alias.c&gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&lt;/IfModule&gt;
+$
+$ sudo a2enconf kippo-graph
+Enabling conf kippo-graph.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$
+</code></pre>
+
+<p>Kippo-Graphの設定</p>
+
+<pre><code>$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ ls -l /usr/share/kippo-graph-1.5.1/config.php*
+-rw-rw-r-- 1 root root 3777  6月 22  2015 /usr/share/kippo-graph-1.5.1/config.php
+-rw-rw-r-- 1 root root 3777  6月 22  2015 /usr/share/kippo-graph-1.5.1/config.php.dist
+$
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'cowrie');
+define('DB_PASS', 'cowrie_password');
+define('DB_NAME', 'cowrie');
+define('DB_PORT', '3306');
+</code></pre>
+
+<h3 id="kippo-graphの修正:05481c997d19830c663ad9e91abca85e">Kippo-Graphの修正</h3>
+
+<p>KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)がありました。</p>
+
+<p>PLAYLOGを再生するために以下のファイルを修正しました。一応、PLAYLOGが再生できるようになりましたが、他の部分に影響がないかは不明です。。。試すとしても自己責任でお願いします。</p>
+
+<p><code>class/KippoPlayLog.class.php</code>の修正</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php{,.org}
+$ ls -l class/KippoPlayLog.class.php*
+-rw-rw-r-- 1 root root 2134  6月 22  2015 class/KippoPlayLog.class.php
+-rw-rw-r-- 1 root root 2134  6月 22  2015 class/KippoPlayLog.class.php.org
+$
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+$
+</code></pre>
+
+<p><code>include/play.php</code>の修正</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php{,.org}
+$ls -l include/play.php*
+-rw-rw-r-- 1 root root 10994  6月 22  2015 include/play.php
+-rw-rw-r-- 1 root root 10994  6月 22  2015 include/play.php.org
+$
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&lt;                 $log = base64_encode($row['ttylog']);
+---
+&gt;                 $log = base64_encode(file_get_contents($row['ttylog']));
+</code></pre>
+
+<p>ttylogへのシンボリックリンク作成</p>
+
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s /home/cowrie/cowrie/log/ log
+$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+$ ls -dl /home/cowrie/cowrie/log/tty
+drwxr-sr-x 2 cowrie www-data 4096  1月  4 19:05 /home/cowrie/cowrie/log/tty
+$
+</code></pre>
+
+<p>Cowrie起動スクリプトの修正</p>
+
+<pre><code>$ sudo su - cowrie
+$ cd cowrie
+$ cp -p start.sh{,.backup20170105}
+$ ls -l start.sh*
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh.backup20170105
+-rwxr-xr-x 1 cowrie cowrie 920  1月  4 19:05 start.sh.org
+$
+$ vi start.sh
+$ diff start.sh.org start.sh
+7c7
+&lt; DAEMONIZE=&quot;&quot;
+---
+&gt; DAEMONIZE=&quot;-n&quot;
+35c35
+&lt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0077 --pidfile ${PIDFILE} cowrie
+---
+&gt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+37c37
+&lt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0077 --pidfile ${PIDFILE} cowrie
+---
+&gt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+$
+</code></pre>
+
+<p>Cowrieの再起動</p>
+
+<pre><code>$ sudo supervisorctl restart cowrie
+cowrie: stopped
+cowrie: started
+$
+</code></pre>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/">家庭内インターネット接続環境を構築する その7</a></li>
+                  
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">27</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (8)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (23)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2016 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

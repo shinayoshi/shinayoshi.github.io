@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その8</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Jan 5, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きはhomepot1を構築していきます。 Kippo-GraphによるSSHハニーポット(Cowrie)の可視化 MySQLのインストールと初期化 MySQLをインストールします。 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定します。 $ sudo -E apt-get install mysql-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18 libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server-5.5 mysql-server-core-5.5 提案パッケージ: libclone-perl libmldbm-perl libnet-daemon-perl libsql-statement-perl libipc-sharedcache-perl mailx tinyca 以下のパッケージが新たにインストールされます: libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18 libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server mysql-server-5.5 mysql-server-core-5.5 アップグレード: 0 個、新規インストール: 11 個、削除: 0 個、保留: 0 個。 8,275 kB のアーカイブを取得する必要があります。 この操作後に追加で 89.3 MB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-common all 5.5.53-0+deb8u1 [75.5 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient18 armhf 5.5.53-0+deb8u1 [617 kB] 取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi-perl armhf 1.631-3+b1 [807 kB] 取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbd-mysql-perl armhf 4.028-2+deb8u2 [113 kB] 取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libterm-readkey-perl armhf 2.32-1+b2 [26.1 kB] 取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-client-5.5 armhf 5.5.53-0+deb8u1 [1,447 kB] 取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-core-5.5 armhf 5.5.53-0+deb8u1 [3,448 kB] 取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-5.5 armhf 5.5.53-0+deb8u1 [1,591 kB] 取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhtml-template-perl all 2.95-1 [66.8 kB] 取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server all 5.5.53-0+deb8u1 [73.8 kB] 8,275 kB を 22秒 で取得しました (376 kB/s) パッケージを事前設定しています ...
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">
                   <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その7</h2>
                   <p class="list-group-item-text">
@@ -272,30 +293,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Cactiにデバイスを登録する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun Aug 21, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                     , 
-                    cacti
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Cactiに新規デバイスを登録するメモです。 SNMPv3を使用してSNMPの値を取得します。 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。 $ sudo apt-get install snmpd snmp snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。 $ snmpconf -g basic_setup The following installed configuration files were found: 1: /etc/snmp/snmp.conf 2: /etc/snmp/snmpd.conf Would you like me to read them in? Their content will be merged with the output files created by this session. Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot; Read in which (default = all): 2 ************************************************ *** Beginning basic system information setup *** ************************************************ Do you want to configure the information returned in the system MIB group (contact info, etc)?
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -362,6 +359,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
@@ -380,8 +379,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/" class="list-group-item">Cactiにデバイスを登録する [ 2016-08-21 ]</a>
-      
     
   </div>
 </section>
@@ -395,7 +392,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">26</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">27</span>server</a>
     
   </div>
 </section>
@@ -440,7 +437,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (7)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (8)</a>
     
     
     
@@ -460,7 +457,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (22)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (23)</a>
     
     
     
