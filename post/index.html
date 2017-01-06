@@ -74,6 +74,27 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その9</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きはhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &quot;net.ipv6.conf.all.stable_secret&quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.default.stable_secret&quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth0.stable_secret&quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth1.stable_secret&quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.lo.stable_secret&quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定します。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 ##INPUTチェーン #IPスプーフィング対策 $ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset #セッションハイジャック対策 $ sudo iptables -A INPUT -p tcp !
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">
                   <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その8</h2>
                   <p class="list-group-item-text">
@@ -269,30 +290,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbian(Jessie)にSquidをインストールする</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Mon Aug 22, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                     , 
-                    squid
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。 Raspbianの初期設定 過去のブログ記事を参考に初期設定を実施する。 パッケージの最新化 パッケージのインストール &ndash; chkconfig &ndash; tcpdump &ndash; telnet &ndash; dnsutils IPアドレスの固定化 NTP設定 rpi-configの設定 &ndash; ディスク拡張 &ndash; 文字コード設定 &ndash; タイムゾーン設定 &ndash; Wifiの国設定 &ndash; ホスト名変更 公開鍵認証方式の設定 IPv6の無効化 SELinuxの無効化 iptablesの設定 logwatchのインストール Zabbix Agentのインストール・監視登録 SNMPDのインストール・Cacti登録 Squidのインストール Squidをインストールする。 $ sudo apt-get install squid Squidを設定する。 $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf 609,611c609,616 &lt; acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &lt; acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &lt; acl localnet src 192.168.0.0/16 # RFC1918 possible internal network --- &gt; #acl localnet src 10.0.0.0/8 # RFC1918 possible internal network &gt; #acl localnet src 172.16.0.0/12 # RFC1918 possible internal network &gt; #acl localnet src 192.168.0.0/16 # RFC1918 possible internal network &gt; acl localnet src 192.168.10.0/24 &gt; acl localnet src 192.168.20.0/24 &gt; acl localnet src 192.168.30.0/24 &gt; acl localnet src 192.168.40.0/24 &gt; 676c681 &lt; #http_access allow localnet --- &gt; http_access allow localnet 1738a1744 &gt; cache_mem 256 MB 1747a1754 &gt; maximum_object_size_in_memory 512 KB 1945a1953 &gt; cache_dir ufs /var/spool/squid 10000 16 256 1988a1997 &gt; maximum_object_size 20480 KB 2097a2107 &gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh 2121c2131,2132 &lt; access_log /var/log/squid/access.log squid --- &gt; #access_log /var/log/squid/access.log squid &gt; access_log /var/log/squid/access.log combined 2217a2229 &gt; emulate_httpd_log off 2751c2763,2768 &lt; refresh_pattern .
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -359,6 +356,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
@@ -377,8 +376,6 @@
       
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
-      
     
   </div>
 </section>
@@ -392,7 +389,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">27</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">28</span>server</a>
     
   </div>
 </section>
@@ -437,7 +434,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (8)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (9)</a>
     
     
     
@@ -457,7 +454,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (23)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (24)</a>
     
     
     

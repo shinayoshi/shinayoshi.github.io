@@ -7,8 +7,332 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Thu, 05 Jan 2017 03:34:58 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Jan 2017 01:02:37 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その9</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/</link>
+      <pubDate>Sat, 07 Jan 2017 01:02:37 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続きは&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。
+Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;ipv6の無効化:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;IPv6の無効化&lt;/h2&gt;
+
+&lt;p&gt;IPv6は使用しないため、IPv6を無効化します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.all.disable_ipv6 = 1
+$
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6 = 1
+$
+$ sudo sysctl -a | grep disable_ipv6
+sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot;
+net.ipv6.conf.all.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot;
+net.ipv6.conf.default.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot;
+net.ipv6.conf.eth0.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot;
+net.ipv6.conf.eth1.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot;
+net.ipv6.conf.lo.disable_ipv6 = 1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再起動後もIPv6が無効化するように設定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;selinuxの無効化:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;SELinuxの無効化&lt;/h2&gt;
+
+&lt;p&gt;Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。&lt;/p&gt;
+
+&lt;h2 id=&#34;iptablesの設定:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;iptablesの設定&lt;/h2&gt;
+
+&lt;p&gt;iptablesでfirewallを設定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+##INPUTチェーン
+#IPスプーフィング対策
+$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+
+#セッションハイジャック対策
+$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#不正なパケット拒否
+$ sudo iptables -A INPUT -m state --state INVALID -j DROP
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+#$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+##OUTPUTチェーン
+#ループバックへの通信は通す
+$ sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#ICMP応答のパケットは通す
+$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#外部からの通信を始めた場合のパケットを許可
+$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#tcp-resetの通信は通す
+$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
+
+#ユーザrootが発したパケットは許可
+$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
+
+#NTPは許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+#$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信も拒否。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT DROP
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351&#34;&gt;iptablesで鉄壁？の守りを実現する3つのTips&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/iptables.html&#34;&gt;CentOS iptablesによるパケットフィルタ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kassyjp.ninja-web.net/ras/jessie/iptables.htm&#34;&gt;2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログ出力先をsyslogに変更:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;ログ出力先をsyslogに変更&lt;/h2&gt;
+
+&lt;p&gt;twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更します。&lt;/p&gt;
+
+&lt;p&gt;ログ保管用のディレクトリ作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == &#39;cowrie&#39; then /var/log/cowrie/cowrie.log
+&amp;amp; ~
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieのログ出力先変更&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd cowrie
+$ cp -p start.sh{,.backup20170107}
+$ ls -l start.sh*
+-rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh.backup20170105
+-rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh.backup20170107
+-rwxr-xr-x 1 cowrie cowrie 920  1月  4 19:05 start.sh.org
+$
+$ vi start.sh
+$ diff start.sh.backup20170107 start.sh
+35c35
+&amp;lt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     twistd $XARGS $DAEMONIZE --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
+37c37
+&amp;lt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     authbind --deep twistd $DAEMONIZE $XARGS --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;logrotateの設定:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;logrotateの設定&lt;/h2&gt;
+
+&lt;p&gt;logrotateをインストールします(通常はインストール済みのはずです)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install logrotate
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+logrotate はすでに最新版です。
+アップグレード: 0 個、新規インストール: 0 個、削除: 0 個、保留: 0 個。
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrie用のlogrotate設定を作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+        endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -d /etc/logrotate.d/cowrie
+reading config file /etc/logrotate.d/cowrie
+
+Handling 1 logs
+
+rotating pattern: /var/log/cowrie/cowrie.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/cowrie/cowrie.log
+  log /var/log/cowrie/cowrie.log does not exist -- skipping
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;logwatchのインストール:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;logwatchのインストール&lt;/h2&gt;
+
+&lt;p&gt;logwatchをインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install logwatch
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
+  liblockfile-bin liblockfile1 libsys-cpu-perl
+提案パッケージ:
+  mail-reader eximon4 exim4-doc-html exim4-doc-info spf-tools-perl swaks
+  fortune-mod
+推奨パッケージ:
+  mailx
+以下のパッケージが新たにインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
+  liblockfile-bin liblockfile1 libsys-cpu-perl logwatch
+アップグレード: 0 個、新規インストール: 9 個、削除: 0 個、保留: 0 個。
+3,532 kB のアーカイブを取得する必要があります。
+この操作後に追加で 17.1 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile-bin armhf 1.09-6 [18.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile1 armhf 1.09-6 [14.7 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-config all 4.84.2-2+deb8u2 [503 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-base armhf 4.84.2-2+deb8u2 [1,046 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-daemon-light armhf 4.84.2-2+deb8u2 [578 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main bsd-mailx armhf 8.1.2-0.20141216cvs-2 [74.3 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdate-manip-perl all 6.47-1 [923 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsys-cpu-perl armhf 0.61-1+b1 [9,800 B]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main logwatch all 7.4.1-2 [365 kB]
+3,532 kB を 48秒 で取得しました (72.9 kB/s)                                    
+パッケージを事前設定しています ...
+以前に未選択のパッケージ liblockfile-bin を選択しています。
+(データベースを読み込んでいます ... 現在 36617 個のファイルとディレクトリがインストールされています。)
+.../liblockfile-bin_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile-bin (1.09-6) を展開しています...
+以前に未選択のパッケージ liblockfile1:armhf を選択しています。
+.../liblockfile1_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile1:armhf (1.09-6) を展開しています...
+以前に未選択のパッケージ exim4-config を選択しています。
+.../exim4-config_4.84.2-2+deb8u2_all.deb を展開する準備をしています ...
+exim4-config (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-base を選択しています。
+.../exim4-base_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-base (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-daemon-light を選択しています。
+.../exim4-daemon-light_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-daemon-light (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ bsd-mailx を選択しています。
+.../bsd-mailx_8.1.2-0.20141216cvs-2_armhf.deb を展開する準備をしています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を展開しています...
+以前に未選択のパッケージ libdate-manip-perl を選択しています。
+.../libdate-manip-perl_6.47-1_all.deb を展開する準備をしています ...
+libdate-manip-perl (6.47-1) を展開しています...
+以前に未選択のパッケージ libsys-cpu-perl を選択しています。
+.../libsys-cpu-perl_0.61-1+b1_armhf.deb を展開する準備をしています ...
+libsys-cpu-perl (0.61-1+b1) を展開しています...
+以前に未選択のパッケージ logwatch を選択しています。
+.../logwatch_7.4.1-2_all.deb を展開する準備をしています ...
+logwatch (7.4.1-2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblockfile-bin (1.09-6) を設定しています ...
+liblockfile1:armhf (1.09-6) を設定しています ...
+exim4-config (4.84.2-2+deb8u2) を設定しています ...
+Adding system-user for exim (v4)
+exim4-base (4.84.2-2+deb8u2) を設定しています ...
+exim: DB upgrade, deleting hints-db
+exim4-daemon-light (4.84.2-2+deb8u2) を設定しています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を設定しています ...
+update-alternatives: /usr/bin/mailx (mailx) を提供するために自動モードで /usr/bin/bsd-mailx を使います
+libdate-manip-perl (6.47-1) を設定しています ...
+libsys-cpu-perl (0.61-1+b1) を設定しています ...
+logwatch (7.4.1-2) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logwatchの実行結果を確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その8</title>
@@ -331,6 +655,54 @@ mysql&amp;gt; show tables;
 mysql&amp;gt; 
 mysql&amp;gt; quit
 Bye
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libmysqlclient-dev
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下のパッケージが新たにインストールされます:
+  libmysqlclient-dev
+アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 0 個。
+889 kB のアーカイブを取得する必要があります。
+この操作後に追加で 4,866 kB のディスク容量が消費されます。
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient-dev armhf 5.5.53-0+deb8u1 [889 kB]
+889 kB を 2秒 で取得しました (306 kB/s)     
+以前に未選択のパッケージ libmysqlclient-dev を選択しています。
+(データベースを読み込んでいます ... 現在 38240 個のファイルとディレクトリがインストールされています。)
+.../libmysqlclient-dev_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を設定しています ...
+$
+$ sudo su - cowrie
+$ cd cowrie/
+$ source cowrie-env/bin/activate
+$ pip install mysql-python
+Downloading/unpacking mysql-python
+  Downloading MySQL-python-1.2.5.zip (108kB): 108kB downloaded
+  Running setup.py (path:/tmp/pip-build-prjaIE/mysql-python/setup.py) egg_info for package mysql-python
+Installing collected packages: mysql-python
+  Running setup.py install for mysql-python
+    building &#39;_mysql&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Dversion_info=(1,2,5,&#39;final&#39;,1) -D__version__=1.2.5 -I/usr/include/mysql -I/usr/include/python2.7 -c _mysql.c -o build/temp.linux-armv7l-2.7/_mysql.o -DBIG_JOINS=1 -fno-strict-aliasing -g -DNDEBUG
+    In file included from _mysql.c:44:0:
+    /usr/include/mysql/my_config.h:423:0: warning: &amp;quot;HAVE_WCSCOLL&amp;quot; redefined
+     #define HAVE_WCSCOLL
+     ^
+    In file included from /usr/include/python2.7/pyconfig.h:13:0,
+                     from /usr/include/python2.7/Python.h:8,
+                     from _mysql.c:29:
+    /usr/include/arm-linux-gnueabihf/python2.7/pyconfig.h:911:0: note: this is the location of the previous definition
+     #define HAVE_WCSCOLL 1
+     ^
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/_mysql.o -L/usr/lib/arm-linux-gnueabihf -lmysqlclient_r -lpthread -lz -lm -ldl -o build/lib.linux-armv7l-2.7/_mysql.so
+  Could not find .egg-info directory in install record for mysql-python
+Successfully installed mysql-python
+Cleaning up...
+$
+$ deactivate
 $
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1926,7 +2298,7 @@ $
 
 &lt;p&gt;今後iptablesの設定変更を保存するには以下のコマンドを実行します。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl save netfilter-persistent
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;cowrieの自動起動設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieの自動起動設定&lt;/h3&gt;
@@ -5132,212 +5504,6 @@ $ diff start.sh.org start.sh
 
 &lt;pre&gt;&lt;code&gt;$ ./stop.sh
 $ ./start.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)にCowrieをインストールする</title>
-      <link>http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/</link>
-      <pubDate>Mon, 15 Aug 2016 20:46:34 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
-はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。&lt;/p&gt;
-
-&lt;p&gt;個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspbianの初期設定:4c0925631b42437e2f8c229197506152&#34;&gt;Raspbianの初期設定&lt;/h2&gt;
-
-&lt;p&gt;Raspbianの初期設定として以下を行いました。&lt;/p&gt;
-
-&lt;h3 id=&#34;パッケージの最新化:4c0925631b42437e2f8c229197506152&#34;&gt;パッケージの最新化&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ipアドレスの固定化:4c0925631b42437e2f8c229197506152&#34;&gt;IPアドレスの固定化&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.10.10/24
-static routers=192.168.10.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ntp設定:4c0925631b42437e2f8c229197506152&#34;&gt;NTP設定&lt;/h3&gt;
-
-&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ntpq -p
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;raspi-config関連:4c0925631b42437e2f8c229197506152&#34;&gt;raspi-config関連&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ディスク拡張&lt;/li&gt;
-&lt;li&gt;文字コード設定&lt;/li&gt;
-&lt;li&gt;タイムゾーン設定&lt;/li&gt;
-&lt;li&gt;Wifiの国設定&lt;/li&gt;
-&lt;li&gt;ホスト名変更&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152&#34;&gt;公開鍵認証方式の設定&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh-keygen -t rsa
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
-Created directory &#39;/home/pi/.ssh&#39;.
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/pi/.ssh/id_rsa.
-Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
-
-$ cd ~/.ssh/
-$ cat id_rsa.pub &amp;gt;&amp;gt; authorized_keys
-$ chmod 600 authorized_keys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Raspbianで作成した秘密鍵をローカルPCにコピーする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;公開鍵認証方式でsshログインできることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;sshサーバの設定:4c0925631b42437e2f8c229197506152&#34;&gt;SSHサーバの設定&lt;/h2&gt;
-
-&lt;p&gt;Cowrieで&lt;code&gt;22/tcp&lt;/code&gt;を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ssh/sshd_config
-#Port 22
-Port 20022
-
-#PermitRootLogin without-password
-PermitRootLogin no
-
-ChallengeResponseAuthentication no
-
-#PasswordAuthentication yes
-PasswordAuthentication no
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHサーバの設定を再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ssh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ユーザ設定:4c0925631b42437e2f8c229197506152&#34;&gt;ユーザ設定&lt;/h2&gt;
-
-&lt;p&gt;rootユーザが無効化されていることを確認する(2列目が&lt;code&gt;L&lt;/code&gt;であることを確認)。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo passwd -S root
-root L 05/27/2016 0 99999 7 -1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrieユーザを作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo adduser --disabled-password cowrie
-ユーザ `cowrie&#39; を追加しています...
-新しいグループ `cowrie&#39; (1001) を追加しています...
-新しいユーザ `cowrie&#39; (1001) をグループ `cowrie&#39; として追加しています...
-ホームディレクトリ `/home/cowrie&#39; を作成しています...
-`/etc/skel&#39; からファイルをコピーしています...
-cowrie のユーザ情報を変更中
-新しい値を入力してください。標準設定値を使うならリターンを押してください
-	フルネーム []: 
-	部屋番号 []: 
-	職場電話番号 []: 
-	自宅電話番号 []: 
-	その他 []: 
-以上で正しいですか? [Y/n] y
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieのインストール:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieのインストール&lt;/h2&gt;
-
-&lt;p&gt;Cowrienの公式サイトの&lt;a href=&#34;https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md&#34;&gt;INSTALL.md&lt;/a&gt;を参考にインストールを行う。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
-
-$ sudo su - cowrie
-$ git clone http://github.com/micheloosterhof/cowrie
-$ cd cowrie/
-$ cp cowrie.cfg.dist cowrie.cfg
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieの設定:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieの設定&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vi cowrie.cfg
-#sensor_name=myhostname
-sensor_name=rpicowrie
-
-#hostname = svr04
-hostname = cowrie01
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieの起動と終了:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieの起動と終了&lt;/h2&gt;
-
-&lt;p&gt;起動するときは以下のコマンドを実行する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./start.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;終了するときは以下のコマンドを実行する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./stop.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieポートのポートフォワード&lt;/h2&gt;
-
-&lt;p&gt;Cowrieでは&lt;code&gt;2222/tcp&lt;/code&gt;でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-$ sudo iptables -t nat -n -L
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;iptables設定の保存:4c0925631b42437e2f8c229197506152&#34;&gt;iptables設定の保存&lt;/h2&gt;
-
-&lt;p&gt;再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install iptables-persistent
-$ sudo systemctl enable netfilter-persistent
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上&lt;/p&gt;

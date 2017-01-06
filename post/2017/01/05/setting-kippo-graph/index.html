@@ -430,6 +430,54 @@ Bye
 $
 </code></pre>
 
+<pre><code>$ sudo -E apt-get install libmysqlclient-dev
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下のパッケージが新たにインストールされます:
+  libmysqlclient-dev
+アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 0 個。
+889 kB のアーカイブを取得する必要があります。
+この操作後に追加で 4,866 kB のディスク容量が消費されます。
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient-dev armhf 5.5.53-0+deb8u1 [889 kB]
+889 kB を 2秒 で取得しました (306 kB/s)     
+以前に未選択のパッケージ libmysqlclient-dev を選択しています。
+(データベースを読み込んでいます ... 現在 38240 個のファイルとディレクトリがインストールされています。)
+.../libmysqlclient-dev_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を設定しています ...
+$
+$ sudo su - cowrie
+$ cd cowrie/
+$ source cowrie-env/bin/activate
+$ pip install mysql-python
+Downloading/unpacking mysql-python
+  Downloading MySQL-python-1.2.5.zip (108kB): 108kB downloaded
+  Running setup.py (path:/tmp/pip-build-prjaIE/mysql-python/setup.py) egg_info for package mysql-python
+Installing collected packages: mysql-python
+  Running setup.py install for mysql-python
+    building '_mysql' extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Dversion_info=(1,2,5,'final',1) -D__version__=1.2.5 -I/usr/include/mysql -I/usr/include/python2.7 -c _mysql.c -o build/temp.linux-armv7l-2.7/_mysql.o -DBIG_JOINS=1 -fno-strict-aliasing -g -DNDEBUG
+    In file included from _mysql.c:44:0:
+    /usr/include/mysql/my_config.h:423:0: warning: &quot;HAVE_WCSCOLL&quot; redefined
+     #define HAVE_WCSCOLL
+     ^
+    In file included from /usr/include/python2.7/pyconfig.h:13:0,
+                     from /usr/include/python2.7/Python.h:8,
+                     from _mysql.c:29:
+    /usr/include/arm-linux-gnueabihf/python2.7/pyconfig.h:911:0: note: this is the location of the previous definition
+     #define HAVE_WCSCOLL 1
+     ^
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/_mysql.o -L/usr/lib/arm-linux-gnueabihf -lmysqlclient_r -lpthread -lz -lm -ldl -o build/lib.linux-armv7l-2.7/_mysql.so
+  Could not find .egg-info directory in install record for mysql-python
+Successfully installed mysql-python
+Cleaning up...
+$
+$ deactivate
+$
+</code></pre>
+
 <p>CowrieのログをMySQLのデータベースに出力する。</p>
 
 <pre><code>$ sudo su - cowrie
@@ -1180,6 +1228,8 @@ $
                   <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/">家庭内インターネット接続環境を構築する その7</a></li>
                   
                   
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/">家庭内インターネット接続環境を構築する その9</a></li>
+                  
                 </ul>
               </div>
             </div>
@@ -1237,6 +1287,8 @@ $
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
@@ -1255,8 +1307,6 @@ $
       
       <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/" class="list-group-item">Raspbian(Jessie)にSquidをインストールする [ 2016-08-22 ]</a>
-      
     
   </div>
 </section>
@@ -1270,7 +1320,7 @@ $
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">27</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">28</span>server</a>
     
   </div>
 </section>
@@ -1315,7 +1365,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (8)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (9)</a>
     
     
     
@@ -1335,7 +1385,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (23)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (24)</a>
     
     
     
