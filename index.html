@@ -74,6 +74,233 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/">家庭内インターネット接続環境を構築する その11</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>前回に引き続きは<code>homemon1</code>、<code>homemon2</code>を構築していきます。
+FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。</p>
+
+<h2 id="rsyslogの設定:273aa48f87da59ed5cb2388af8a4171d">rsyslogの設定</h2>
+
+<p>ネットワーク機器のSyslogを保存する用の設定</p>
+
+<p>ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。
+例）/var/log/network-device/ホスト名/ホスト名.log</p>
+
+<pre><code>$ sudo cp -p /etc/rsyslog.conf{,.org}
+$ ls -l /etc/rsyslog.conf*
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf.org
+$
+$ sudo vi /etc/rsyslog.conf
+#$ModLoad imudp
+#$UDPServerRun 514
+$ModLoad imudp
+$UDPServerRun 514
+
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Queue
+#
+$MainMsgQueueType LinkedList
+#$ActionQueueType Direct
+
+$ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
+16,17c16,17
+&lt; #$ModLoad imudp
+&lt; #$UDPServerRun 514
+---
+&gt; $ModLoad imudp
+&gt; $UDPServerRun 514
+46a47,52
+&gt; 
+&gt; #
+&gt; # Queue
+&gt; #
+&gt; $MainMsgQueueType LinkedList
+&gt; #$ActionQueueType Direct
+$
+$ sudo vi /etc/rsyslog.d/network-device.conf
+$template NetworkDeviceFileName,&quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&quot;
+if $fromhost-ip != '127.0.0.1' then ?NetworkDeviceFileName
+</code></pre>
+
+<p>rsyslogの再起動</p>
+
+<pre><code>$ sudo systemctl restart rsyslog
+</code></pre>
+
+<ul>
+<li><a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/s1-working_with_queues_in_rsyslog.html">20.4. Rsyslog でのキュー (Queue) を使った操作</a></li>
+</ul>
+
+<h2 id="ログローテート:273aa48f87da59ed5cb2388af8a4171d">ログローテート</h2>
+
+<p>ログローテートの設定</p>
+
+<pre><code>$ sudo vi /etc/logrotate.d/network-device
+/var/log/network-device/*/*.log
+{
+	daily
+	rotate 92
+	dateext
+	create 0640 root adm
+	missingok
+	ifempty
+	compress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate &gt; /dev/null
+	endscript
+}
+</code></pre>
+
+<p>logrotateをテスト実行し、エラーがないことを確認</p>
+
+<pre><code>$ sudo logrotate -dv /etc/logrotate.d/network-device 
+reading config file /etc/logrotate.d/network-device
+
+Handling 1 logs
+
+rotating pattern: /var/log/network-device/*/*.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/network-device/192.168.30.254/192.168.30.254.log
+  log does not need rotating
+not running postrotate script, since no logs were rotated
+</code></pre>
+
+<ul>
+<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
+<li><a href="https://open-groove.net/linux/logrotate-test/">logrotate（ログローテート）の動作確認 | OpenGroove</a></li>
+</ul>
+
+<h2 id="fortigate-60dのsyslog送信設定:273aa48f87da59ed5cb2388af8a4171d">FortiGate 60DのSyslog送信設定</h2>
+
+<p>FortiGate 60DからSyslogサーバにsyslog送信を行うように設定</p>
+
+<pre><code># config log syslogd setting
+(setting)# set status enable
+(setting)# set server &quot;192.168.30.10&quot;
+(setting)# end
+#
+# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &quot;192.168.30.20&quot;
+(setting)# end
+#
+</code></pre>
+
+<p>FortiGate 60Dのsyslog送信設定の確認</p>
+
+<pre><code># show log syslogd setting
+config log syslogd setting
+	set status enable
+	set server &quot;192.168.30.10&quot;
+end
+#
+# show log syslogd2 setting
+config log syslogd2 setting
+	set status enable
+	set server &quot;192.168.30.20&quot;
+end
+#
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/">家庭内インターネット接続環境を構築する その10</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>今回は<code>homemon1</code>、<code>homemon2</code>を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。</p>
+
+<h2 id="ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab">NTPサーバの構築</h2>
+
+<pre><code>$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+</code></pre>
+
+<p>NTPサーバの再起動</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/">家庭内インターネット接続環境を構築する その9</a></h1>
                   <p>
                     <span class="label label-primary">Sat Jan 7, 2017</span> in
@@ -747,6 +974,8 @@ Bye
 $
 </code></pre>
 
+<p>CowrieのログをMySQLのデータベースに出力する事前準備</p>
+
 <pre><code>$ sudo -E apt-get install libmysqlclient-dev
 パッケージリストを読み込んでいます... 完了
 依存関係ツリーを作成しています                
@@ -795,7 +1024,7 @@ $ deactivate
 $
 </code></pre>
 
-<p>CowrieのログをMySQLのデータベースに出力する。</p>
+<p>CowrieのログをMySQLのデータベースに出力</p>
 
 <pre><code>$ sudo su - cowrie
 $ cd cowrie/
@@ -4480,221 +4709,10 @@ server ntp.jst.mfeed.ad.jp iburst
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/">家庭内インターネット接続環境を構築する その1</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Oct 22, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/fortigate">fortigate</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。</p>
-
-<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
-
-<h2 id="機材:e8a70867bb0ccfe3cfd50643695a747c">機材</h2>
-
-<p>本環境を構築するために以下の機材を用意しました。</p>
-
-<ul>
-<li>FortiGate 60D : 1台</li>
-<li>Raspberry Pi 2 : 5台</li>
-<li>USB LANアダプタ : 5個</li>
-<li>Switching HUB : 3台</li>
-<li>WANルータ : 1台</li>
-</ul>
-
-<p>具体的な構築内容は次回から記載します。</p>
-
-                </div>
-              </article>
-              
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
-                  <p>
-                    <span class="label label-primary">Wed Aug 24, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/bind">bind</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
-Raspbianの基本的な設定は完了している前提です。</p>
-
-<h2 id="bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09">bind9のインストール</h2>
-
-<pre><code>$ sudo apt-get install bind9 dnsutils
-</code></pre>
-
-<p>bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。</p>
-
-<pre><code>$ sudo cat /etc/bind/named.conf.options
-controls {
-	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
-};
-include &quot;/etc/bind/rndc.key&quot;;
-
-acl &quot;internal-network&quot; {
-	localhost;
-	127.0.0.1/32;
-	192.168.10.0/24;
-	192.168.20.0/24;
-	192.168.30.0/24;
-	192.168.40.0/24;
-};
-
-options {
-	version &quot;unknown&quot;;
-
-	directory &quot;/var/cache/bind&quot;;
-
-	listen-on {
-		internal-network;
-	};
-
-	querylog yes;
-	allow-query {
-		internal-network;
-	};
-
-	recursion yes;
-	allow-recursion {
-		internal-network;
-	};
-
-	forwarders {
-		192.168.100.1;
-	};
-
-	notify no;
-
-	max-ncache-ttl	300;
-	max-cache-ttl	3600;
-	recursive-clients	300;
-	cleaning-interval	60;
-	lame-ttl	600;
-	max-cache-size	256m;
-
-	allow-transfer {
-		none;
-	};
-
-	allow-update {
-		none;
-	};
-};
-
-logging {
-	channel &quot;log_default&quot; {
-		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
-		print-time yes;
-		severity info;
-		print-category yes;
-	};
-	channel &quot;alert&quot; {
-		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
-		severity info;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-	channel &quot;query&quot; {
-		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
-		severity debug;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-
-	category default { &quot;log_default&quot;; };
-	category security { &quot;alert&quot;; };
-	category queries { &quot;query&quot;; };
-	category lame-servers { null; };
-};
-</code></pre>
-
-<p>コンフィグの不備を確認する。</p>
-
-<pre><code>$ sudo named-checkconf /etc/bind/named.conf
-</code></pre>
-
-<p>ログ保存先のディレクトリを作成する。</p>
-
-<pre><code>$ sudo mkdir -p /var/log/bind
-$ sudo chown bind:bind /var/log/bind
-</code></pre>
-
-<p>bind9を再起動する。</p>
-
-<pre><code>$ sudo systemctl restart bind9
-</code></pre>
-
-<h2 id="iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09">iptablesの設定</h2>
-
-<p>iptablesでfirewallを設定する。</p>
-
-<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-
-$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
-$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
-</code></pre>
-
-<p>iptablesの設定を保存する。</p>
-
-<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
-</code></pre>
-
-<h2 id="dnsの設定:de7ee9c067a99fe782c9ccc491d85d09">DNSの設定</h2>
-
-<p>キャッシュDNSを使用するように設定変更を行う。</p>
-
-<pre><code>$ sudo vi /etc/dhcpcd.conf
-static domain_name_servers=127.0.0.1
-$ sudo systemctl restart dhcpcd
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 3</li>
+  <li>Page 1 of 4</li>
   
   <li class="next"><a href="/page/2/">Older &rarr;</a></li>
   
@@ -4756,6 +4774,10 @@ $ sudo systemctl restart dhcpcd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
@@ -4772,10 +4794,6 @@ $ sudo systemctl restart dhcpcd
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
-      
     
   </div>
 </section>
@@ -4789,7 +4807,7 @@ $ sudo systemctl restart dhcpcd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">28</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">30</span>server</a>
     
   </div>
 </section>
@@ -4834,7 +4852,7 @@ $ sudo systemctl restart dhcpcd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (9)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (11)</a>
     
     
     
@@ -4854,7 +4872,7 @@ $ sudo systemctl restart dhcpcd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (24)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (26)</a>
     
     
     

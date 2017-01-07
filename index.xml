@@ -7,8 +7,207 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 07 Jan 2017 01:02:37 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Jan 2017 16:09:11 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その11</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</link>
+      <pubDate>Sat, 07 Jan 2017 16:09:11 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続きは&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;rsyslogの設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;rsyslogの設定&lt;/h2&gt;
+
+&lt;p&gt;ネットワーク機器のSyslogを保存する用の設定&lt;/p&gt;
+
+&lt;p&gt;ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。
+例）/var/log/network-device/ホスト名/ホスト名.log&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/rsyslog.conf{,.org}
+$ ls -l /etc/rsyslog.conf*
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf.org
+$
+$ sudo vi /etc/rsyslog.conf
+#$ModLoad imudp
+#$UDPServerRun 514
+$ModLoad imudp
+$UDPServerRun 514
+
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Queue
+#
+$MainMsgQueueType LinkedList
+#$ActionQueueType Direct
+
+$ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
+16,17c16,17
+&amp;lt; #$ModLoad imudp
+&amp;lt; #$UDPServerRun 514
+---
+&amp;gt; $ModLoad imudp
+&amp;gt; $UDPServerRun 514
+46a47,52
+&amp;gt; 
+&amp;gt; #
+&amp;gt; # Queue
+&amp;gt; #
+&amp;gt; $MainMsgQueueType LinkedList
+&amp;gt; #$ActionQueueType Direct
+$
+$ sudo vi /etc/rsyslog.d/network-device.conf
+$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&amp;quot;
+if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/s1-working_with_queues_in_rsyslog.html&#34;&gt;20.4. Rsyslog でのキュー (Queue) を使った操作&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログローテート:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;ログローテート&lt;/h2&gt;
+
+&lt;p&gt;ログローテートの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/network-device
+/var/log/network-device/*/*.log
+{
+	daily
+	rotate 92
+	dateext
+	create 0640 root adm
+	missingok
+	ifempty
+	compress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+	endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -dv /etc/logrotate.d/network-device 
+reading config file /etc/logrotate.d/network-device
+
+Handling 1 logs
+
+rotating pattern: /var/log/network-device/*/*.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/network-device/192.168.30.254/192.168.30.254.log
+  log does not need rotating
+not running postrotate script, since no logs were rotated
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;fortigate-60dのsyslog送信設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;FortiGate 60DのSyslog送信設定&lt;/h2&gt;
+
+&lt;p&gt;FortiGate 60DからSyslogサーバにsyslog送信を行うように設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.10&amp;quot;
+(setting)# end
+#
+# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.20&amp;quot;
+(setting)# end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;FortiGate 60Dのsyslog送信設定の確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# show log syslogd setting
+config log syslogd setting
+	set status enable
+	set server &amp;quot;192.168.30.10&amp;quot;
+end
+#
+# show log syslogd2 setting
+config log syslogd2 setting
+	set status enable
+	set server &amp;quot;192.168.30.20&amp;quot;
+end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その10</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</link>
+      <pubDate>Sat, 07 Jan 2017 13:05:24 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab&#34;&gt;NTPサーバの構築&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&amp;gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その9</title>
@@ -658,6 +857,8 @@ Bye
 $
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力する事前準備&lt;/p&gt;
+
 &lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libmysqlclient-dev
 パッケージリストを読み込んでいます... 完了
 依存関係ツリーを作成しています                
@@ -706,7 +907,7 @@ $ deactivate
 $
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;CowrieのログをMySQLのデータベースに出力する。&lt;/p&gt;
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
 $ cd cowrie/
@@ -5012,499 +5213,6 @@ $
 &lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_06.png&#34; alt=&#34;cacti_install_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Cowrieのセキュリティ設定</title>
-      <link>http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/</link>
-      <pubDate>Tue, 16 Aug 2016 18:59:00 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/</guid>
-      <description>
-
-&lt;p&gt;前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
-Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。&lt;/p&gt;
-
-&lt;h2 id=&#34;ipv6の無効化:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;IPv6の無効化&lt;/h2&gt;
-
-&lt;p&gt;IPv6は使用しないため、IPv6を無効化する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-$ sudo sysctl -a | grep disable_ipv6
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;再起動後もIPv6が無効化するように設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
-net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6=1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;selinuxの無効化:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;SELinuxの無効化&lt;/h2&gt;
-
-&lt;p&gt;Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。&lt;/p&gt;
-
-&lt;h2 id=&#34;iptablesの設定:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;iptablesの設定&lt;/h2&gt;
-
-&lt;p&gt;iptablesでfirewallを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#Cowrieポートのポートフォワード(別手順で設定済み)
-#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-
-##INPUTチェーン
-#IPスプーフィング対策
-$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
-
-#セッションハイジャック対策
-$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
-
-#不正なパケット拒否
-$ sudo iptables -A INPUT -m state --state INVALID -j DROP
-
-#内部からの通信を始めた場合のパケットは許可
-$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#ループバックからの通信は通す
-$ sudo iptables -A INPUT -i lo -j ACCEPT
-
-#ICMPパケットは許可
-$ sudo iptables -A INPUT -p icmp -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
-
-#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
-
-#HTTPは許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
-
-#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
-$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
-
-#Zabbix-Agentへの通信は許可
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
-
-##OUTPUTチェーン
-#ループバックへの通信は通す
-$ sudo iptables -A OUTPUT -o lo -j ACCEPT
-
-#ICMP応答のパケットは通す
-$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#外部からの通信を始めた場合のパケットを許可
-$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#tcp-resetの通信は通す
-$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
-
-#ユーザrootが発したパケットは許可
-$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
-
-#NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
-
-#Zabbix-Serverへの通信は許可
-$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
-
-#外部からの通信は拒否。外部への通信も拒否。
-$ sudo iptables -P INPUT DROP
-$ sudo iptables -P FORWARD DROP
-$ sudo iptables -P OUTPUT DROP
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351&#34;&gt;iptablesで鉄壁？の守りを実現する3つのTips&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/iptables.html&#34;&gt;CentOS iptablesによるパケットフィルタ&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kassyjp.ninja-web.net/ras/jessie/iptables.htm&#34;&gt;2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ログ出力先をsyslogに変更:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;ログ出力先をsyslogに変更&lt;/h2&gt;
-
-&lt;p&gt;twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。&lt;/p&gt;
-
-&lt;p&gt;ログ保管用のディレクトリ作成。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo mkdir /var/log/cowrie
-$ sudo chown cowrie:adm /var/log/cowrie/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;rsyslogの設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/rsyslog.d/cowrie.conf
-if $programname == &#39;cowrie&#39; then /var/log/cowrie/cowrie.log
-&amp;amp; ~
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;rsyslogの再起動。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrieのログ出力先変更。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
-$ cd ${COWRIE_INSTALL_DIR}
-$ vi start.sh
-$ diff ./start.sh.back20160818 ./start.sh
-31c31
-&amp;lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
----
-&amp;gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
-33c33
-&amp;lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
----
-&amp;gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;logrotateの設定:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logrotateの設定&lt;/h2&gt;
-
-&lt;p&gt;logrotateをインストールする(通常はインストール済みのはず)。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install logrotate
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrie用のlogrotate設定を作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/cowrie
-/var/log/cowrie/cowrie.log
-{
-        daily
-        rotate 92
-        dateext
-        create 0640 cowrie adm
-        missingok
-        ifempty
-        compress
-        postrotate
-                invoke-rc.d rsyslog rotate &amp;gt; /dev/null
-        endscript
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo logrotate -d /etc/logrotate.d/cowrie
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;logwatchのインストール:fe15561ef667c99ac763e1e39b0b43c7&#34;&gt;logwatchのインストール&lt;/h2&gt;
-
-&lt;p&gt;logwatchをインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install logwatch
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;logwatchの実行結果を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Kippo-GraphをインストールしてCowrieのログを可視化する</title>
-      <link>http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</link>
-      <pubDate>Tue, 16 Aug 2016 08:43:57 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</guid>
-      <description>
-
-&lt;p&gt;Kippo-Graphの公式(&lt;a href=&#34;http://bruteforce.gr/kippo-graph&#34;&gt;Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog&lt;/a&gt;)を参考にKippo-Graphをインストールするまでのメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;mysqlのインストールと初期設定:d89df975e87a1641818c282be53c7899&#34;&gt;MySQLのインストールと初期設定&lt;/h2&gt;
-
-&lt;p&gt;MySQLをインストールする。&lt;/p&gt;
-
-&lt;p&gt;インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get install mysql-server
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;MySQLのセキュア設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ mysql_secure_installation
-
-
-
-
-NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
-      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
-
-
-In order to log into MySQL to secure it, we&#39;ll need the current
-password for the root user.  If you&#39;ve just installed MySQL, and
-you haven&#39;t set the root password yet, the password will be blank,
-so you should just press enter here.
-
-Enter current password for root (enter for none): 
-OK, successfully used password, moving on...
-
-Setting the root password ensures that nobody can log into the MySQL
-root user without the proper authorisation.
-
-You already have a root password set, so you can safely answer &#39;n&#39;.
-
-Change the root password? [Y/n] n
- ... skipping.
-
-By default, a MySQL installation has an anonymous user, allowing anyone
-to log into MySQL without having to have a user account created for
-them.  This is intended only for testing, and to make the installation
-go a bit smoother.  You should remove them before moving into a
-production environment.
-
-Remove anonymous users? [Y/n] Y
- ... Success!
-
-Normally, root should only be allowed to connect from &#39;localhost&#39;.  This
-ensures that someone cannot guess at the root password from the network.
-
-Disallow root login remotely? [Y/n] Y
- ... Success!
-
-By default, MySQL comes with a database named &#39;test&#39; that anyone can
-access.  This is also intended only for testing, and should be removed
-before moving into a production environment.
-
-Remove test database and access to it? [Y/n] Y
- - Dropping test database...
-ERROR 1008 (HY000) at line 1: Can&#39;t drop database &#39;test&#39;; database doesn&#39;t exist
- ... Failed!  Not critical, keep moving...
- - Removing privileges on test database...
- ... Success!
-
-Reloading the privilege tables will ensure that all changes made so far
-will take effect immediately.
-
-Reload privilege tables now? [Y/n] Y
- ... Success!
-
-Cleaning up...
-
-
-
-All done!  If you&#39;ve completed all of the above steps, your MySQL
-installation should now be secure.
-
-Thanks for using MySQL!
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;MySQLの初期設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/mysql/my.cnf
-[mysqld]
-character-set-server=utf8
-collation-server=utf8_general_ci
-skip-character-set-client-handshake
-default-storage-engine=InnoDB
-innodb_file_per_table
-innodb_buffer_pool_size=256M
-skip-name-resolve
-
-[mysqldump]
-default-character-set=utf8
-
-[mysql]
-default-character-set=utf8
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html&#34;&gt;MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;MySQLの再起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart mysql
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieのログ出力先を変更:d89df975e87a1641818c282be53c7899&#34;&gt;Cowrieのログ出力先を変更&lt;/h2&gt;
-
-&lt;p&gt;Cowrie用データベースの作成&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ mysql -uroot -p
-Enter password:
-mysql&amp;gt; create database cowrie character set utf8 collate utf8_bin;
-mysql&amp;gt; grant all privileges on cowrie.* to cowrie@localhost identified by &#39;cowrie_password&#39;;
-mysql&amp;gt; quit
-
-$ cd ${COWRIE_INSTALL_DIR}
-$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CowrieのログをMySQLのデータベースに出力する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cd ${COWRIE_INSTALL_DIR}
-$ vi cowrie.cfg
-↓コメントアウト
-#[iutput_jsonloi]
-#logfile = log/cowrie.json
-
-#[output_mysql]
-#host = localhost
-#database = cowrie
-#username = cowrie
-#password = secret
-#port = 3306
-[output_mysql]
-host = localhost
-database = cowrie
-username = cowrie
-password = cowrie_password
-port = 3306
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrieの再起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./stop.sh
-$ ./start.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;apache2のインストール:d89df975e87a1641818c282be53c7899&#34;&gt;Apache2のインストール&lt;/h2&gt;
-
-&lt;p&gt;Apache2をインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install apache2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Apache2のセキュリティ設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/apache2/conf-available/security.conf
-ServerTokens Prod
-ServerSignature Off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Apache2の文字コード設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/apache2/conf-available/charset.conf
-#AddDefaultCharset UTF-8
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Apache2のServerName設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
-$ sudo a2enconf fqdn
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Apache2の再起動。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;kippo-graphのインストール:d89df975e87a1641818c282be53c7899&#34;&gt;Kippo-Graphのインストール&lt;/h2&gt;
-
-&lt;p&gt;関連パッケージのインストール。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
-$ sudo apt-get install dnsutils
-$ sudo systemctl restart apache2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Kippo-Graphのインストール。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
-$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
-$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
-&amp;lt;IfModule mod_alias.c&amp;gt;
-    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
-&amp;lt;/IfModule&amp;gt;
-$ sudo a2enconf kippo-graph
-$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Kippo-Graphの設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
-$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
-$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
-define(&#39;DB_HOST&#39;, &#39;localhost&#39;);
-define(&#39;DB_USER&#39;, &#39;cowrie&#39;);
-define(&#39;DB_PASS&#39;, &#39;cowrie_password&#39;);
-define(&#39;DB_NAME&#39;, &#39;cowrie&#39;);
-define(&#39;DB_PORT&#39;, &#39;3306&#39;);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;kippo-graphの修正:d89df975e87a1641818c282be53c7899&#34;&gt;Kippo-Graphの修正&lt;/h2&gt;
-
-&lt;p&gt;KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。&lt;/p&gt;
-
-&lt;p&gt;PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;class/KippoPlayLog.class.php&lt;/code&gt;の修正&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
-$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
-$ sudo vi class/KippoPlayLog.class.php
-$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
-21c21
-&amp;lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
----
-&amp;gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;include/play.php&lt;/code&gt;の修正&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
-$ sudo cp -p include/play.php include/play.php.org
-$ sudo vi include/play.php
-$ diff play.php.org play.php
-70c70
-&amp;lt;                 $log = base64_encode($row[&#39;ttylog&#39;]);
----
-&amp;gt;                 $log = base64_encode(file_get_contents($row[&#39;ttylog&#39;]));
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ttylogへのシンボリックリンク作成&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1/include
-$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
-$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
-$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrie起動スクリプトの修正&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
-$ cd ${COWRIE_INSTALL_DIR}/
-$ cp -p start.sh start.sh.org
-$ vi start.sh
-$ diff start.sh.org start.sh
-31c31
-&amp;lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
----
-&amp;gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
-33c33
-&amp;lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
----
-&amp;gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrieの再起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./stop.sh
-$ ./start.sh
-&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

@@ -74,6 +74,217 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/">家庭内インターネット接続環境を構築する その1</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/fortigate">fortigate</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<h2 id="機材:e8a70867bb0ccfe3cfd50643695a747c">機材</h2>
+
+<p>本環境を構築するために以下の機材を用意しました。</p>
+
+<ul>
+<li>FortiGate 60D : 1台</li>
+<li>Raspberry Pi 2 : 5台</li>
+<li>USB LANアダプタ : 5個</li>
+<li>Switching HUB : 3台</li>
+<li>WANルータ : 1台</li>
+</ul>
+
+<p>具体的な構築内容は次回から記載します。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/bind">bind</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
+Raspbianの基本的な設定は完了している前提です。</p>
+
+<h2 id="bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09">bind9のインストール</h2>
+
+<pre><code>$ sudo apt-get install bind9 dnsutils
+</code></pre>
+
+<p>bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。</p>
+
+<pre><code>$ sudo cat /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &quot;/etc/bind/rndc.key&quot;;
+
+acl &quot;internal-network&quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &quot;unknown&quot;;
+
+	directory &quot;/var/cache/bind&quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &quot;log_default&quot; {
+		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &quot;alert&quot; {
+		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &quot;query&quot; {
+		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &quot;log_default&quot;; };
+	category security { &quot;alert&quot;; };
+	category queries { &quot;query&quot;; };
+	category lame-servers { null; };
+};
+</code></pre>
+
+<p>コンフィグの不備を確認する。</p>
+
+<pre><code>$ sudo named-checkconf /etc/bind/named.conf
+</code></pre>
+
+<p>ログ保存先のディレクトリを作成する。</p>
+
+<pre><code>$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+</code></pre>
+
+<p>bind9を再起動する。</p>
+
+<pre><code>$ sudo systemctl restart bind9
+</code></pre>
+
+<h2 id="iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09">iptablesの設定</h2>
+
+<p>iptablesでfirewallを設定する。</p>
+
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+
+$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
+$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<h2 id="dnsの設定:de7ee9c067a99fe782c9ccc491d85d09">DNSの設定</h2>
+
+<p>キャッシュDNSを使用するように設定変更を行う。</p>
+
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$ sudo systemctl restart dhcpcd
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/">Raspbian(Jessie)にSquidをインストールする</a></h1>
                   <p>
                     <span class="label label-primary">Mon Aug 22, 2016</span> in
@@ -1572,318 +1783,12 @@ $ sudo apt-get upgrade
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Thu Aug 11, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
-Zabbix Serverのインストールは別のメモになります。</p>
-
-<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
-
-<p>Raspbianのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
-
-<p>Zabbix Agentのインストール</p>
-
-<pre><code>$ sudo apt-get install zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
-
-<p>Zabbix Agentを設定する。</p>
-
-<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
-Server=(Zabbix server IP address)
-ServerActive=(Zabbix server IP address)
-Hostname=(Hostname)
-
-$ sudo systemctl restart zabbix-agent
-</code></pre>
-
-<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
-
-<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
-
-<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/">Raspbian(Jessie)にZabbix Serverをインストール</a></h1>
-                  <p>
-                    <span class="label label-primary">Wed Aug 10, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)にZabbix Serverをインストールするメモです。
-Zabbix Agentのインストールは別のメモになります。</p>
-
-<ul>
-<li><a href="https://www.zabbix.com/documentation/2.2/manual/installation/install_from_packages">3 Installation from packages [Zabbix Documentation 2.2]</a></li>
-</ul>
-
-<h2 id="パッケージの更新:4df21ad0746a34acfa37879eaf637713">パッケージの更新</h2>
-
-<p>Raspbianのパッケージを最新する。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get upgrade
-</code></pre>
-
-<h2 id="zabbix-serverのインストール:4df21ad0746a34acfa37879eaf637713">Zabbix Serverのインストール</h2>
-
-<p>Zabbix Serverのインストール</p>
-
-<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
-
-<pre><code>$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php
-$ sudo apt-get install php5-mysql
-$ sudo apt-get install task-japanese
-</code></pre>
-
-<h3 id="mysqlの初期設定:4df21ad0746a34acfa37879eaf637713">MySQLの初期設定</h3>
-
-<p>MySQLのセキュア設定</p>
-
-<pre><code>$ mysql_secure_installation
-In order to log into MySQL to secure it, we'll need the current
-password for the root user.  If you've just installed MySQL, and
-you haven't set the root password yet, the password will be blank,
-so you should just press enter here.
-
-Enter current password for root (enter for none): 
-OK, successfully used password, moving on...
-
-Setting the root password ensures that nobody can log into the MySQL
-root user without the proper authorisation.
-
-You already have a root password set, so you can safely answer 'n'.
-
-Change the root password? [Y/n] n
- ... skipping.
-
-By default, a MySQL installation has an anonymous user, allowing anyone
-to log into MySQL without having to have a user account created for
-them.  This is intended only for testing, and to make the installation
-go a bit smoother.  You should remove them before moving into a
-production environment.
-
-Remove anonymous users? [Y/n] Y
- ... Success!
-
-Normally, root should only be allowed to connect from 'localhost'.  This
-ensures that someone cannot guess at the root password from the network.
-
-Disallow root login remotely? [Y/n] Y
- ... Success!
-
-By default, MySQL comes with a database named 'test' that anyone can
-access.  This is also intended only for testing, and should be removed
-before moving into a production environment.
-
-Remove test database and access to it? [Y/n] Y
- - Dropping test database...
-ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
- ... Failed!  Not critical, keep moving...
- - Removing privileges on test database...
- ... Success!
-
-Reloading the privilege tables will ensure that all changes made so far
-will take effect immediately.
-
-Reload privilege tables now? [Y/n] Y
- ... Success!
-
-Cleaning up...
-
-
-
-All done!  If you've completed all of the above steps, your MySQL
-installation should now be secure.
-
-Thanks for using MySQL!
-</code></pre>
-
-<p>MySQLの初期設定</p>
-
-<pre><code>$ sudo vi /etc/mysql/my.cnf
-[mysqld]
-character-set-server=utf8
-collation-server=utf8_general_ci
-skip-character-set-client-handshake
-default-storage-engine=InnoDB
-innodb_file_per_table
-innodb_buffer_pool_size=256M
-skip-name-resolve
-
-[mysqldump]
-default-character-set=utf8
-
-[mysql]
-default-character-set=utf8
-</code></pre>
-
-<ul>
-<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
-</ul>
-
-<p>MySQLの再起動</p>
-
-<pre><code>$ sudo systemctl restart mysql
-</code></pre>
-
-<h3 id="apache2の初期設定:4df21ad0746a34acfa37879eaf637713">Apache2の初期設定</h3>
-
-<p>Apache2のセキュリティ設定</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
-ServerTokens Prod
-ServerSignature Off
-</code></pre>
-
-<p>Apache2の文字コード設定</p>
-
-<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
-#AddDefaultCharset UTF-8
-</code></pre>
-
-<p>Apache2のServerName設定</p>
-
-<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
-$ sudo a2enconf fqdn
-</code></pre>
-
-<p>Apache2の再起動</p>
-
-<pre><code>$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<ul>
-<li><a href="http://mk-55.hatenablog.com/entry/2014/07/07/004510">ubuntuにおけるapache2のAH00558エラーを解決する。 - mk_55&rsquo;s diary</a></li>
-</ul>
-
-<h2 id="zabbix-serverの設定:4df21ad0746a34acfa37879eaf637713">Zabbix Serverの設定</h2>
-
-<p>データベースの作成</p>
-
-<pre><code>$ mysql -uroot -p
-Enter password:
-mysql&gt; 
-mysql&gt; create database zabbix character set utf8 collate utf8_bin;
-mysql&gt; grant all privileges on zabbix.* to zabbix@localhost identified by 'zabbix_password';
-mysql&gt; quit
-
-$ zcat /usr/share/zabbix-server-mysql/schema.sql.gz | mysql -uzabbix -p zabbix
-$ zcat /usr/share/zabbix-server-mysql/images.sql.gz | mysql -uzabbix -p zabbix
-$ zcat /usr/share/zabbix-server-mysql/data.sql.gz | mysql -uzabbix -p zabbix
-</code></pre>
-
-<p>Apache2のZabbixサイト設定</p>
-
-<pre><code>$ sudo cp /usr/share/doc/zabbix-frontend-php/examples/apache.conf /etc/apache2/conf-available/zabbix.conf
-$ sudo vi /etc/apache2/conf-available/zabbix.conf
-# Add the following lines
-php_value max_execution_time 300
-php_value memory_limit 128M
-php_value post_max_size 16M
-php_value upload_max_filesize 2M
-php_value max_input_time 300
-php_value date.timezone Asia/Tokyo
-
-$ sudo a2enconf zabbix
-$ sudo apachectl configtest
-$ sudo systemctl restart apache2
-</code></pre>
-
-<p>Zabbixのサーバ設定</p>
-
-<pre><code>$ sudo vi /etc/zabbix/zabbix_server.conf
-DBHost=localhost
-DBName=zabbix
-DBUser=zabbix
-DBPassword=zabbix_password
-
-$ sudo vi /etc/default/zabbix-server
-START=yes
-
-$ sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/share/zabbix/fonts/
-$ sudo vi /usr/share/zabbix/include/defines.inc.php
-define('ZBX_GRAPH_FONT_NAME',		'unifont');
-
-$ sudo systemctl restart zabbix-server
-</code></pre>
-
-<h2 id="zabbix-serverへのアクセス:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのアクセス</h2>
-
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスする。</p>
-
-<p>Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
-
-<h2 id="zabbix-serverへのログイン:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのログイン</h2>
-
-<p>Zabbixの初期設定が完了するとログイン画面が表示されるので、デフォルトアカウント(<code>Admin/zabbix</code>)でログインする。
-ログイン後は画面右上のProfileを開き、パスワードを変更しておく。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
   <li class="previous"><a href="/">&larr; Newer</a></li>
   
-  <li>Page 2 of 3</li>
+  <li>Page 2 of 4</li>
   
   <li class="next"><a href="/page/3/">Older &rarr;</a></li>
   
@@ -1945,6 +1850,10 @@ $ sudo systemctl restart zabbix-server
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
@@ -1961,10 +1870,6 @@ $ sudo systemctl restart zabbix-server
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
-      
     
   </div>
 </section>
@@ -1978,7 +1883,7 @@ $ sudo systemctl restart zabbix-server
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">28</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">30</span>server</a>
     
   </div>
 </section>
@@ -2023,7 +1928,7 @@ $ sudo systemctl restart zabbix-server
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (9)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (11)</a>
     
     
     
@@ -2043,7 +1948,7 @@ $ sudo systemctl restart zabbix-server
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (24)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (26)</a>
     
     
     

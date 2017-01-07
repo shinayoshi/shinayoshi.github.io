@@ -7,8 +7,207 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 07 Jan 2017 01:02:37 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Jan 2017 16:09:11 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その11</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</link>
+      <pubDate>Sat, 07 Jan 2017 16:09:11 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続きは&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;rsyslogの設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;rsyslogの設定&lt;/h2&gt;
+
+&lt;p&gt;ネットワーク機器のSyslogを保存する用の設定&lt;/p&gt;
+
+&lt;p&gt;ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。
+例）/var/log/network-device/ホスト名/ホスト名.log&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/rsyslog.conf{,.org}
+$ ls -l /etc/rsyslog.conf*
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf.org
+$
+$ sudo vi /etc/rsyslog.conf
+#$ModLoad imudp
+#$UDPServerRun 514
+$ModLoad imudp
+$UDPServerRun 514
+
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Queue
+#
+$MainMsgQueueType LinkedList
+#$ActionQueueType Direct
+
+$ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
+16,17c16,17
+&amp;lt; #$ModLoad imudp
+&amp;lt; #$UDPServerRun 514
+---
+&amp;gt; $ModLoad imudp
+&amp;gt; $UDPServerRun 514
+46a47,52
+&amp;gt; 
+&amp;gt; #
+&amp;gt; # Queue
+&amp;gt; #
+&amp;gt; $MainMsgQueueType LinkedList
+&amp;gt; #$ActionQueueType Direct
+$
+$ sudo vi /etc/rsyslog.d/network-device.conf
+$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&amp;quot;
+if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/s1-working_with_queues_in_rsyslog.html&#34;&gt;20.4. Rsyslog でのキュー (Queue) を使った操作&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログローテート:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;ログローテート&lt;/h2&gt;
+
+&lt;p&gt;ログローテートの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/network-device
+/var/log/network-device/*/*.log
+{
+	daily
+	rotate 92
+	dateext
+	create 0640 root adm
+	missingok
+	ifempty
+	compress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+	endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -dv /etc/logrotate.d/network-device 
+reading config file /etc/logrotate.d/network-device
+
+Handling 1 logs
+
+rotating pattern: /var/log/network-device/*/*.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/network-device/192.168.30.254/192.168.30.254.log
+  log does not need rotating
+not running postrotate script, since no logs were rotated
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;fortigate-60dのsyslog送信設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;FortiGate 60DのSyslog送信設定&lt;/h2&gt;
+
+&lt;p&gt;FortiGate 60DからSyslogサーバにsyslog送信を行うように設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.10&amp;quot;
+(setting)# end
+#
+# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.20&amp;quot;
+(setting)# end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;FortiGate 60Dのsyslog送信設定の確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# show log syslogd setting
+config log syslogd setting
+	set status enable
+	set server &amp;quot;192.168.30.10&amp;quot;
+end
+#
+# show log syslogd2 setting
+config log syslogd2 setting
+	set status enable
+	set server &amp;quot;192.168.30.20&amp;quot;
+end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その10</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</link>
+      <pubDate>Sat, 07 Jan 2017 13:05:24 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab&#34;&gt;NTPサーバの構築&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&amp;gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その9</title>
@@ -658,6 +857,8 @@ Bye
 $
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力する事前準備&lt;/p&gt;
+
 &lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libmysqlclient-dev
 パッケージリストを読み込んでいます... 完了
 依存関係ツリーを作成しています                
@@ -706,7 +907,7 @@ $ deactivate
 $
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;CowrieのログをMySQLのデータベースに出力する。&lt;/p&gt;
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
 $ cd cowrie/
@@ -5012,254 +5213,6 @@ $
 &lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_06.png&#34; alt=&#34;cacti_install_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)にCowrieをインストールする</title>
-      <link>http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/</link>
-      <pubDate>Mon, 15 Aug 2016 20:46:34 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
-はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。&lt;/p&gt;
-
-&lt;p&gt;個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspbianの初期設定:4c0925631b42437e2f8c229197506152&#34;&gt;Raspbianの初期設定&lt;/h2&gt;
-
-&lt;p&gt;Raspbianの初期設定として以下を行いました。&lt;/p&gt;
-
-&lt;h3 id=&#34;パッケージの最新化:4c0925631b42437e2f8c229197506152&#34;&gt;パッケージの最新化&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ipアドレスの固定化:4c0925631b42437e2f8c229197506152&#34;&gt;IPアドレスの固定化&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.10.10/24
-static routers=192.168.10.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;ntp設定:4c0925631b42437e2f8c229197506152&#34;&gt;NTP設定&lt;/h3&gt;
-
-&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ntpq -p
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;raspi-config関連:4c0925631b42437e2f8c229197506152&#34;&gt;raspi-config関連&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ディスク拡張&lt;/li&gt;
-&lt;li&gt;文字コード設定&lt;/li&gt;
-&lt;li&gt;タイムゾーン設定&lt;/li&gt;
-&lt;li&gt;Wifiの国設定&lt;/li&gt;
-&lt;li&gt;ホスト名変更&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152&#34;&gt;公開鍵認証方式の設定&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh-keygen -t rsa
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
-Created directory &#39;/home/pi/.ssh&#39;.
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/pi/.ssh/id_rsa.
-Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
-
-$ cd ~/.ssh/
-$ cat id_rsa.pub &amp;gt;&amp;gt; authorized_keys
-$ chmod 600 authorized_keys
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Raspbianで作成した秘密鍵をローカルPCにコピーする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;公開鍵認証方式でsshログインできることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;sshサーバの設定:4c0925631b42437e2f8c229197506152&#34;&gt;SSHサーバの設定&lt;/h2&gt;
-
-&lt;p&gt;Cowrieで&lt;code&gt;22/tcp&lt;/code&gt;を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/ssh/sshd_config
-#Port 22
-Port 20022
-
-#PermitRootLogin without-password
-PermitRootLogin no
-
-ChallengeResponseAuthentication no
-
-#PasswordAuthentication yes
-PasswordAuthentication no
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHサーバの設定を再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ssh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ユーザ設定:4c0925631b42437e2f8c229197506152&#34;&gt;ユーザ設定&lt;/h2&gt;
-
-&lt;p&gt;rootユーザが無効化されていることを確認する(2列目が&lt;code&gt;L&lt;/code&gt;であることを確認)。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo passwd -S root
-root L 05/27/2016 0 99999 7 -1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Cowrieユーザを作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo adduser --disabled-password cowrie
-ユーザ `cowrie&#39; を追加しています...
-新しいグループ `cowrie&#39; (1001) を追加しています...
-新しいユーザ `cowrie&#39; (1001) をグループ `cowrie&#39; として追加しています...
-ホームディレクトリ `/home/cowrie&#39; を作成しています...
-`/etc/skel&#39; からファイルをコピーしています...
-cowrie のユーザ情報を変更中
-新しい値を入力してください。標準設定値を使うならリターンを押してください
-	フルネーム []: 
-	部屋番号 []: 
-	職場電話番号 []: 
-	自宅電話番号 []: 
-	その他 []: 
-以上で正しいですか? [Y/n] y
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieのインストール:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieのインストール&lt;/h2&gt;
-
-&lt;p&gt;Cowrienの公式サイトの&lt;a href=&#34;https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md&#34;&gt;INSTALL.md&lt;/a&gt;を参考にインストールを行う。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
-
-$ sudo su - cowrie
-$ git clone http://github.com/micheloosterhof/cowrie
-$ cd cowrie/
-$ cp cowrie.cfg.dist cowrie.cfg
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieの設定:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieの設定&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vi cowrie.cfg
-#sensor_name=myhostname
-sensor_name=rpicowrie
-
-#hostname = svr04
-hostname = cowrie01
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieの起動と終了:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieの起動と終了&lt;/h2&gt;
-
-&lt;p&gt;起動するときは以下のコマンドを実行する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./start.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;終了するときは以下のコマンドを実行する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ./stop.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152&#34;&gt;Cowrieポートのポートフォワード&lt;/h2&gt;
-
-&lt;p&gt;Cowrieでは&lt;code&gt;2222/tcp&lt;/code&gt;でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-$ sudo iptables -t nat -n -L
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;iptables設定の保存:4c0925631b42437e2f8c229197506152&#34;&gt;iptables設定の保存&lt;/h2&gt;
-
-&lt;p&gt;再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install iptables-persistent
-$ sudo systemctl enable netfilter-persistent
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</title>
-      <link>http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/</link>
-      <pubDate>Sat, 13 Aug 2016 00:34:26 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;mibファイルのアップロード:7017348ad71b7a4303759dd4acee2115&#34;&gt;MIBファイルのアップロード&lt;/h2&gt;
-
-&lt;p&gt;FortiGateのプライベートMIB(&lt;code&gt;FORTINET-CORE-MIB.mib&lt;/code&gt;、&lt;code&gt;FORTINET-FORTIGATE-MIB.mib&lt;/code&gt;)を&lt;code&gt;/home/pi&lt;/code&gt;直下にアップロードします。&lt;/p&gt;
-
-&lt;h2 id=&#34;プライベートmibの設定:7017348ad71b7a4303759dd4acee2115&#34;&gt;プライベートMIBの設定&lt;/h2&gt;
-
-&lt;p&gt;プライベートMIBファイルを&lt;code&gt;/usr/share/snmp/mibs/vendor&lt;/code&gt;に移動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo mkdir /usr/share/snmp/mibs/vendor
-$ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/
-$ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;プライベートMIBを使用するように&lt;code&gt;snmp.conf&lt;/code&gt;を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/snmp/snmp.conf
-mibdirs +/usr/share/snmp/mibs/vendor
-mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;プライベートmibの設定確認:7017348ad71b7a4303759dd4acee2115&#34;&gt;プライベートMIBの設定確認&lt;/h2&gt;
-
-&lt;p&gt;FortiGateのMIBフィールド名が表示されることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4
-FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
-&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

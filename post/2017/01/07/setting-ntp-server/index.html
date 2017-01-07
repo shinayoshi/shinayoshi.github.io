@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -67,89 +67,115 @@
       </header>
 
 
-
       <div id="main" role="main" class="container">
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <section>
-                <h1>Tags</h1>
-                <ul>
+              <article>
+                <div class="title">
+                  <h1>家庭内インターネット接続環境を構築する その10</h1>
+                  <p>
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab">NTPサーバの構築</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
                   
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi (26)</a>
-                  </li>
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>今回は<code>homemon1</code>、<code>homemon2</code>を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。</p>
+
+<h2 id="ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab">NTPサーバの構築</h2>
+
+<pre><code>$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+</code></pre>
+
+<p>NTPサーバの再起動</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>以上</p>
+
                   
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie (14)</a>
-                  </li>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
                   
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/home-network">home-network (11)</a>
-                  </li>
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/">家庭内インターネット接続環境を構築する その9</a></li>
                   
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie (3)</a>
-                  </li>
                   
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix (3)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/cacti">cacti (2)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/centos">centos (2)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/wifi">wifi (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/igo">igo (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/blog">blog (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/squid">squid (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/kippo-graph">kippo-graph (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/fgt-60d">fgt-60d (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/kivy">kivy (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/bind">bind (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/shogi">shogi (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/fortigate">fortigate (1)</a>
-                  </li>
-                  
-                  <li>
-                    <a href="http://www.shinayoshi.net//tags/backup">backup (1)</a>
-                  </li>
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/">家庭内インターネット接続環境を構築する その11</a></li>
                   
                 </ul>
-              </section>
+              </div>
             </div>
             <div class="sidebar col-md-3">
               <aside>

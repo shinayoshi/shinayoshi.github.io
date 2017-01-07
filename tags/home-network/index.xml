@@ -7,8 +7,207 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 07 Jan 2017 01:02:37 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 07 Jan 2017 16:09:11 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/home-network/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その11</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</link>
+      <pubDate>Sat, 07 Jan 2017 16:09:11 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続きは&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;rsyslogの設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;rsyslogの設定&lt;/h2&gt;
+
+&lt;p&gt;ネットワーク機器のSyslogを保存する用の設定&lt;/p&gt;
+
+&lt;p&gt;ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。
+例）/var/log/network-device/ホスト名/ホスト名.log&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/rsyslog.conf{,.org}
+$ ls -l /etc/rsyslog.conf*
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf
+-rw-r--r-- 1 root root 2632 12月 14  2015 /etc/rsyslog.conf.org
+$
+$ sudo vi /etc/rsyslog.conf
+#$ModLoad imudp
+#$UDPServerRun 514
+$ModLoad imudp
+$UDPServerRun 514
+
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Queue
+#
+$MainMsgQueueType LinkedList
+#$ActionQueueType Direct
+
+$ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
+16,17c16,17
+&amp;lt; #$ModLoad imudp
+&amp;lt; #$UDPServerRun 514
+---
+&amp;gt; $ModLoad imudp
+&amp;gt; $UDPServerRun 514
+46a47,52
+&amp;gt; 
+&amp;gt; #
+&amp;gt; # Queue
+&amp;gt; #
+&amp;gt; $MainMsgQueueType LinkedList
+&amp;gt; #$ActionQueueType Direct
+$
+$ sudo vi /etc/rsyslog.d/network-device.conf
+$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&amp;quot;
+if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/s1-working_with_queues_in_rsyslog.html&#34;&gt;20.4. Rsyslog でのキュー (Queue) を使った操作&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログローテート:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;ログローテート&lt;/h2&gt;
+
+&lt;p&gt;ログローテートの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/network-device
+/var/log/network-device/*/*.log
+{
+	daily
+	rotate 92
+	dateext
+	create 0640 root adm
+	missingok
+	ifempty
+	compress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+	endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -dv /etc/logrotate.d/network-device 
+reading config file /etc/logrotate.d/network-device
+
+Handling 1 logs
+
+rotating pattern: /var/log/network-device/*/*.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/network-device/192.168.30.254/192.168.30.254.log
+  log does not need rotating
+not running postrotate script, since no logs were rotated
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;fortigate-60dのsyslog送信設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;FortiGate 60DのSyslog送信設定&lt;/h2&gt;
+
+&lt;p&gt;FortiGate 60DからSyslogサーバにsyslog送信を行うように設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.10&amp;quot;
+(setting)# end
+#
+# config log syslogd setting
+(setting)# set status enable
+(setting)# set server &amp;quot;192.168.30.20&amp;quot;
+(setting)# end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;FortiGate 60Dのsyslog送信設定の確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# show log syslogd setting
+config log syslogd setting
+	set status enable
+	set server &amp;quot;192.168.30.10&amp;quot;
+end
+#
+# show log syslogd2 setting
+config log syslogd2 setting
+	set status enable
+	set server &amp;quot;192.168.30.20&amp;quot;
+end
+#
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その10</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</link>
+      <pubDate>Sat, 07 Jan 2017 13:05:24 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。&lt;/p&gt;
+
+&lt;h2 id=&#34;ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab&#34;&gt;NTPサーバの構築&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&amp;gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&amp;gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NTPサーバの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その9</title>
@@ -658,6 +857,8 @@ Bye
 $
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力する事前準備&lt;/p&gt;
+
 &lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libmysqlclient-dev
 パッケージリストを読み込んでいます... 完了
 依存関係ツリーを作成しています                
@@ -706,7 +907,7 @@ $ deactivate
 $
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;CowrieのログをMySQLのデータベースに出力する。&lt;/p&gt;
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
 $ cd cowrie/

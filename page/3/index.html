@@ -74,6 +74,312 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
+                  <p>
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
+Zabbix Serverのインストールは別のメモになります。</p>
+
+<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
+
+<p>Raspbianのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
+
+<p>Zabbix Agentのインストール</p>
+
+<pre><code>$ sudo apt-get install zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
+
+<p>Zabbix Agentを設定する。</p>
+
+<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
+Server=(Zabbix server IP address)
+ServerActive=(Zabbix server IP address)
+Hostname=(Hostname)
+
+$ sudo systemctl restart zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
+
+<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
+
+<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/">Raspbian(Jessie)にZabbix Serverをインストール</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed Aug 10, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にZabbix Serverをインストールするメモです。
+Zabbix Agentのインストールは別のメモになります。</p>
+
+<ul>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual/installation/install_from_packages">3 Installation from packages [Zabbix Documentation 2.2]</a></li>
+</ul>
+
+<h2 id="パッケージの更新:4df21ad0746a34acfa37879eaf637713">パッケージの更新</h2>
+
+<p>Raspbianのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="zabbix-serverのインストール:4df21ad0746a34acfa37879eaf637713">Zabbix Serverのインストール</h2>
+
+<p>Zabbix Serverのインストール</p>
+
+<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
+
+<pre><code>$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php
+$ sudo apt-get install php5-mysql
+$ sudo apt-get install task-japanese
+</code></pre>
+
+<h3 id="mysqlの初期設定:4df21ad0746a34acfa37879eaf637713">MySQLの初期設定</h3>
+
+<p>MySQLのセキュア設定</p>
+
+<pre><code>$ mysql_secure_installation
+In order to log into MySQL to secure it, we'll need the current
+password for the root user.  If you've just installed MySQL, and
+you haven't set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you've completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+</code></pre>
+
+<p>MySQLの初期設定</p>
+
+<pre><code>$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+</code></pre>
+
+<ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
+</ul>
+
+<p>MySQLの再起動</p>
+
+<pre><code>$ sudo systemctl restart mysql
+</code></pre>
+
+<h3 id="apache2の初期設定:4df21ad0746a34acfa37879eaf637713">Apache2の初期設定</h3>
+
+<p>Apache2のセキュリティ設定</p>
+
+<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+</code></pre>
+
+<p>Apache2の文字コード設定</p>
+
+<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+</code></pre>
+
+<p>Apache2のServerName設定</p>
+
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
+$ sudo a2enconf fqdn
+</code></pre>
+
+<p>Apache2の再起動</p>
+
+<pre><code>$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre>
+
+<ul>
+<li><a href="http://mk-55.hatenablog.com/entry/2014/07/07/004510">ubuntuにおけるapache2のAH00558エラーを解決する。 - mk_55&rsquo;s diary</a></li>
+</ul>
+
+<h2 id="zabbix-serverの設定:4df21ad0746a34acfa37879eaf637713">Zabbix Serverの設定</h2>
+
+<p>データベースの作成</p>
+
+<pre><code>$ mysql -uroot -p
+Enter password:
+mysql&gt; 
+mysql&gt; create database zabbix character set utf8 collate utf8_bin;
+mysql&gt; grant all privileges on zabbix.* to zabbix@localhost identified by 'zabbix_password';
+mysql&gt; quit
+
+$ zcat /usr/share/zabbix-server-mysql/schema.sql.gz | mysql -uzabbix -p zabbix
+$ zcat /usr/share/zabbix-server-mysql/images.sql.gz | mysql -uzabbix -p zabbix
+$ zcat /usr/share/zabbix-server-mysql/data.sql.gz | mysql -uzabbix -p zabbix
+</code></pre>
+
+<p>Apache2のZabbixサイト設定</p>
+
+<pre><code>$ sudo cp /usr/share/doc/zabbix-frontend-php/examples/apache.conf /etc/apache2/conf-available/zabbix.conf
+$ sudo vi /etc/apache2/conf-available/zabbix.conf
+# Add the following lines
+php_value max_execution_time 300
+php_value memory_limit 128M
+php_value post_max_size 16M
+php_value upload_max_filesize 2M
+php_value max_input_time 300
+php_value date.timezone Asia/Tokyo
+
+$ sudo a2enconf zabbix
+$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre>
+
+<p>Zabbixのサーバ設定</p>
+
+<pre><code>$ sudo vi /etc/zabbix/zabbix_server.conf
+DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=zabbix_password
+
+$ sudo vi /etc/default/zabbix-server
+START=yes
+
+$ sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/share/zabbix/fonts/
+$ sudo vi /usr/share/zabbix/include/defines.inc.php
+define('ZBX_GRAPH_FONT_NAME',		'unifont');
+
+$ sudo systemctl restart zabbix-server
+</code></pre>
+
+<h2 id="zabbix-serverへのアクセス:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのアクセス</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスする。</p>
+
+<p>Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
+
+<h2 id="zabbix-serverへのログイン:4df21ad0746a34acfa37879eaf637713">Zabbix Serverへのログイン</h2>
+
+<p>Zabbixの初期設定が完了するとログイン画面が表示されるので、デフォルトアカウント(<code>Admin/zabbix</code>)でログインする。
+ログイン後は画面右上のProfileを開き、パスワードを変更しておく。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/">Raspbianをバックアップ・リストアする</a></h1>
                   <p>
                     <span class="label label-primary">Sun Aug 7, 2016</span> in
@@ -1091,88 +1397,14 @@ $ sudo systemctl disable sshd
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/">囲碁・将棋の思考エンジンの覚え書き</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/diary">diary</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/igo">igo</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/shogi">shogi</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>囲碁・将棋の思考エンジンは以下が有名らしい。
-よく忘れるので覚え書きとして残しておく。</p>
-
-<p>実際に使用したことはないため、使用方法や強さはわかりません。あしからず。</p>
-
-<h2 id="囲碁の思考エンジン:a0d1e30c95d0ce93df0972286458f7bf">囲碁の思考エンジン</h2>
-
-<ul>
-<li><a href="http://pachi.or.cz">Pachi</a></li>
-<li><a href="http://fuego.sourceforge.net">Fuego</a></li>
-<li><a href="http://www.gnu.org/software/gnugo/download.html">GNU Go</a></li>
-</ul>
-
-<h2 id="将棋の思考エンジン:a0d1e30c95d0ce93df0972286458f7bf">将棋の思考エンジン</h2>
-
-<ul>
-<li><a href="http://www.geocities.jp/bonanza_shogi/">Bonanza</a></li>
-<li><a href="http://hiraokatakuya.github.io/apery/">Apery</a></li>
-<li><a href="http://gps.tanaka.ecc.u-tokyo.ac.jp/gpsshogi/">GPSshogi</a></li>
-</ul>
-
-<h3 id="将棋guiソフト:a0d1e30c95d0ce93df0972286458f7bf">将棋GUIソフト</h3>
-
-<ul>
-<li><a href="http://www.geocities.jp/shogidokoro/index.html">将棋所</a></li>
-</ul>
-
-                </div>
-              </article>
-              
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2015/09/06/first-post/">hugo始めました</a></h1>
-                  <p>
-                    <span class="label label-primary">Sun Sep 6, 2015</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/diary">diary</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/blog">blog</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  <p>Hugoでブログ始めました。</p>
-
-<p>本ブログでは私が得た技術的な知識・経験を投稿していく予定です。</p>
-
-<p>今後ともよろしくお願いします。</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
   <li class="previous"><a href="/page/2/">&larr; Newer</a></li>
   
-  <li>Page 3 of 3</li>
+  <li>Page 3 of 4</li>
+  
+  <li class="next"><a href="/page/4/">Older &rarr;</a></li>
   
 </ul>
 
@@ -1232,6 +1464,10 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
@@ -1248,10 +1484,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">家庭内インターネット接続環境を構築する その1 [ 2016-10-22 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/" class="list-group-item">Raspbian(Jessie)でキャッシュDNSを構築する [ 2016-08-24 ]</a>
-      
     
   </div>
 </section>
@@ -1265,7 +1497,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">28</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">30</span>server</a>
     
   </div>
 </section>
@@ -1310,7 +1542,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (9)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (11)</a>
     
     
     
@@ -1330,7 +1562,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (24)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (26)</a>
     
     
     
