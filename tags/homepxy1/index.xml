@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Homepxy1 on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/homepxy1/</link>
+    <description>Recent content in Homepxy1 on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2016 shinayoshi</copyright>
+    <lastBuildDate>Tue, 03 Jan 2017 23:25:23 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/homepxy1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その6</title>
+      <link>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</link>
+      <pubDate>Tue, 03 Jan 2017 23:25:23 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspberry Pi 2でプロキシサーバ構築&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+今回はプロキシサーバを構築していきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;squidの設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Squidの設定&lt;/h3&gt;
+
+&lt;p&gt;squidのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install squid
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  squid-common squid-langpack
+提案パッケージ:
+  squidclient squid-cgi logcheck-database smbclient winbind
+以下のパッケージが新たにインストールされます:
+  squid squid-common squid-langpack
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+1,106 kB のアーカイブを取得する必要があります。
+この操作後に追加で 3,882 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-langpack all 20140506-1 [150 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-common all 2.7.STABLE9-4.1 [352 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid armhf 2.7.STABLE9-4.1+b1 [604 kB]
+1,106 kB を 4秒 で取得しました (267 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ squid-langpack を選択しています。
+(データベースを読み込んでいます ... 現在 31342 個のファイルとディレクトリがインストールされています。)
+.../squid-langpack_20140506-1_all.deb を展開する準備をしています ...
+squid-langpack (20140506-1) を展開しています...
+以前に未選択のパッケージ squid-common を選択しています。
+.../squid-common_2.7.STABLE9-4.1_all.deb を展開する準備をしています ...
+squid-common (2.7.STABLE9-4.1) を展開しています...
+以前に未選択のパッケージ squid を選択しています。
+.../squid_2.7.STABLE9-4.1+b1_armhf.deb を展開する準備をしています ...
+squid (2.7.STABLE9-4.1+b1) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+squid-langpack (20140506-1) を設定しています ...
+squid-common (2.7.STABLE9-4.1) を設定しています ...
+squid (2.7.STABLE9-4.1+b1) を設定しています ...
+Creating squid spool directory structure
+2017/01/03 23:26:35| Creating Swap Directories
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ ls -l /etc/squid/squid.conf*
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf
+-rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf.org
+$
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&amp;lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&amp;lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&amp;gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&amp;gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&amp;gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&amp;gt; acl localnet src 192.168.10.0/24
+&amp;gt; acl localnet src 192.168.20.0/24
+&amp;gt; acl localnet src 192.168.30.0/24
+&amp;gt; acl localnet src 192.168.40.0/24
+&amp;gt; 
+676c681
+&amp;lt; #http_access allow localnet
+---
+&amp;gt; http_access allow localnet
+1738a1744
+&amp;gt; cache_mem 256 MB
+1747a1754
+&amp;gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&amp;gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&amp;gt; maximum_object_size 20480 KB
+2097a2107
+&amp;gt; logformat combined %&amp;gt;a %ui %un [%tl] &amp;quot;%rm %ru HTTP/%rv&amp;quot; %Hs %&amp;lt;st &amp;quot;%{Referer}&amp;gt;h&amp;quot; &amp;quot;%{User-Agent}&amp;gt;h&amp;quot; %Ss:%Sh
+2121c2131,2132
+&amp;lt; access_log /var/log/squid/access.log squid
+---
+&amp;gt; #access_log /var/log/squid/access.log squid
+&amp;gt; access_log /var/log/squid/access.log combined
+2217a2229
+&amp;gt; emulate_httpd_log off
+2751c2763,2768
+&amp;lt; refresh_pattern .		0	20%	4320
+---
+&amp;gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&amp;gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&amp;gt; refresh_pattern . 45 20% 4320
+2944a2962
+&amp;gt; via off
+3100a3119,3122
+&amp;gt; header_access Referer deny all
+&amp;gt; header_access X-Forwarded-For deny all
+&amp;gt; header_access Via deny all
+&amp;gt; header_access Cache-Control deny all
+3392a3415
+&amp;gt; visible_hostname unknown
+4699a4723
+&amp;gt; forwarded_for off
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidの設定不備を確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo squid -k parse
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Squidの起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart squid
+$ sudo systemctl enable squid
+Synchronizing state for squid.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d squid defaults
+Executing /usr/sbin/update-rc.d squid enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/squid.html&#34;&gt;CentOS Squidの設定&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://tech.ckme.co.jp/proxy.shtml&#34;&gt;Proxyサーバの設定（squid）：tech.ckme.co.jp&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid&#34;&gt;Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.asial.co.jp/1076&#34;&gt;Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;ブラウザのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;ブラウザのプロキシ設定&lt;/h3&gt;
+
+&lt;p&gt;ブラウザ使用するプロキシ設定をSquidに変更する。&lt;/p&gt;
+
+&lt;p&gt;Squidのログを確認してSquid経由でWebアクセスができていることを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cat /var/log/squid/access.log
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raspbianのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspbianのプロキシ設定&lt;/h3&gt;
+
+&lt;p&gt;起動時にプロキシを使用するように設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&amp;quot;192.168.20.10:3128&amp;quot;
+export http_proxy=&amp;quot;http://${PROXY}&amp;quot;
+export https_proxy=&amp;quot;http://${PROXY}&amp;quot;
+export no_proxy=&amp;quot;localhost,127.0.0.1,192.168.*&amp;quot;
+
+export HTTP_PROXY=&amp;quot;${http_proxy}&amp;quot;
+export HTTPS_PROXY=&amp;quot;${https_proxy}&amp;quot;
+export NO_PROXY=&amp;quot;${no_proxy}&amp;quot;
+$ source /etc/profile.d/proxy.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には&lt;code&gt;-E&lt;/code&gt;オプションを指定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://karaage.hatenadiary.jp/entry/2015/11/26/073000&#34;&gt;Mac/Linux/Raspberry Piでプロキシサーバを手軽に設定する方法 - karaage. [からあげ]&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その5</title>
+      <link>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</link>
+      <pubDate>Tue, 03 Jan 2017 22:22:47 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7&#34;&gt;Raspberry Pi 2でキャッシュDNSサーバ構築&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
+まずはキャッシュDNSサーバを構築していきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;bind9の設定:a3b948e685fd47b3236875750b0610c7&#34;&gt;bind9の設定&lt;/h3&gt;
+
+&lt;p&gt;bind9のインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install bind9 dnsutils
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bind9utils
+提案パッケージ:
+  bind9-doc ufw rblcheck
+以下のパッケージが新たにインストールされます:
+  bind9 bind9utils dnsutils
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+562 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,620 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.9.5.dfsg-9+deb8u8 [292 kB]
+562 kB を 2秒 で取得しました (229 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ dnsutils を選択しています。
+(データベースを読み込んでいます ... 現在 31244 個のファイルとディレクトリがインストールされています。)
+.../dnsutils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9utils を選択しています。
+.../bind9utils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+以前に未選択のパッケージ bind9 を選択しています。
+.../bind9_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9utils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+bind9 (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+グループ `bind&#39; (グループ ID 114) を追加しています...
+完了。
+システムユーザ `bind&#39; (UID 109) を追加しています...
+新しいユーザ `bind&#39; (UID 109) をグループ `bind&#39; に追加しています...
+ホームディレクトリ `/var/cache/bind&#39; は作成しません。
+wrote key file &amp;quot;/etc/bind/rndc.key&amp;quot;
+#
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9の設定&lt;/p&gt;
+
+&lt;p&gt;※変更箇所が多いため、変更箇所ではなく変更後のコンフィグを記載します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/bind/named.conf.options{,.org}
+$ ls -l /etc/bind/named.conf.options*
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options
+-rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options.org
+$
+$ sudo vi /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &amp;quot;/etc/bind/rndc.key&amp;quot;;
+
+acl &amp;quot;internal-network&amp;quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &amp;quot;unknown&amp;quot;;
+
+	directory &amp;quot;/var/cache/bind&amp;quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &amp;quot;log_default&amp;quot; {
+		file &amp;quot;/var/log/bind/named.log&amp;quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &amp;quot;alert&amp;quot; {
+		file &amp;quot;/var/log/bind/alert.log&amp;quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &amp;quot;query&amp;quot; {
+		file &amp;quot;/var/log/bind/query.log&amp;quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &amp;quot;log_default&amp;quot;; };
+	category security { &amp;quot;alert&amp;quot;; };
+	category queries { &amp;quot;query&amp;quot;; };
+	category lame-servers { null; };
+};
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9のコンフィグ不備を確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo named-checkconf /etc/bind/named.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ログ保存先のディレクトリ作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+$ ls -ld /var/log/bind
+drwxr-xr-x 2 bind bind 4096  1月  3 22:39 /var/log/bind
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9の起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart bind9
+$ sudo systemctl enable bind9
+Synchronizing state for bind9.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d bind9 defaults
+Executing /usr/sbin/update-rc.d bind9 enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;dnsクライアントの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/dhcpcd.conf{,.backup20160103}
+$ ls -l /etc/dhcpcd.conf*
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf
+-rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf.backup20160103
+-rw-rw-r-- 1 root netdev 1247 10月 17  2015 /etc/dhcpcd.conf.org
+$
+$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$
+$ diff /etc/dhcpcd.conf.backup20160103 /etc/dhcpcd.conf
+46c46
+&amp;lt; static domain_name_servers=192.168.100.1
+---
+&amp;gt; static domain_name_servers=127.0.0.1
+$
+$ sudo systemctl restart dhcpcd
+$ cat /etc/resolv.conf 
+# Generated by resolvconf
+nameserver 127.0.0.1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bind9による名前解決の確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dig www.google.co.jp
+
+; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.9.5-9+deb8u8-Raspbian &amp;lt;&amp;lt;&amp;gt;&amp;gt; www.google.co.jp
+;; global options: +cmd
+;; Got answer:
+;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 455
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;www.google.co.jp.		IN	A
+
+;; ANSWER SECTION:
+www.google.co.jp.	187	IN	A	172.217.26.99
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:55:14 JST 2017
+;; MSG SIZE  rcvd: 61
+
+$ dig -x 8.8.8.8
+
+; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.9.5-9+deb8u8-Raspbian &amp;lt;&amp;lt;&amp;gt;&amp;gt; -x 8.8.8.8
+;; global options: +cmd
+;; Got answer:
+;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 3656
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 13, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;8.8.8.8.in-addr.arpa.		IN	PTR
+
+;; ANSWER SECTION:
+8.8.8.8.in-addr.arpa.	3600	IN	PTR	google-public-dns-a.google.com.
+
+;; AUTHORITY SECTION:
+.			3449	IN	NS	h.root-servers.net.
+.			3449	IN	NS	m.root-servers.net.
+.			3449	IN	NS	c.root-servers.net.
+.			3449	IN	NS	l.root-servers.net.
+.			3449	IN	NS	b.root-servers.net.
+.			3449	IN	NS	f.root-servers.net.
+.			3449	IN	NS	g.root-servers.net.
+.			3449	IN	NS	k.root-servers.net.
+.			3449	IN	NS	e.root-servers.net.
+.			3449	IN	NS	d.root-servers.net.
+.			3449	IN	NS	a.root-servers.net.
+.			3449	IN	NS	j.root-servers.net.
+.			3449	IN	NS	i.root-servers.net.
+
+;; Query time: 70 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Tue Jan 03 22:57:45 JST 2017
+;; MSG SIZE  rcvd: 304
+
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

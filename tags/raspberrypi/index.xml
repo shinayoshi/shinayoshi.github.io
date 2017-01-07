@@ -23,7 +23,7 @@
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;前回に引き続きは&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+&lt;p&gt;前回に引き続き&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
 FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。&lt;/p&gt;
 
 &lt;h2 id=&#34;rsyslogの設定:273aa48f87da59ed5cb2388af8a4171d&#34;&gt;rsyslogの設定&lt;/h2&gt;
@@ -222,7 +222,7 @@ $
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;前回に引き続きは&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。
+&lt;p&gt;前回に引き続き&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。
 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。&lt;/p&gt;
 
 &lt;h2 id=&#34;ipv6の無効化:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;IPv6の無効化&lt;/h2&gt;
@@ -546,7 +546,7 @@ $
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;前回に引き続きは&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+&lt;p&gt;前回に引き続き&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。&lt;/p&gt;
 
 &lt;h2 id=&#34;kippo-graphによるsshハニーポット-cowrie-の可視化:05481c997d19830c663ad9e91abca85e&#34;&gt;Kippo-GraphによるSSHハニーポット(Cowrie)の可視化&lt;/h2&gt;
 
@@ -2588,7 +2588,7 @@ $
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;前回に引き続きは&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+&lt;p&gt;前回に引き続き&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
 
 &lt;h2 id=&#34;raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspberry Pi 2でプロキシサーバ構築&lt;/h2&gt;
 
