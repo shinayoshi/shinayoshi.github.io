@@ -74,6 +74,115 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/">ZabbixでSNMPデバイスの監視を行う</a></h1>
+                  <p>
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。</p>
+
+<p>とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。</p>
+
+<h2 id="パッケージの更新:f5404dafe03c7d830d1b17663408aefc">パッケージの更新</h2>
+
+<p>Zabbix Serverのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="snmp関連パッケージのインストール:f5404dafe03c7d830d1b17663408aefc">SNMP関連パッケージのインストール</h2>
+
+<p>Zabbix ServerにSNMP関連のパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get install snmp snmp-mibs-downloader
+</code></pre>
+
+<!-- $ sudo apt-get install snmpd -->
+
+<!-- $ sudo apt-get install snmptrapd snmptt -->
+
+<h2 id="snmpの設定:f5404dafe03c7d830d1b17663408aefc">SNMPの設定</h2>
+
+<p><code>/usr/bin/download-mibs</code>でダウンロードしたMIBSを読み込めるように設定する。</p>
+
+<pre><code>$ sudo vi /etc/snmp/snmp.conf
+#mibs :
+</code></pre>
+
+<p>メモ：デフォルトでは以下のディレクトリを検索する。<code>snmpstatus --help</code>の出力で確認。</p>
+
+<pre><code>${HOME}/.snmp/mibs
+/usr/share/snmp/mibs
+/usr/share/snmp/mibs/iana
+/usr/share/snmp/mibs/ietf
+/usr/share/mibs/site
+/usr/share/snmp/mibs
+/usr/share/mibs/iana
+/usr/share/mibs/ietf
+/usr/share/mibs/netsnmp
+</code></pre>
+
+<h2 id="zabbix-serverの再起動:f5404dafe03c7d830d1b17663408aefc">Zabbix Serverの再起動</h2>
+
+<p>Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。</p>
+
+<pre><code>$ sudo systemctl restart zabbix-server
+</code></pre>
+
+<h2 id="zabbix-serverでのsnmp-device監視設定:f5404dafe03c7d830d1b17663408aefc">Zabbix ServerでのSNMP Device監視設定</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
+
+<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
+
+<p>ホストの設定画面が表示されるので最低限以下を設定する。</p>
+
+<p>&ldquo;ホスト&rdquo;タブ</p>
+
+<ul>
+<li>ホスト名：監視対象機器のホスト名。</li>
+<li>グループ：所属するグループ。適切なグループがなければ新規作成。</li>
+<li>エージェントのインターフェース：削除。</li>
+<li>SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。</li>
+</ul>
+
+<p>&ldquo;テンプレート&rdquo;タブ</p>
+
+<ul>
+<li>テンプレートとのリンク：&rdquo;Template SNMP Device&rdquo;を追加。</li>
+</ul>
+
+<p>&ldquo;マクロ&rdquo;タブ</p>
+
+<ul>
+<li>マクロ：<code>{$SNMP_COMMUNITY}</code> ⇒ 値：<code>監視対象機器のコミュニティ名</code></li>
+</ul>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
                   <p>
                     <span class="label label-primary">Thu Aug 11, 2016</span> in
@@ -1135,268 +1244,6 @@ $ sudo firewall-cmd \-\-list-all-zones
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Jan 16, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/centos">centos</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>お名前.comのVPS(KVM)の初期設定メモを残しておく。
-「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。</p>
-
-<h2 id="rootでログイン:130a6ce433fd353093f8e4a56dec5622">rootでログイン</h2>
-
-<p>お名前.comのコンソール画面でログインを行います。</p>
-
-<pre><code>login: root
-Password:
-</code></pre>
-
-<p>ログインに成功すると以下のようなプロンプトが表示されます。</p>
-
-<pre><code>[root@&lt;ホスト名&gt; ~\]#
-</code></pre>
-
-<p>以降の手順では、rootアカウントのプロンプトを<code>#</code>で表現します。</p>
-
-<h2 id="シリアルコンソール接続の有効化:130a6ce433fd353093f8e4a56dec5622">シリアルコンソール接続の有効化</h2>
-
-<p>シリアルコンソールで接続できるように設定します。</p>
-
-<pre><code># vi /etc/default/grub
-GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot;
-↓変更
-GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot;
-# grub2-mkconfig \-o /boot/grub2/grub.cfg
-# reboot
-</code></pre>
-
-<h2 id="共用sshサーバ経由のシリアルコンソール接続:130a6ce433fd353093f8e4a56dec5622">共用SSHサーバ経由のシリアルコンソール接続</h2>
-
-<p>お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。</p>
-
-<p>SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。<a href="http://guide.onamae-server.com/vpskvm/3_14_15_75_2/">SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド</a></p>
-
-<h2 id="ホスト名変更:130a6ce433fd353093f8e4a56dec5622">ホスト名変更</h2>
-
-<p>ホスト名の変更を行います。</p>
-
-<pre><code># hostnamectl set-hostname newhost.example.com
-</code></pre>
-
-<p>ホスト名の変更を反映するために再起動を行います。</p>
-
-<pre><code># reboot
-</code></pre>
-
-<p>再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。</p>
-
-<h2 id="パッケージの更新:130a6ce433fd353093f8e4a56dec5622">パッケージの更新</h2>
-
-<p>パッケージを最新の状態に更新します。</p>
-
-<pre><code># yum \-y update
-</code></pre>
-
-<p>kernelのバージョンアップがあった場合にはサーバの再起動を実施します。</p>
-
-<pre><code># reboot
-</code></pre>
-
-<h2 id="管理者アカウントの作成:130a6ce433fd353093f8e4a56dec5622">管理者アカウントの作成</h2>
-
-<p>通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。</p>
-
-<pre><code># useradd centos
-# passwd centos
-Changing password for user centos.
-New password: &lt;パスワード入力&gt;
-Retype new password: &lt;パスワード再入力&gt;
-passwd: all authentication tokens updated successfully.
-# gpasswd \-a centos wheel
-</code></pre>
-
-<h2 id="sudo権限の付与:130a6ce433fd353093f8e4a56dec5622">sudo権限の付与</h2>
-
-<p>管理者アカウントにsudo権限を付与します。以下ではcentosにROOT関連のコマンドとSHUTDOWN関連のコマンド以外のすべてのコマンドの実行権限を付与しています。</p>
-
-<pre><code># visudo \-f /etc/sudoers.d/wheel
-Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo
-Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init
-%wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN
-</code></pre>
-
-<h2 id="rootのログアウトと管理者アカウントでログイン:130a6ce433fd353093f8e4a56dec5622">rootのログアウトと管理者アカウントでログイン</h2>
-
-<p>管理者アカウントを作成してsudoが使えるようになったので、rootアカウントをログアウトして管理者アカウントでログインし直します。</p>
-
-<pre><code># exit
-logout
-＜省略＞
-login: centos
-Password:
-[centos@&lt;ホスト名&gt; ~]$
-</code></pre>
-
-<p>以降の手順では、管理者アカウントのプロンプトを<code>$</code>で表現します。</p>
-
-<h2 id="rootアカウントの無効化:130a6ce433fd353093f8e4a56dec5622">rootアカウントの無効化</h2>
-
-<p>すべての作業は管理者アカウントで行うため、rootアカウントを無効化します。※シリアルコンソールからもrootでログインできなくなりますので、設定する際は慎重に行ってください。</p>
-
-<pre><code>$ sudo passwd -l root
-[sudo] password for centos:
-Locking password for user root.
-passwd: Success
-</code></pre>
-
-<h2 id="root宛てメールの転送:130a6ce433fd353093f8e4a56dec5622">root宛てメールの転送</h2>
-
-<p>root宛てに届くメールを管理者アカウントに転送するように設定します。</p>
-
-<pre><code>$ sudo vi /etc/aliases
-root:           centos
-$ sudo newaliases
-</code></pre>
-
-<h2 id="firewalldの設定:130a6ce433fd353093f8e4a56dec5622">Firewalldの設定</h2>
-
-<p>Firewalldを使用して不要な通信を拒否するように設定します。</p>
-
-<h3 id="firewalldのインストール:130a6ce433fd353093f8e4a56dec5622">Firewalldのインストール</h3>
-
-<pre><code>$ sudo yum \-y install firewalld
-$ sudo systemctl start firewalld
-$ sudo systemctl enable firewalld
-</code></pre>
-
-<h3 id="firewalldの設定確認:130a6ce433fd353093f8e4a56dec5622">Firewalldの設定確認</h3>
-
-<pre><code>$ sudo firewall-cmd --get-active-zones
-$ sudo firewall-cmd --list-all-zones
-$ sudo firewall-cmd --get-services
-</code></pre>
-
-<h3 id="firewalldの初期設定:130a6ce433fd353093f8e4a56dec5622">Firewalldの初期設定</h3>
-
-<p>eth0のゾーンをpublicに変更します。</p>
-
-<pre><code>$ sudo firewall-cmd --zone=public --change-interface=eth0
-</code></pre>
-
-<p>publicゾーンで不要なサービスを無効化します。</p>
-
-<pre><code>$ sudo firewall-cmd --permanent --zone=public --remove-service=ssh
-$ sudo firewall-cmd --permanent --zone=public --remove-service=dhcpv6-client
-$ sudo firewall-cmd --reload
-</code></pre>
-
-<p>設定の確認</p>
-
-<pre><code>$ sudo firewall-cmd --zone=public --list-all
-</code></pre>
-
-<h2 id="selinuxの無効化:130a6ce433fd353093f8e4a56dec5622">SELinuxの無効化</h2>
-
-<pre><code>$ sudo setenforce Permissive
-$ sudo getenforce
-</code></pre>
-
-<pre><code>$ sudo vi /etc/selinux/config
-SELINUX=enforcing
-↓変更
-SELINUX=permissive
-</code></pre>
-
-<h2 id="ipv6の無効化:130a6ce433fd353093f8e4a56dec5622">IPv6の無効化</h2>
-
-<p>IPv6を無効化します。</p>
-
-<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-$ sudo sysctl -a | grep disable_ipv6
-</code></pre>
-
-<p>上記のコマンドではシステムを再起動した場合にIPv6が有効になってしまうため、再起動しても無効になるように設定します。</p>
-
-<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
-net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6=1
-</code></pre>
-
-<h3 id="postfixのipv6無効化:130a6ce433fd353093f8e4a56dec5622">PostfixのIPv6無効化</h3>
-
-<p>IPv6の無効化に併せてPostfixもIPv6を無効化します。</p>
-
-<pre><code>$ sudo vi /etc/postfix/main.cf
-#inet_protocols = all
-inet_protocols = ipv4
-$ sudo systemctl restart postfix
-</code></pre>
-
-<h2 id="ntpの時刻同期:130a6ce433fd353093f8e4a56dec5622">NTPの時刻同期</h2>
-
-<p>chronyにより時刻同期を行うように設定します。</p>
-
-<pre><code>$ sudo yum -y install chrony
-$ sudo vi /etc/chrony.conf
-#server 0.centos.pool.ntp.org iburst
-#server 1.centos.pool.ntp.org iburst
-#server 2.centos.pool.ntp.org iburst
-#server 3.centos.pool.ntp.org iburst
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-</code></pre>
-
-<p>chronydを起動します。</p>
-
-<pre><code>$ sudo systemctl start chronyd
-$ sudo systemctl enable chronyd
-</code></pre>
-
-<p>時刻の同期状況を確認するには以下のコマンドを実行します。</p>
-
-<pre><code>$ chronyc sources
-</code></pre>
-
-<h2 id="不要サービスの停止:130a6ce433fd353093f8e4a56dec5622">不要サービスの停止</h2>
-
-<p>セキュリティのため、サーバのリソースのために不要サービスを停止します。お名前.comのVPS(KVM)には共用SSH経由のシリアルコンソールでログインするため、SSHを停止しています。</p>
-
-<pre><code>$ sudo systemctl list-units --type=service
-$ sudo systemctl stop sshd
-$ sudo systemctl disable sshd
-</code></pre>
-
-<h2 id="logwatchのインストール:130a6ce433fd353093f8e4a56dec5622">logwatchのインストール</h2>
-
-<p>logwatchをインストールします。</p>
-
-<pre><code>$ sudo yum -y install logwatch
-</code></pre>
-
-<p>logwatchの実行結果を確認します。</p>
-
-<pre><code>$ sudo logwatch --output stdout
-</code></pre>
-
-<p>以上、初期設定は終了となります。</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1464,6 +1311,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット環境を構築する その12 [ 2017-01-08 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
@@ -1482,8 +1331,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
-      
     
   </div>
 </section>
@@ -1497,7 +1344,7 @@ $ sudo systemctl disable sshd
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">30</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">31</span>server</a>
     
   </div>
 </section>
@@ -1542,7 +1389,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (11)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (12)</a>
     
     
     
@@ -1550,11 +1397,11 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (3)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (3)</a>
     
     
     
@@ -1586,7 +1433,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (26)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (27)</a>
     
     
     

@@ -74,6 +74,30 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">
+                  <h2 class="list-group-item-heading">ZabbixでSNMPデバイスの監視を行う</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。 とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。 パッケージの更新 Zabbix Serverのパッケージを最新する。 $ sudo apt-get update $ sudo apt-get upgrade SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。 $ sudo apt-get install snmp snmp-mibs-downloader SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。 $ sudo vi /etc/snmp/snmp.conf #mibs : メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。 ${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。 $ sudo systemctl restart zabbix-server Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。 ホストの設定画面が表示されるので最低限以下を設定する。 &ldquo;ホスト&rdquo;タブ ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。 &ldquo;テンプレート&rdquo;タブ テンプレートとのリンク：&rdquo;Template SNMP Device&rdquo;を追加。 &ldquo;マクロ&rdquo;タブ マクロ：{$SNMP_COMMUNITY} ⇒
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Agentをインストール</h2>
                   <p class="list-group-item-text">
@@ -266,31 +290,15 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 16, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    centos
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~\]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig \-o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum \-y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
   
   <li class="previous"><a href="/categories/server/page/2/">&larr; Newer</a></li>
   
-  <li>Page 3 of 3</li>
+  <li>Page 3 of 4</li>
+  
+  <li class="next"><a href="/categories/server/page/4/">Older &rarr;</a></li>
   
 </ul>
 
@@ -350,6 +358,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット環境を構築する その12 [ 2017-01-08 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
@@ -368,8 +378,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
-      
     
   </div>
 </section>
@@ -383,7 +391,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">30</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">31</span>server</a>
     
   </div>
 </section>
@@ -428,7 +436,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (11)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (12)</a>
     
     
     
@@ -436,11 +444,11 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (3)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (3)</a>
     
     
     
@@ -472,7 +480,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (26)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (27)</a>
     
     
     

@@ -7,8 +7,926 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sat, 07 Jan 2017 16:09:11 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 08 Jan 2017 20:40:44 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット環境を構築する その12</title>
+      <link>http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</link>
+      <pubDate>Sun, 08 Jan 2017 20:40:44 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;を構築していきます。
+本環境の監視を行うためにZabbixを導入します。&lt;/p&gt;
+
+&lt;h2 id=&#34;zabbix-serverのインストール:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbix Serverのインストール&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm
+  fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5
+  libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls
+  libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3
+  libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0
+  libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3
+  libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base
+  libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv
+  manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server
+  mysql-server-5.5 mysql-server-core-5.5 nkf php5 php5-cli php5-common php5-gd
+  php5-json php5-ldap php5-readline psf-unifont snmpd ssl-cert ttf-dejavu-core
+  ttf-unifont unifont x11-common xfonts-encodings xfonts-unifont xfonts-utils
+提案パッケージ:
+  www-browser apache2-doc apache2-suexec-pristine apache2-suexec-custom
+  php-pear libclone-perl libmldbm-perl libnet-daemon-perl
+  libsql-statement-perl libgd-tools libipc-sharedcache-perl libmyodbc
+  odbc-postgresql tdsodbc unixodbc-bin lm-sensors snmp-mibs-downloader mailx
+  tinyca php5-user-cache snmptrapd openssl-blacklist unifont-bin
+以下のパッケージが新たにインストールされます:
+  apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm
+  fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5
+  libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls
+  libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3
+  libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0
+  libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3
+  libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base
+  libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv
+  manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server
+  mysql-server-5.5 mysql-server-core-5.5 nkf php5 php5-cli php5-common php5-gd
+  php5-json php5-ldap php5-mysql php5-readline psf-unifont snmpd ssl-cert
+  task-japanese ttf-dejavu-core ttf-unifont unifont x11-common
+  xfonts-encodings xfonts-unifont xfonts-utils zabbix-frontend-php
+  zabbix-server-mysql
+アップグレード: 0 個、新規インストール: 73 個、削除: 0 個、保留: 1 個。
+43.9 MB のアーカイブを取得する必要があります。
+この操作後に追加で 211 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://archive.raspberrypi.org/debian/ jessie/main libxfont1 armhf 1:1.5.2-1 [119 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapr1 armhf 1.5.1-3 [77.1 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1 armhf 1.5.4-1 [75.9 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-dbd-sqlite3 armhf 1.5.4-1 [17.7 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-ldap armhf 1.5.4-1 [16.7 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblua5.1-0 armhf 5.1.5-7.1 [83.7 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-bin armhf 2.4.10-10+deb8u7 [893 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-utils armhf 2.4.10-10+deb8u7 [194 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-data all 2.4.10-10+deb8u7 [163 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2 armhf 2.4.10-10+deb8u7 [207 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main fonts-dejavu-core all 2.34-1 [1,047 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main fontconfig-config all 2.11.0-6.3+deb8u1 [274 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfontconfig1 armhf 2.11.0-6.3+deb8u1 [312 kB]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfontenc1 armhf 1:1.1.2-1 [23.9 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjbig0 armhf 2.1-3.1 [27.5 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtiff5 armhf 4.0.3-12.3+deb8u1 [194 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main libvpx1 armhf 1.3.0-3+rvt [783 kB]
+取得:21 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxpm4 armhf 1:3.5.11-1 [41.7 kB]
+取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgd3 armhf 2.1.0-5+deb8u8 [127 kB]
+取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main libiksemel3 armhf 1.4-2 [23.4 kB]
+取得:24 http://mirrordirector.raspbian.org/raspbian/ jessie/main libltdl7 armhf 2.4.2-1.11 [42.5 kB]
+取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-common all 5.5.53-0+deb8u1 [75.5 kB]
+取得:26 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient18 armhf 5.5.53-0+deb8u1 [617 kB]
+取得:27 http://mirrordirector.raspbian.org/raspbian/ jessie/main libodbc1 armhf 2.3.1-3 [179 kB]
+取得:28 http://mirrordirector.raspbian.org/raspbian/ jessie/main libonig2 armhf 5.9.5-3.2 [101 kB]
+取得:29 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:30 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:31 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:32 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:33 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi-perl armhf 1.631-3+b1 [807 kB]
+取得:34 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbd-mysql-perl armhf 4.028-2+deb8u2 [113 kB]
+取得:35 http://mirrordirector.raspbian.org/raspbian/ jessie/main libterm-readkey-perl armhf 2.32-1+b2 [26.1 kB]
+取得:36 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-client-5.5 armhf 5.5.53-0+deb8u1 [1,447 kB]
+取得:37 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-core-5.5 armhf 5.5.53-0+deb8u1 [3,448 kB]
+取得:38 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-5.5 armhf 5.5.53-0+deb8u1 [1,591 kB]
+取得:39 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl4-corelibs-perl all 0.003-1 [43.6 kB]
+取得:40 http://mirrordirector.raspbian.org/raspbian/ jessie/main lsof armhf 4.86+dfsg-1 [321 kB]
+取得:41 http://mirrordirector.raspbian.org/raspbian/ jessie/main bdf2psf all 1.123 [50.4 kB]
+取得:42 http://mirrordirector.raspbian.org/raspbian/ jessie/main fbterm armhf 1.7-2 [53.0 kB]
+取得:43 http://mirrordirector.raspbian.org/raspbian/ jessie/main fping armhf 3.10-2 [35.2 kB]
+取得:44 http://mirrordirector.raspbian.org/raspbian/ jessie/main libqdbm14 armhf 1.8.78-5+b1 [86.0 kB]
+取得:45 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-common armhf 5.6.29+dfsg-0+deb8u1 [720 kB]
+取得:46 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-json armhf 1.3.6-1 [16.9 kB]
+取得:47 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-cli armhf 5.6.29+dfsg-0+deb8u1 [1,904 kB]
+取得:48 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapache2-mod-php5 armhf 5.6.29+dfsg-0+deb8u1 [1,879 kB]
+取得:49 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhtml-template-perl all 2.95-1 [66.8 kB]
+取得:50 http://mirrordirector.raspbian.org/raspbian/ jessie/main libopenipmi0 armhf 2.0.16-1.4 [396 kB]
+取得:51 http://mirrordirector.raspbian.org/raspbian/ jessie/main lv armhf 4.51-2.2 [311 kB]
+取得:52 http://mirrordirector.raspbian.org/raspbian/ jessie/main manpages-ja all 0.5.0.0.20140515+dfsg-1 [3,607 kB]
+取得:53 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5 all 5.6.29+dfsg-0+deb8u1 [1,312 B]
+取得:54 http://mirrordirector.raspbian.org/raspbian/ jessie/main task-japanese all 3.31+deb8u1 [884 B]
+取得:55 http://mirrordirector.raspbian.org/raspbian/ jessie/main manpages-ja-dev all 0.5.0.0.20140515+dfsg-1 [2,274 kB]
+取得:56 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server all 5.5.53-0+deb8u1 [73.8 kB]
+取得:57 http://mirrordirector.raspbian.org/raspbian/ jessie/main nkf armhf 2.13-4 [121 kB]
+取得:58 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-gd armhf 5.6.29+dfsg-0+deb8u1 [23.2 kB]
+取得:59 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-ldap armhf 5.6.29+dfsg-0+deb8u1 [19.0 kB]
+取得:60 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-mysql armhf 5.6.29+dfsg-0+deb8u1 [52.2 kB]
+取得:61 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-readline armhf 5.6.29+dfsg-0+deb8u1 [11.2 kB]
+取得:62 http://mirrordirector.raspbian.org/raspbian/ jessie/main psf-unifont all 1:7.0.06-1 [35.0 kB]
+取得:63 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+取得:64 http://mirrordirector.raspbian.org/raspbian/ jessie/main ssl-cert all 1.0.35 [20.9 kB]
+取得:65 http://mirrordirector.raspbian.org/raspbian/ jessie/main ttf-dejavu-core all 2.34-1 [30.7 kB]
+取得:66 http://mirrordirector.raspbian.org/raspbian/ jessie/main x11-common all 1:7.7+7 [287 kB]
+取得:67 http://mirrordirector.raspbian.org/raspbian/ jessie/main xfonts-encodings all 1:1.0.4-2 [574 kB]
+取得:68 http://mirrordirector.raspbian.org/raspbian/ jessie/main xfonts-utils armhf 1:7.7+2 [68.8 kB]
+取得:69 http://mirrordirector.raspbian.org/raspbian/ jessie/main ttf-unifont all 1:7.0.06-1 [4,963 kB]
+取得:70 http://mirrordirector.raspbian.org/raspbian/ jessie/main xfonts-unifont all 1:7.0.06-1 [2,679 kB]
+取得:71 http://mirrordirector.raspbian.org/raspbian/ jessie/main unifont all 1:7.0.06-1 [1,419 kB]
+取得:72 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-frontend-php all 1:2.2.7+dfsg-2+deb8u1 [2,901 kB]
+取得:73 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-server-mysql armhf 1:2.2.7+dfsg-2+deb8u1 [1,696 kB]
+43.9 MB を 1分 11秒 で取得しました (617 kB/s)                                  
+パッケージからテンプレートを展開しています: 100%
+パッケージを事前設定しています ...
+
+→rootアカウントのパスワードを設定します。
+ ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
+ │ 強制ではありませんが、MySQL を管理する &amp;quot;root&amp;quot; ユーザのパスワードを設定す  │ 
+ │ ることを強くお勧めします。                                                │ 
+ │                                                                           │ 
+ │ この値を空のままにしておいた場合は、パスワードは変更されません。          │ 
+ │                                                                           │ 
+ │ MySQL の &amp;quot;root&amp;quot; ユーザに対する新しいパスワード:                           │ 
+ │                                                                           │ 
+ │ _________________________________________________________________________ │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+→再度rootアカウントのパスワードを入力します。
+ ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
+ │                                                  │ 
+ │                                                  │ 
+ │ MySQL の &amp;quot;root&amp;quot; ユーザに対する新しいパスワード:  │ 
+ │                                                  │ 
+ │ ________________________________________________ │ 
+ │                                                  │ 
+ │                      &amp;lt;了解&amp;gt;                      │ 
+ │                                                  │ 
+ └──────────────────────────────────────────────────┘ 
+
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 31244 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libapr1:armhf を選択しています。
+.../libapr1_1.5.1-3_armhf.deb を展開する準備をしています ...
+libapr1:armhf (1.5.1-3) を展開しています...
+以前に未選択のパッケージ libaprutil1:armhf を選択しています。
+.../libaprutil1_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-dbd-sqlite3:armhf を選択しています。
+.../libaprutil1-dbd-sqlite3_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-ldap:armhf を選択しています。
+.../libaprutil1-ldap_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-ldap:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ liblua5.1-0:armhf を選択しています。
+.../liblua5.1-0_5.1.5-7.1_armhf.deb を展開する準備をしています ...
+liblua5.1-0:armhf (5.1.5-7.1) を展開しています...
+以前に未選択のパッケージ apache2-bin を選択しています。
+.../apache2-bin_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-bin (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-utils を選択しています。
+.../apache2-utils_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-utils (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-data を選択しています。
+.../apache2-data_2.4.10-10+deb8u7_all.deb を展開する準備をしています ...
+apache2-data (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2 を選択しています。
+.../apache2_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2 (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ libaio1:armhf を選択しています。
+.../libaio1_0.3.110-1_armhf.deb を展開する準備をしています ...
+libaio1:armhf (0.3.110-1) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ fonts-dejavu-core を選択しています。
+.../fonts-dejavu-core_2.34-1_all.deb を展開する準備をしています ...
+fonts-dejavu-core (2.34-1) を展開しています...
+以前に未選択のパッケージ fontconfig-config を選択しています。
+.../fontconfig-config_2.11.0-6.3+deb8u1_all.deb を展開する準備をしています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libfontconfig1:armhf を選択しています。
+.../libfontconfig1_2.11.0-6.3+deb8u1_armhf.deb を展開する準備をしています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libfontenc1:armhf を選択しています。
+.../libfontenc1_1%3a1.1.2-1_armhf.deb を展開する準備をしています ...
+libfontenc1:armhf (1:1.1.2-1) を展開しています...
+以前に未選択のパッケージ libjbig0:armhf を選択しています。
+.../libjbig0_2.1-3.1_armhf.deb を展開する準備をしています ...
+libjbig0:armhf (2.1-3.1) を展開しています...
+以前に未選択のパッケージ libtiff5:armhf を選択しています。
+.../libtiff5_4.0.3-12.3+deb8u1_armhf.deb を展開する準備をしています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libvpx1:armhf を選択しています。
+.../libvpx1_1.3.0-3+rvt_armhf.deb を展開する準備をしています ...
+libvpx1:armhf (1.3.0-3+rvt) を展開しています...
+以前に未選択のパッケージ libxpm4:armhf を選択しています。
+.../libxpm4_1%3a3.5.11-1_armhf.deb を展開する準備をしています ...
+libxpm4:armhf (1:3.5.11-1) を展開しています...
+以前に未選択のパッケージ libgd3:armhf を選択しています。
+.../libgd3_2.1.0-5+deb8u8_armhf.deb を展開する準備をしています ...
+libgd3:armhf (2.1.0-5+deb8u8) を展開しています...
+以前に未選択のパッケージ libiksemel3:armhf を選択しています。
+.../libiksemel3_1.4-2_armhf.deb を展開する準備をしています ...
+libiksemel3:armhf (1.4-2) を展開しています...
+以前に未選択のパッケージ libltdl7:armhf を選択しています。
+.../libltdl7_2.4.2-1.11_armhf.deb を展開する準備をしています ...
+libltdl7:armhf (2.4.2-1.11) を展開しています...
+以前に未選択のパッケージ mysql-common を選択しています。
+.../mysql-common_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-common (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libmysqlclient18:armhf を選択しています。
+.../libmysqlclient18_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libodbc1:armhf を選択しています。
+.../libodbc1_2.3.1-3_armhf.deb を展開する準備をしています ...
+libodbc1:armhf (2.3.1-3) を展開しています...
+以前に未選択のパッケージ libonig2:armhf を選択しています。
+.../libonig2_5.9.5-3.2_armhf.deb を展開する準備をしています ...
+libonig2:armhf (5.9.5-3.2) を展開しています...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libdbi-perl を選択しています。
+.../libdbi-perl_1.631-3+b1_armhf.deb を展開する準備をしています ...
+libdbi-perl (1.631-3+b1) を展開しています...
+以前に未選択のパッケージ libdbd-mysql-perl を選択しています。
+.../libdbd-mysql-perl_4.028-2+deb8u2_armhf.deb を展開する準備をしています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を展開しています...
+以前に未選択のパッケージ libterm-readkey-perl を選択しています。
+.../libterm-readkey-perl_2.32-1+b2_armhf.deb を展開する準備をしています ...
+libterm-readkey-perl (2.32-1+b2) を展開しています...
+以前に未選択のパッケージ mysql-client-5.5 を選択しています。
+.../mysql-client-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ mysql-server-core-5.5 を選択しています。
+.../mysql-server-core-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+mysql-common (5.5.53-0+deb8u1) を設定しています ...
+以前に未選択のパッケージ mysql-server-5.5 を選択しています。
+(データベースを読み込んでいます ... 現在 32643 個のファイルとディレクトリがインストールされています。)
+.../mysql-server-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libperl4-corelibs-perl を選択しています。
+.../libperl4-corelibs-perl_0.003-1_all.deb を展開する準備をしています ...
+libperl4-corelibs-perl (0.003-1) を展開しています...
+以前に未選択のパッケージ lsof を選択しています。
+.../lsof_4.86+dfsg-1_armhf.deb を展開する準備をしています ...
+lsof (4.86+dfsg-1) を展開しています...
+以前に未選択のパッケージ bdf2psf を選択しています。
+.../archives/bdf2psf_1.123_all.deb を展開する準備をしています ...
+bdf2psf (1.123) を展開しています...
+以前に未選択のパッケージ fbterm を選択しています。
+.../fbterm_1.7-2_armhf.deb を展開する準備をしています ...
+fbterm (1.7-2) を展開しています...
+以前に未選択のパッケージ fping を選択しています。
+.../fping_3.10-2_armhf.deb を展開する準備をしています ...
+fping (3.10-2) を展開しています...
+以前に未選択のパッケージ libqdbm14 を選択しています。
+.../libqdbm14_1.8.78-5+b1_armhf.deb を展開する準備をしています ...
+libqdbm14 (1.8.78-5+b1) を展開しています...
+以前に未選択のパッケージ php5-common を選択しています。
+.../php5-common_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-json を選択しています。
+.../php5-json_1.3.6-1_armhf.deb を展開する準備をしています ...
+php5-json (1.3.6-1) を展開しています...
+以前に未選択のパッケージ php5-cli を選択しています。
+.../php5-cli_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-cli (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libapache2-mod-php5 を選択しています。
+.../libapache2-mod-php5_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libhtml-template-perl を選択しています。
+.../libhtml-template-perl_2.95-1_all.deb を展開する準備をしています ...
+libhtml-template-perl (2.95-1) を展開しています...
+以前に未選択のパッケージ libopenipmi0 を選択しています。
+.../libopenipmi0_2.0.16-1.4_armhf.deb を展開する準備をしています ...
+libopenipmi0 (2.0.16-1.4) を展開しています...
+以前に未選択のパッケージ libxfont1:armhf を選択しています。
+.../libxfont1_1%3a1.5.2-1_armhf.deb を展開する準備をしています ...
+libxfont1:armhf (1:1.5.2-1) を展開しています...
+以前に未選択のパッケージ lv を選択しています。
+.../archives/lv_4.51-2.2_armhf.deb を展開する準備をしています ...
+lv (4.51-2.2) を展開しています...
+以前に未選択のパッケージ manpages-ja を選択しています。
+.../manpages-ja_0.5.0.0.20140515+dfsg-1_all.deb を展開する準備をしています ...
+manpages-ja (0.5.0.0.20140515+dfsg-1) を展開しています...
+以前に未選択のパッケージ manpages-ja-dev を選択しています。
+.../manpages-ja-dev_0.5.0.0.20140515+dfsg-1_all.deb を展開する準備をしています ...
+manpages-ja-dev (0.5.0.0.20140515+dfsg-1) を展開しています...
+以前に未選択のパッケージ mysql-server を選択しています。
+.../mysql-server_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-server (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ nkf を選択しています。
+.../archives/nkf_2.13-4_armhf.deb を展開する準備をしています ...
+nkf (2.13-4) を展開しています...
+以前に未選択のパッケージ php5 を選択しています。
+.../php5_5.6.29+dfsg-0+deb8u1_all.deb を展開する準備をしています ...
+php5 (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-gd を選択しています。
+.../php5-gd_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-gd (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-ldap を選択しています。
+.../php5-ldap_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-ldap (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-mysql を選択しています。
+.../php5-mysql_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-mysql (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-readline を選択しています。
+.../php5-readline_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-readline (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ psf-unifont を選択しています。
+.../psf-unifont_1%3a7.0.06-1_all.deb を展開する準備をしています ...
+psf-unifont (1:7.0.06-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ ssl-cert を選択しています。
+.../ssl-cert_1.0.35_all.deb を展開する準備をしています ...
+ssl-cert (1.0.35) を展開しています...
+以前に未選択のパッケージ task-japanese を選択しています。
+.../task-japanese_3.31+deb8u1_all.deb を展開する準備をしています ...
+task-japanese (3.31+deb8u1) を展開しています...
+以前に未選択のパッケージ ttf-dejavu-core を選択しています。
+.../ttf-dejavu-core_2.34-1_all.deb を展開する準備をしています ...
+ttf-dejavu-core (2.34-1) を展開しています...
+以前に未選択のパッケージ x11-common を選択しています。
+.../x11-common_1%3a7.7+7_all.deb を展開する準備をしています ...
+x11-common (1:7.7+7) を展開しています...
+以前に未選択のパッケージ xfonts-encodings を選択しています。
+.../xfonts-encodings_1%3a1.0.4-2_all.deb を展開する準備をしています ...
+xfonts-encodings (1:1.0.4-2) を展開しています...
+以前に未選択のパッケージ xfonts-utils を選択しています。
+.../xfonts-utils_1%3a7.7+2_armhf.deb を展開する準備をしています ...
+xfonts-utils (1:7.7+2) を展開しています...
+以前に未選択のパッケージ ttf-unifont を選択しています。
+.../ttf-unifont_1%3a7.0.06-1_all.deb を展開する準備をしています ...
+ttf-unifont (1:7.0.06-1) を展開しています...
+以前に未選択のパッケージ xfonts-unifont を選択しています。
+.../xfonts-unifont_1%3a7.0.06-1_all.deb を展開する準備をしています ...
+xfonts-unifont (1:7.0.06-1) を展開しています...
+以前に未選択のパッケージ unifont を選択しています。
+.../unifont_1%3a7.0.06-1_all.deb を展開する準備をしています ...
+unifont (1:7.0.06-1) を展開しています...
+以前に未選択のパッケージ zabbix-frontend-php を選択しています。
+.../zabbix-frontend-php_1%3a2.2.7+dfsg-2+deb8u1_all.deb を展開する準備をしています ...
+zabbix-frontend-php (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+以前に未選択のパッケージ zabbix-server-mysql を選択しています。
+.../zabbix-server-mysql_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-server-mysql (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libapr1:armhf (1.5.1-3) を設定しています ...
+libaprutil1:armhf (1.5.4-1) を設定しています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を設定しています ...
+libaprutil1-ldap:armhf (1.5.4-1) を設定しています ...
+liblua5.1-0:armhf (5.1.5-7.1) を設定しています ...
+apache2-bin (2.4.10-10+deb8u7) を設定しています ...
+apache2-utils (2.4.10-10+deb8u7) を設定しています ...
+apache2-data (2.4.10-10+deb8u7) を設定しています ...
+apache2 (2.4.10-10+deb8u7) を設定しています ...
+Enabling module mpm_event.
+Enabling module authz_core.
+Enabling module authz_host.
+Enabling module authn_core.
+Enabling module auth_basic.
+Enabling module access_compat.
+Enabling module authn_file.
+Enabling module authz_user.
+Enabling module alias.
+Enabling module dir.
+Enabling module autoindex.
+Enabling module env.
+Enabling module mime.
+Enabling module negotiation.
+Enabling module setenvif.
+Enabling module filter.
+Enabling module deflate.
+Enabling module status.
+Enabling conf charset.
+Enabling conf localized-error-pages.
+Enabling conf other-vhosts-access-log.
+Enabling conf security.
+Enabling conf serve-cgi-bin.
+Enabling site 000-default.
+libaio1:armhf (0.3.110-1) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+fonts-dejavu-core (2.34-1) を設定しています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を設定しています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を設定しています ...
+libfontenc1:armhf (1:1.1.2-1) を設定しています ...
+libjbig0:armhf (2.1-3.1) を設定しています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を設定しています ...
+libvpx1:armhf (1.3.0-3+rvt) を設定しています ...
+libxpm4:armhf (1:3.5.11-1) を設定しています ...
+libgd3:armhf (2.1.0-5+deb8u8) を設定しています ...
+libiksemel3:armhf (1.4-2) を設定しています ...
+libltdl7:armhf (2.4.2-1.11) を設定しています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を設定しています ...
+libodbc1:armhf (2.3.1-3) を設定しています ...
+libonig2:armhf (5.9.5-3.2) を設定しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+libdbi-perl (1.631-3+b1) を設定しています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を設定しています ...
+libterm-readkey-perl (2.32-1+b2) を設定しています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を設定しています ...
+170108 22:06:42 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+170108 22:06:42 [Note] Ignoring --secure-file-priv value as server is running with --bootstrap.
+170108 22:06:42 [Note] /usr/sbin/mysqld (mysqld 5.5.53-0+deb8u1) starting as process 14599 ...
+libperl4-corelibs-perl (0.003-1) を設定しています ...
+lsof (4.86+dfsg-1) を設定しています ...
+bdf2psf (1.123) を設定しています ...
+fbterm (1.7-2) を設定しています ...
+fping (3.10-2) を設定しています ...
+libqdbm14 (1.8.78-5+b1) を設定しています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/pdo.ini with new version
+php5_invoke: Enable module pdo for cli SAPI
+php5_invoke: Enable module pdo for apache2 SAPI
+
+Creating config file /etc/php5/mods-available/opcache.ini with new version
+php5_invoke: Enable module opcache for cli SAPI
+php5_invoke: Enable module opcache for apache2 SAPI
+php5-json (1.3.6-1) を設定しています ...
+php5_invoke: Enable module json for cli SAPI
+php5_invoke: Enable module json for apache2 SAPI
+php5-cli (5.6.29+dfsg-0+deb8u1) を設定しています ...
+update-alternatives: /usr/bin/php (php) を提供するために自動モードで /usr/bin/php5 を使います
+update-alternatives: /usr/bin/phar (phar) を提供するために自動モードで /usr/bin/phar5 を使います
+
+Creating config file /etc/php5/cli/php.ini with new version
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/apache2/php.ini with new version
+Module mpm_event disabled.
+Enabling module mpm_prefork.
+apache2_switch_mpm Switch to prefork
+apache2_invoke: Enable module php5
+libhtml-template-perl (2.95-1) を設定しています ...
+libopenipmi0 (2.0.16-1.4) を設定しています ...
+libxfont1:armhf (1:1.5.2-1) を設定しています ...
+lv (4.51-2.2) を設定しています ...
+manpages-ja (0.5.0.0.20140515+dfsg-1) を設定しています ...
+manpages-ja-dev (0.5.0.0.20140515+dfsg-1) を設定しています ...
+mysql-server (5.5.53-0+deb8u1) を設定しています ...
+nkf (2.13-4) を設定しています ...
+php5 (5.6.29+dfsg-0+deb8u1) を設定しています ...
+php5-gd (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/gd.ini with new version
+php5_invoke: Enable module gd for cli SAPI
+php5_invoke: Enable module gd for apache2 SAPI
+php5-ldap (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/ldap.ini with new version
+php5_invoke: Enable module ldap for cli SAPI
+php5_invoke: Enable module ldap for apache2 SAPI
+php5-mysql (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/mysql.ini with new version
+php5_invoke: Enable module mysql for cli SAPI
+php5_invoke: Enable module mysql for apache2 SAPI
+
+Creating config file /etc/php5/mods-available/mysqli.ini with new version
+php5_invoke: Enable module mysqli for cli SAPI
+php5_invoke: Enable module mysqli for apache2 SAPI
+
+Creating config file /etc/php5/mods-available/pdo_mysql.ini with new version
+php5_invoke: Enable module pdo_mysql for cli SAPI
+php5_invoke: Enable module pdo_mysql for apache2 SAPI
+php5-readline (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/readline.ini with new version
+php5_invoke: Enable module readline for cli SAPI
+php5_invoke: Enable module readline for apache2 SAPI
+psf-unifont (1:7.0.06-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp&#39; は、現在作成中のユーザの所属になっていません。
+ssl-cert (1.0.35) を設定しています ...
+task-japanese (3.31+deb8u1) を設定しています ...
+ttf-dejavu-core (2.34-1) を設定しています ...
+x11-common (1:7.7+7) を設定しています ...
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+xfonts-encodings (1:1.0.4-2) を設定しています ...
+xfonts-utils (1:7.7+2) を設定しています ...
+ttf-unifont (1:7.0.06-1) を設定しています ...
+xfonts-unifont (1:7.0.06-1) を設定しています ...
+unifont (1:7.0.06-1) を設定しています ...
+zabbix-frontend-php (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+zabbix-server-mysql (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_server.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;mysqlの初期設定:d408cd6d355b48aec871928776dae66b&#34;&gt;MySQLの初期設定&lt;/h3&gt;
+
+&lt;p&gt;MySQLのセキュア設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql_secure_installation 
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we&#39;ll need the current
+password for the root user.  If you&#39;ve just installed MySQL, and
+you haven&#39;t set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer &#39;n&#39;.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from &#39;localhost&#39;.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named &#39;test&#39; that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can&#39;t drop database &#39;test&#39;; database doesn&#39;t exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you&#39;ve completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQLの初期設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/mysql/my.cnf{,.org}
+$ ls -l /etc/mysql/my.cnf*
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf.org
+$
+$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+# Add the following line to last of mysqld section
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+# Add the following line to last of mysqldump section
+default-character-set=utf8
+
+[mysql]
+# Add the following line to last of mysql section
+default-character-set=utf8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html&#34;&gt;MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;MySQLの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart mysql
+$ sudo systemctl enable mysql
+Synchronizing state for mysql.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d mysql defaults
+Executing /usr/sbin/update-rc.d mysql enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;apache2の初期設定:d408cd6d355b48aec871928776dae66b&#34;&gt;Apache2の初期設定&lt;/h3&gt;
+
+&lt;p&gt;Apache2のセキュリティ設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/apache2/conf-available/security.conf{,.org}
+$ ls -l /etc/apache2/conf-available/security.conf*
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の文字コード設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/apache2/conf-available/charset.conf{,.org}
+$ ls -l /etc/apache2/conf-available/charset.conf*
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のServerName設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
+$ sudo a2enconf fqdn
+Enabling conf fqdn.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$ sudo systemctl enable apache2
+Synchronizing state for apache2.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d apache2 defaults
+Executing /usr/sbin/update-rc.d apache2 enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverの設定:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbix Serverの設定&lt;/h3&gt;
+
+&lt;p&gt;データベースの作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql -uroot -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 37
+Server version: 5.5.53-0+deb8u1 (Raspbian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+
+mysql&amp;gt; 
+mysql&amp;gt; create database zabbix character set utf8 collate utf8_bin;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&amp;gt; 
+mysql&amp;gt; grant all privileges on zabbix.* to zabbix@localhost identified by &#39;zabbix_password&#39;;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&amp;gt; 
+mysql&amp;gt; quit
+Bye
+$
+$ zcat /usr/share/zabbix-server-mysql/schema.sql.gz | mysql -uzabbix -p zabbix
+Enter password: 
+$
+$ zcat /usr/share/zabbix-server-mysql/images.sql.gz | mysql -uzabbix -p zabbix
+Enter password: 
+$
+$ zcat /usr/share/zabbix-server-mysql/data.sql.gz | mysql -uzabbix -p zabbix
+Enter password: 
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のZabbixサイト設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /usr/share/doc/zabbix-frontend-php/examples/apache.conf /etc/apache2/conf-available/zabbix.conf
+$
+$ sudo vi /etc/apache2/conf-available/zabbix.conf
+php_value max_execution_time 300
+php_value memory_limit 128M
+php_value post_max_size 16M
+php_value upload_max_filesize 2M
+php_value max_input_time 300
+php_value date.timezone Asia/Tokyo
+$
+$ cat /etc/apache2/conf-available/zabbix.conf
+# Define /zabbix alias, this is the default
+&amp;lt;IfModule mod_alias.c&amp;gt;
+    Alias /zabbix /usr/share/zabbix
+    php_value max_execution_time 300
+    php_value memory_limit 128M
+    php_value post_max_size 16M
+    php_value upload_max_filesize 2M
+    php_value max_input_time 300
+    php_value date.timezone Asia/Tokyo
+&amp;lt;/IfModule&amp;gt;
+$
+$ sudo a2enconf zabbix
+Enabling conf zabbix.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbixのサーバ設定:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbixのサーバ設定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/zabbix/zabbix_server.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_server.conf*
+-rw-r--r-- 1 root root 12634  9月 18 03:38 /etc/zabbix/zabbix_server.conf
+-rw-r--r-- 1 root root 12634  9月 18 03:38 /etc/zabbix/zabbix_server.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_server.conf
+DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=zabbix_password
+$
+$ sudo cp -p /etc/default/zabbix-server{,.org}
+$ ls -l /etc/default/zabbix-server*
+-rw-r--r-- 1 root root 407  6月  6  2016 /etc/default/zabbix-server
+-rw-r--r-- 1 root root 407  6月  6  2016 /etc/default/zabbix-server.org
+$
+$ sudo vi /etc/default/zabbix-server
+#START=no
+START=yes
+$
+$ sudo ln -s /usr/share/fonts/truetype/unifont/unifont.ttf /usr/share/zabbix/fonts/
+$
+$ sudo cp -p /usr/share/zabbix/include/defines.inc.php{,.org}
+$ ls -l /usr/share/zabbix/include/defines.inc.php*
+-rw-r--r-- 1 root root 30844 10月 24  2014 /usr/share/zabbix/include/defines.inc.php
+-rw-r--r-- 1 root root 30844 10月 24  2014 /usr/share/zabbix/include/defines.inc.php.org
+$
+$ sudo vi /usr/share/zabbix/include/defines.inc.php
+//define(&#39;ZBX_GRAPH_FONT_NAME&#39;,           &#39;DejaVuSans&#39;); // font file name
+define(&#39;ZBX_GRAPH_FONT_NAME&#39;,           &#39;unifont&#39;); // font file name
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Zabbix Serverの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-server
+$ sudo systemctl enable zabbix-server
+Synchronizing state for zabbix-server.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-server defaults
+Executing /usr/sbin/update-rc.d zabbix-server enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverへのアクセス:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbix Serverへのアクセス&lt;/h3&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスする。&lt;/p&gt;
+
+&lt;p&gt;Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;1.Welcome&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-01.png&#34; alt=&#34;zabbix-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;2.Check of pre-requisites&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;すべて&lt;code&gt;OK&lt;/code&gt;になっていることを確認して、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-02.png&#34; alt=&#34;zabbix-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;3.Configure DB connection&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以下の情報を入力し、&lt;code&gt;Test connection&lt;/code&gt;をクリックします。&lt;code&gt;OK&lt;/code&gt;が表示されることを確認して、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Database type: MySQL
+Database host: localhost
+Database port: 0
+Database name: zabbix
+User: zabbix
+Password: zabbix_password
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-05.png&#34; alt=&#34;zabbix-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;4.Zabbix server details&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以下の情報を確認し、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host: localhost
+Port: 10051
+Name:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-06.png&#34; alt=&#34;zabbix-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;5.Pre-Installation summary&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;表示内容に間違いがないことを確認し、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-07.png&#34; alt=&#34;zabbix-install-07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;6.Install&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Configuration file &amp;quot;/etc/zabbix/zabbix.conf.php&amp;quot; created: Fail&lt;/code&gt;と表示されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-08.png&#34; alt=&#34;zabbix-install-08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;その場合は&lt;code&gt;Download configuration file&lt;/code&gt;をクリックして&lt;code&gt;zabbix.conf.php&lt;/code&gt;をダウンロードし、手動で&lt;code&gt;/etc/zabbix/&lt;/code&gt;に配置します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ls -l /etc/zabbix/zabbix.conf.php 
+-rw-r--r-- 1 root root 425  1月  8 23:17 /etc/zabbix/zabbix.conf.php
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;Retry&lt;/code&gt;をクリックして&lt;code&gt;Configuration file &amp;quot;/etc/zabbix/zabbix.conf.php&amp;quot; created: OK&lt;/code&gt;になったことを確認します。&lt;code&gt;Finish&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-09.png&#34; alt=&#34;zabbix-install-09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;zabbix-serverへのログイン:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbix Serverへのログイン&lt;/h3&gt;
+
+&lt;p&gt;Zabbixの初期設定が完了するとログイン画面が表示されるので、デフォルトアカウント(&lt;code&gt;Admin/zabbix&lt;/code&gt;)でログインします。 ログイン後は画面右上のProfileを開き、パスワードを変更しておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-10.png&#34; alt=&#34;zabbix-install-10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その11</title>
@@ -5022,197 +5940,6 @@ $ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 -
 &lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_12.png&#34; alt=&#34;cacti_register_12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)にCactiをインストールする</title>
-      <link>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</link>
-      <pubDate>Sat, 20 Aug 2016 20:46:05 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(Jessie)にCactiを導入するまでのメモです。
-Apache2やMySQLはインストール済みであることを前提としています。&lt;/p&gt;
-
-&lt;h2 id=&#34;cactiのインストール:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiのインストール&lt;/h2&gt;
-
-&lt;p&gt;Cactiをインストールする。
-途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install cacti cacti-spine
-
-↓&amp;lt;了解&amp;gt;を選択してEnter
- ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
- │                                                                           │ 
- │ 警告: php に対するインクルードパスが変更されています!                     │ 
- │                                                                           │ 
- │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
- │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
- │                                                                           │ 
- │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
- │ かもしれません。                                                          │ 
- │                                                                           │ 
- │                                  &amp;lt;了解&amp;gt;                                   │ 
- │                                                                           │ 
- └───────────────────────────────────────────────────────────────────────────┘ 
-
-↓apache2を選択してEnter
- ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
- │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
- │                                                                           │ 
- │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
- │                                                                           │ 
- │ ウェブサーバ:                                                             │ 
- │                                                                           │ 
- │                               apache2                                     │ 
- │                               lighttpd                                    │ 
- │                               どれでもない                                │ 
- │                                                                           │ 
- │                                                                           │ 
- │                                  &amp;lt;了解&amp;gt;                                   │ 
- │                                                                           │ 
- └───────────────────────────────────────────────────────────────────────────┘ 
-
-↓&amp;lt;はい&amp;gt;を選択してEnter
- ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
- │                                                                           │ 
- │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
- │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
- │                                                                           │ 
- │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
- │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
- │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
- │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
- │                                                                           │ 
- │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
- │                                                                           │ 
- │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
- │                                                                           │ 
- │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
- │                                                                           │ 
- └───────────────────────────────────────────────────────────────────────────┘ 
-
-↓MySQLのrootユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
-  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
-  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
-  │ ウントのパスワードを入力してください。                                   │ 
-  │                                                                          │ 
-  │ データベースの管理権限を持つユーザのパスワード:                          │ 
-  │                                                                          │ 
-  │ ________________________________________________________________________ │ 
-  │                                                                          │ 
-  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
-  │                                                                          │ 
-  └──────────────────────────────────────────────────────────────────────────┘ 
-
-↓MySQLのcactiユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
-  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
-  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
-  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
-  │                                                                          │ 
-  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
-  │                                                                          │ 
-  │ ________________________________________________________________________ │ 
-  │                                                                          │ 
-  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
-  │                                                                          │ 
-  └──────────────────────────────────────────────────────────────────────────┘ 
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;データベースをMyISAMからInnoDBに変更する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cd /usr/share/cacti/cli
-$ sudo php convert_innodb.php
-Converting All Non-Memory Cacti Database Tables to Innodb with Less than &#39;300000&#39; Records
-Converting Table -&amp;gt; &#39;cdef&#39; Successful
-Converting Table -&amp;gt; &#39;cdef_items&#39; Successful
-Converting Table -&amp;gt; &#39;colors&#39; Successful
-Converting Table -&amp;gt; &#39;data_input&#39; Successful
-Converting Table -&amp;gt; &#39;data_input_data&#39; Successful
-Converting Table -&amp;gt; &#39;data_input_fields&#39; Successful
-Converting Table -&amp;gt; &#39;data_local&#39; Successful
-Converting Table -&amp;gt; &#39;data_template&#39; Successful
-Converting Table -&amp;gt; &#39;data_template_data&#39; Successful
-Converting Table -&amp;gt; &#39;data_template_data_rra&#39; Successful
-Converting Table -&amp;gt; &#39;data_template_rrd&#39; Successful
-Converting Table -&amp;gt; &#39;graph_local&#39; Successful
-Converting Table -&amp;gt; &#39;graph_template_input&#39; Successful
-Converting Table -&amp;gt; &#39;graph_template_input_defs&#39; Successful
-Converting Table -&amp;gt; &#39;graph_templates&#39; Successful
-Converting Table -&amp;gt; &#39;graph_templates_gprint&#39; Successful
-Converting Table -&amp;gt; &#39;graph_templates_graph&#39; Successful
-Converting Table -&amp;gt; &#39;graph_templates_item&#39; Successful
-Converting Table -&amp;gt; &#39;graph_tree&#39; Successful
-Converting Table -&amp;gt; &#39;graph_tree_items&#39; Successful
-Converting Table -&amp;gt; &#39;host&#39; Successful
-Converting Table -&amp;gt; &#39;host_graph&#39; Successful
-Converting Table -&amp;gt; &#39;host_snmp_cache&#39; Successful
-Converting Table -&amp;gt; &#39;host_snmp_query&#39; Successful
-Converting Table -&amp;gt; &#39;host_template&#39; Successful
-Converting Table -&amp;gt; &#39;host_template_graph&#39; Successful
-Converting Table -&amp;gt; &#39;host_template_snmp_query&#39; Successful
-Converting Table -&amp;gt; &#39;plugin_config&#39; Successful
-Converting Table -&amp;gt; &#39;plugin_db_changes&#39; Successful
-Converting Table -&amp;gt; &#39;plugin_hooks&#39; Successful
-Converting Table -&amp;gt; &#39;plugin_realms&#39; Successful
-Converting Table -&amp;gt; &#39;poller&#39; Successful
-Converting Table -&amp;gt; &#39;poller_command&#39; Successful
-Converting Table -&amp;gt; &#39;poller_item&#39; Successful
-Converting Table -&amp;gt; &#39;poller_output&#39; Successful
-Converting Table -&amp;gt; &#39;poller_reindex&#39; Successful
-Converting Table -&amp;gt; &#39;poller_time&#39; Successful
-Converting Table -&amp;gt; &#39;rra&#39; Successful
-Converting Table -&amp;gt; &#39;rra_cf&#39; Successful
-Converting Table -&amp;gt; &#39;settings&#39; Successful
-Converting Table -&amp;gt; &#39;settings_graphs&#39; Successful
-Converting Table -&amp;gt; &#39;settings_tree&#39; Successful
-Converting Table -&amp;gt; &#39;snmp_query&#39; Successful
-Converting Table -&amp;gt; &#39;snmp_query_graph&#39; Successful
-Converting Table -&amp;gt; &#39;snmp_query_graph_rrd&#39; Successful
-Converting Table -&amp;gt; &#39;snmp_query_graph_rrd_sv&#39; Successful
-Converting Table -&amp;gt; &#39;snmp_query_graph_sv&#39; Successful
-Converting Table -&amp;gt; &#39;user_auth&#39; Successful
-Converting Table -&amp;gt; &#39;user_auth_perms&#39; Successful
-Converting Table -&amp;gt; &#39;user_auth_realm&#39; Successful
-Converting Table -&amp;gt; &#39;user_log&#39; Successful
-Converting Table -&amp;gt; &#39;version&#39; Successful
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cactiへのアクセス:2f489629b1913a89dc29f01f282bd186&#34;&gt;Cactiへのアクセス&lt;/h2&gt;
-
-&lt;p&gt;ブラウザからCactiのURL(&lt;code&gt;http://IPアドレス/cacti&lt;/code&gt;)にアクセスする。&lt;/p&gt;
-
-&lt;p&gt;Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
-
-&lt;p&gt;↓Nextをクリック&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_01.png&#34; alt=&#34;cacti_install_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓Nextをクリック&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_02.png&#34; alt=&#34;cacti_install_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓Errorがないことを確認してFinishをクリック&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_03.png&#34; alt=&#34;cacti_install_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓admin/adminでログイン&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_04.png&#34; alt=&#34;cacti_install_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓adminの新しいパスワードを入力してSaveをクリック&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_05.png&#34; alt=&#34;cacti_install_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160820_01/cacti_install_06.png&#34; alt=&#34;cacti_install_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>
