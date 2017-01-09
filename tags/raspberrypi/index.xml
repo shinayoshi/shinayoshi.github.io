@@ -2630,6 +2630,9 @@ $ sudo vi /etc/ssh/sshd_config
 #Port 22
 Port 20022
 
+#RSAAuthentication yes
+RSAAuthentication no
+
 #PermitRootLogin without-password
 PermitRootLogin no
 
@@ -2643,13 +2646,18 @@ $ diff /etc/ssh/sshd_config.org /etc/ssh/sshd_config
 &amp;lt; Port 22
 ---
 &amp;gt; #Port 22
-&amp;gt; Port 20022
+&amp;gt; Port 10122
 28c29,30
 &amp;lt; PermitRootLogin without-password
 ---
 &amp;gt; #PermitRootLogin without-password
 &amp;gt; PermitRootLogin no
-52a55
+31c33,34
+&amp;lt; RSAAuthentication yes
+---
+&amp;gt; #RSAAuthentication yes
+&amp;gt; RSAAuthentication no
+52a56
 &amp;gt; PasswordAuthentication no
 $
 &lt;/code&gt;&lt;/pre&gt;
