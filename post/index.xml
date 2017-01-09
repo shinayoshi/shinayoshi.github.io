@@ -7,11 +7,816 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Sun, 08 Jan 2017 20:40:44 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>家庭内インターネット環境を構築する その12</title>
+      <title>家庭内インターネット接続環境を構築する その15</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
+      <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はCactiを導入しました。
+今回はCactiに&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;を登録していきます。SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp&#39; は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-01.png&#34; alt=&#34;register-cacti-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-02.png&#34; alt=&#34;register-cacti-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-03.png&#34; alt=&#34;register-cacti-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-04.png&#34; alt=&#34;register-cacti-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認します。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-05.png&#34; alt=&#34;register-cacti-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-06.png&#34; alt=&#34;register-cacti-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-07.png&#34; alt=&#34;register-cacti-07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-08.png&#34; alt=&#34;register-cacti-08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-09.png&#34; alt=&#34;register-cacti-09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-10.png&#34; alt=&#34;register-cacti-10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-11.png&#34; alt=&#34;register-cacti-11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-12.png&#34; alt=&#34;register-cacti-12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その14</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-cacti/</link>
+      <pubDate>Mon, 09 Jan 2017 14:45:15 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-cacti/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;にCactiを導入します。&lt;/p&gt;
+
+&lt;h2 id=&#34;cactiのインストール:155ae028b993b1af7e622df9d1a9e821&#34;&gt;Cactiのインストール&lt;/h2&gt;
+
+&lt;p&gt;Cactiをインストールします。
+途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install cacti cacti-spine
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1
+  libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0
+  libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4
+  libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp
+  rrdtool snmp
+提案パッケージ:
+  moreutils snmp-mibs-downloader php5-adodb librrds-perl
+以下のパッケージが新たにインストールされます:
+  cacti cacti-spine dbconfig-common fontconfig javascript-common libcairo2
+  libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery
+  libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0
+  libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0
+  libxcb-shm0 libxrender1 php5-snmp rrdtool snmp
+アップグレード: 0 個、新規インストール: 26 個、削除: 0 個、保留: 1 個。
+6,777 kB のアーカイブを取得する必要があります。
+この操作後に追加で 16.6 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main fontconfig armhf 2.11.0-6.3+deb8u1 [402 kB]
+取得:2 http://archive.raspberrypi.org/debian/ jessie/main libpixman-1-0 armhf 0.33.3+git20151011-7de61d8-rpi1 [156 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxcb-render0 armhf 1.10-3 [16.0 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxcb-shm0 armhf 1.10-3 [11.0 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxrender1 armhf 1:0.9.8-1 [30.4 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdatrie1 armhf 0.2.8-1 [29.1 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgraphite2-3 armhf 1.3.6-1~deb8u1 [62.5 kB]
+取得:8 http://archive.raspberrypi.org/debian/ jessie/main libcairo2 armhf 1.14.0-2.1+deb8u1+rpi1 [662 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libharfbuzz0b armhf 0.9.35-2 [464 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libthai-data all 0.1.21-1 [159 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libthai0 armhf 0.1.21-1 [43.4 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main dbconfig-common all 1.8.47+nmu3+deb8u1 [628 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main javascript-common all 11 [6,120 B]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi1 armhf 0.9.0-4 [27.4 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjs-jquery all 1.7.2+dfsg-3.2 [97.5 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjs-jquery-cookie all 10-1 [7,978 B]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main libphp-adodb all 5.15-1 [567 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main librrd4 armhf 1.4.8-1.2 [195 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-snmp armhf 5.6.29+dfsg-0+deb8u1 [16.1 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main rrdtool armhf 1.4.8-1.2 [424 kB]
+取得:21 http://archive.raspberrypi.org/debian/ jessie/ui libpango-1.0-0 armhf 1.36.8-3+rpi1 [274 kB]
+取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main cacti all 0.8.8b+dfsg-8+deb8u6 [1,895 kB]
+取得:24 http://archive.raspberrypi.org/debian/ jessie/ui libpangoft2-1.0-0 armhf 1.36.8-3+rpi1 [208 kB]
+取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main cacti-spine armhf 0.8.8b-1+b3 [53.9 kB]
+取得:26 http://archive.raspberrypi.org/debian/ jessie/ui libpangocairo-1.0-0 armhf 1.36.8-3+rpi1 [197 kB]
+6,777 kB を 21秒 で取得しました (311 kB/s)                                     
+パッケージを事前設定しています ...
+
+↓&amp;lt;了解&amp;gt;を選択してEnter
+ ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
+ │                                                                           │ 
+ │ 警告: php に対するインクルードパスが変更されています!                     │ 
+ │                                                                           │ 
+ │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
+ │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
+ │                                                                           │ 
+ │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
+ │ かもしれません。                                                          │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓apache2を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
+ │                                                                           │ 
+ │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
+ │                                                                           │ 
+ │ ウェブサーバ:                                                             │ 
+ │                                                                           │ 
+ │                               apache2                                     │ 
+ │                               lighttpd                                    │ 
+ │                               どれでもない                                │ 
+ │                                                                           │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+以前に未選択のパッケージ fontconfig を選択しています。
+(データベースを読み込んでいます ... 現在 37219 個のファイルとディレクトリがインストールされています。)
+.../fontconfig_2.11.0-6.3+deb8u1_armhf.deb を展開する準備をしています ...
+fontconfig (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libpixman-1-0:armhf を選択しています。
+.../libpixman-1-0_0.33.3+git20151011-7de61d8-rpi1_armhf.deb を展開する準備をしています ...
+libpixman-1-0:armhf (0.33.3+git20151011-7de61d8-rpi1) を展開しています...
+以前に未選択のパッケージ libxcb-render0:armhf を選択しています。
+.../libxcb-render0_1.10-3_armhf.deb を展開する準備をしています ...
+libxcb-render0:armhf (1.10-3) を展開しています...
+以前に未選択のパッケージ libxcb-shm0:armhf を選択しています。
+.../libxcb-shm0_1.10-3_armhf.deb を展開する準備をしています ...
+libxcb-shm0:armhf (1.10-3) を展開しています...
+以前に未選択のパッケージ libxrender1:armhf を選択しています。
+.../libxrender1_1%3a0.9.8-1_armhf.deb を展開する準備をしています ...
+libxrender1:armhf (1:0.9.8-1) を展開しています...
+以前に未選択のパッケージ libcairo2:armhf を選択しています。
+.../libcairo2_1.14.0-2.1+deb8u1+rpi1_armhf.deb を展開する準備をしています ...
+libcairo2:armhf (1.14.0-2.1+deb8u1+rpi1) を展開しています...
+以前に未選択のパッケージ libdatrie1:armhf を選択しています。
+.../libdatrie1_0.2.8-1_armhf.deb を展開する準備をしています ...
+libdatrie1:armhf (0.2.8-1) を展開しています...
+以前に未選択のパッケージ libgraphite2-3:armhf を選択しています。
+.../libgraphite2-3_1.3.6-1~deb8u1_armhf.deb を展開する準備をしています ...
+libgraphite2-3:armhf (1.3.6-1~deb8u1) を展開しています...
+以前に未選択のパッケージ libharfbuzz0b:armhf を選択しています。
+.../libharfbuzz0b_0.9.35-2_armhf.deb を展開する準備をしています ...
+libharfbuzz0b:armhf (0.9.35-2) を展開しています...
+以前に未選択のパッケージ libthai-data を選択しています。
+.../libthai-data_0.1.21-1_all.deb を展開する準備をしています ...
+libthai-data (0.1.21-1) を展開しています...
+以前に未選択のパッケージ libthai0:armhf を選択しています。
+.../libthai0_0.1.21-1_armhf.deb を展開する準備をしています ...
+libthai0:armhf (0.1.21-1) を展開しています...
+以前に未選択のパッケージ libpango-1.0-0:armhf を選択しています。
+.../libpango-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpango-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ libpangoft2-1.0-0:armhf を選択しています。
+.../libpangoft2-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpangoft2-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ libpangocairo-1.0-0:armhf を選択しています。
+.../libpangocairo-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpangocairo-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ dbconfig-common を選択しています。
+.../dbconfig-common_1.8.47+nmu3+deb8u1_all.deb を展開する準備をしています ...
+dbconfig-common (1.8.47+nmu3+deb8u1) を展開しています...
+以前に未選択のパッケージ javascript-common を選択しています。
+.../javascript-common_11_all.deb を展開する準備をしています ...
+javascript-common (11) を展開しています...
+以前に未選択のパッケージ libdbi1:armhf を選択しています。
+.../libdbi1_0.9.0-4_armhf.deb を展開する準備をしています ...
+libdbi1:armhf (0.9.0-4) を展開しています...
+以前に未選択のパッケージ libjs-jquery を選択しています。
+.../libjs-jquery_1.7.2+dfsg-3.2_all.deb を展開する準備をしています ...
+libjs-jquery (1.7.2+dfsg-3.2) を展開しています...
+以前に未選択のパッケージ libjs-jquery-cookie を選択しています。
+.../libjs-jquery-cookie_10-1_all.deb を展開する準備をしています ...
+libjs-jquery-cookie (10-1) を展開しています...
+以前に未選択のパッケージ libphp-adodb を選択しています。
+.../libphp-adodb_5.15-1_all.deb を展開する準備をしています ...
+libphp-adodb (5.15-1) を展開しています...
+以前に未選択のパッケージ librrd4 を選択しています。
+.../librrd4_1.4.8-1.2_armhf.deb を展開する準備をしています ...
+librrd4 (1.4.8-1.2) を展開しています...
+以前に未選択のパッケージ php5-snmp を選択しています。
+.../php5-snmp_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-snmp (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ rrdtool を選択しています。
+.../rrdtool_1.4.8-1.2_armhf.deb を展開する準備をしています ...
+rrdtool (1.4.8-1.2) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ cacti を選択しています。
+.../cacti_0.8.8b+dfsg-8+deb8u6_all.deb を展開する準備をしています ...
+cacti (0.8.8b+dfsg-8+deb8u6) を展開しています...
+以前に未選択のパッケージ cacti-spine を選択しています。
+.../cacti-spine_0.8.8b-1+b3_armhf.deb を展開する準備をしています ...
+cacti-spine (0.8.8b-1+b3) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+fontconfig (2.11.0-6.3+deb8u1) を設定しています ...
+Regenerating fonts cache... done.
+libpixman-1-0:armhf (0.33.3+git20151011-7de61d8-rpi1) を設定しています ...
+libxcb-render0:armhf (1.10-3) を設定しています ...
+libxcb-shm0:armhf (1.10-3) を設定しています ...
+libxrender1:armhf (1:0.9.8-1) を設定しています ...
+libcairo2:armhf (1.14.0-2.1+deb8u1+rpi1) を設定しています ...
+libdatrie1:armhf (0.2.8-1) を設定しています ...
+libgraphite2-3:armhf (1.3.6-1~deb8u1) を設定しています ...
+libharfbuzz0b:armhf (0.9.35-2) を設定しています ...
+libthai-data (0.1.21-1) を設定しています ...
+libthai0:armhf (0.1.21-1) を設定しています ...
+libpango-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+libpangoft2-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+libpangocairo-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+dbconfig-common (1.8.47+nmu3+deb8u1) を設定しています ...
+
+Creating config file /etc/dbconfig-common/config with new version
+javascript-common (11) を設定しています ...
+apache2_invoke: Enable configuration javascript-common
+libdbi1:armhf (0.9.0-4) を設定しています ...
+libjs-jquery (1.7.2+dfsg-3.2) を設定しています ...
+libjs-jquery-cookie (10-1) を設定しています ...
+libphp-adodb (5.15-1) を設定しています ...
+librrd4 (1.4.8-1.2) を設定しています ...
+php5-snmp (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/snmp.ini with new version
+php5_invoke: Enable module snmp for cli SAPI
+php5_invoke: Enable module snmp for apache2 SAPI
+rrdtool (1.4.8-1.2) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+cacti (0.8.8b+dfsg-8+deb8u6) を設定しています ...
+
+↓&amp;lt;はい&amp;gt;を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
+ │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
+ │                                                                           │ 
+ │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
+ │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
+ │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
+ │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
+ │                                                                           │ 
+ │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
+ │                                                                           │ 
+ │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
+ │                                                                           │ 
+ │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのrootユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
+  │ ウントのパスワードを入力してください。                                   │ 
+  │                                                                          │ 
+  │ データベースの管理権限を持つユーザのパスワード:                          │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのcactiユーザのパスワードを入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
+  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
+  │                                                                          │ 
+  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &amp;lt;了解&amp;gt;                     &amp;lt;取消&amp;gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓再度MySQLのcactiユーザのパスワード入力し、&amp;lt;了解&amp;gt;を選択してEnter
+  ┌────┤ cacti を設定しています ├─────┐
+  │                                   │ 
+  │                                   │ 
+  │ パスワードの確認:                 │ 
+  │                                   │ 
+  │ _________________________________ │ 
+  │                                   │ 
+  │      &amp;lt;了解&amp;gt;        &amp;lt;取消&amp;gt;         │ 
+  │                                   │ 
+  └───────────────────────────────────┘ 
+
+dbconfig-common: writing config to /etc/dbconfig-common/cacti.conf
+
+Creating config file /etc/dbconfig-common/cacti.conf with new version
+
+Creating config file /etc/cacti/debian.php with new version
+granting access to database cacti for cacti@localhost: success.
+verifying access for cacti@localhost: success.
+creating database cacti: success.
+verifying database cacti exists: success.
+populating database via sql...  done.
+dbconfig-common: flushing administrative password
+
+Creating config file /etc/apache2/conf-available/cacti.conf with new version
+
+Creating config file /etc/lighttpd/conf-available/20-cacti.conf with new version
+apache2_invoke: Enable configuration cacti
+cacti-spine (0.8.8b-1+b3) を設定しています ...
+
+Creating config file /etc/cacti/spine.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;データベースをMyISAMからInnoDBに変更します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/cacti/cli
+$ sudo php convert_innodb.php
+Converting All Non-Memory Cacti Database Tables to Innodb with Less than &#39;300000&#39; Records
+Converting Table -&amp;gt; &#39;cdef&#39; Successful
+Converting Table -&amp;gt; &#39;cdef_items&#39; Successful
+Converting Table -&amp;gt; &#39;colors&#39; Successful
+Converting Table -&amp;gt; &#39;data_input&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_input_fields&#39; Successful
+Converting Table -&amp;gt; &#39;data_local&#39; Successful
+Converting Table -&amp;gt; &#39;data_template&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_data_rra&#39; Successful
+Converting Table -&amp;gt; &#39;data_template_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;graph_local&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input&#39; Successful
+Converting Table -&amp;gt; &#39;graph_template_input_defs&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_gprint&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_graph&#39; Successful
+Converting Table -&amp;gt; &#39;graph_templates_item&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree&#39; Successful
+Converting Table -&amp;gt; &#39;graph_tree_items&#39; Successful
+Converting Table -&amp;gt; &#39;host&#39; Successful
+Converting Table -&amp;gt; &#39;host_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_cache&#39; Successful
+Converting Table -&amp;gt; &#39;host_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;host_template&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_graph&#39; Successful
+Converting Table -&amp;gt; &#39;host_template_snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_config&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_db_changes&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_hooks&#39; Successful
+Converting Table -&amp;gt; &#39;plugin_realms&#39; Successful
+Converting Table -&amp;gt; &#39;poller&#39; Successful
+Converting Table -&amp;gt; &#39;poller_command&#39; Successful
+Converting Table -&amp;gt; &#39;poller_item&#39; Successful
+Converting Table -&amp;gt; &#39;poller_output&#39; Successful
+Converting Table -&amp;gt; &#39;poller_reindex&#39; Successful
+Converting Table -&amp;gt; &#39;poller_time&#39; Successful
+Converting Table -&amp;gt; &#39;rra&#39; Successful
+Converting Table -&amp;gt; &#39;rra_cf&#39; Successful
+Converting Table -&amp;gt; &#39;settings&#39; Successful
+Converting Table -&amp;gt; &#39;settings_graphs&#39; Successful
+Converting Table -&amp;gt; &#39;settings_tree&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_rrd_sv&#39; Successful
+Converting Table -&amp;gt; &#39;snmp_query_graph_sv&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_perms&#39; Successful
+Converting Table -&amp;gt; &#39;user_auth_realm&#39; Successful
+Converting Table -&amp;gt; &#39;user_log&#39; Successful
+Converting Table -&amp;gt; &#39;version&#39; Successful
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cactiへのアクセス:155ae028b993b1af7e622df9d1a9e821&#34;&gt;Cactiへのアクセス&lt;/h3&gt;
+
+&lt;p&gt;ブラウザからCactiのURL(&lt;code&gt;http://IPアドレス/cacti&lt;/code&gt;)にアクセスします。&lt;/p&gt;
+
+&lt;p&gt;Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-01.png&#34; alt=&#34;cacti-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Nextをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-02.png&#34; alt=&#34;cacti-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Errorがないことを確認してFinishをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-03.png&#34; alt=&#34;cacti-install-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓admin/adminでログイン&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-04.png&#34; alt=&#34;cacti-install-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓adminの新しいパスワードを入力してSaveをクリック&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-05.png&#34; alt=&#34;cacti-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ログイン後の初期画面&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_02/cacti-install-06.png&#34; alt=&#34;cacti-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その13</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
+      <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はZabbix Serverを導入しました。
+今回は&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;にZabbix Agentを導入していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;zabbix-agentのインストール:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentのインストール&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Agentをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install zabbix-agent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libcurl3-gnutls libpci3 pciutils
+以下のパッケージが新たにインストールされます:
+  libcurl3-gnutls libpci3 pciutils zabbix-agent
+アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。
+819 kB のアーカイブを取得する必要があります。
+この操作後に追加で 2,344 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB]
+819 kB を 2秒 で取得しました (346 kB/s)
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 33530 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ pciutils を選択しています。
+.../pciutils_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+pciutils (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ zabbix-agent を選択しています。
+.../zabbix-agent_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+pciutils (1:3.2.1-3) を設定しています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_agentd.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-agentの設定:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentの設定&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Agentを設定します。
+以下では&lt;code&gt;homepxy1&lt;/code&gt;を設定した際の例を記載します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/zabbix/zabbix_agentd.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_agentd.conf*
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_agentd.conf
+#Server=127.0.0.1
+Server=192.168.30.10,192.168.30.20
+
+#ServerActive=127.0.0.1
+ServerActive=192.168.30.10,192.168.30.20
+
+#Hostname=Zabbix server
+Hostname=homepxy1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Zabbix Agentを再起動します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-agent
+$ sudo systemctl enable zabbix-agent
+Synchronizing state for zabbix-agent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-agent defaults
+Executing /usr/sbin/update-rc.d zabbix-agent enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;iptablesの通信許可-iptablesを設定しているホストのみ:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;iptablesの通信許可(iptablesを設定しているホストのみ)&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Serverとの通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverでの監視登録:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Serverでの監視登録&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Zabbixへのログイン&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスしてログインします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-01.png&#34; alt=&#34;zabbix-agent-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; -&amp;gt; &lt;code&gt;Hosts&lt;/code&gt;を選択します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-02.png&#34; alt=&#34;zabbix-agent-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Create host&lt;/code&gt;を選択し、&lt;code&gt;Host&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host name: homepxy1
+Groups: Linux servers
+Agent interfaces: 192.168.20.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-03.png&#34; alt=&#34;zabbix-agent-install-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Templates&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Linked templates: Template OS Linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-04.png&#34; alt=&#34;zabbix-agent-install-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Save&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加確認&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Hosts&lt;/code&gt;のリストに追加したホスト名が表示されていること、StatusがMonitoredになっていることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-05.png&#34; alt=&#34;zabbix-agent-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下は対象ホストをすべて登録した状態になります。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-06.png&#34; alt=&#34;zabbix-agent-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その12</title>
       <link>http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</link>
       <pubDate>Sun, 08 Jan 2017 20:40:44 +0900</pubDate>
       
@@ -147,7 +952,7 @@
 パッケージからテンプレートを展開しています: 100%
 パッケージを事前設定しています ...
 
-→rootアカウントのパスワードを設定します。
+↓rootアカウントのパスワードを設定します。
  ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
  │ 強制ではありませんが、MySQL を管理する &amp;quot;root&amp;quot; ユーザのパスワードを設定す  │ 
  │ ることを強くお勧めします。                                                │ 
@@ -162,7 +967,7 @@
  │                                                                           │ 
  └───────────────────────────────────────────────────────────────────────────┘ 
 
-→再度rootアカウントのパスワードを入力します。
+↓再度rootアカウントのパスワードを入力します。
  ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
  │                                                  │ 
  │                                                  │ 
@@ -842,12 +1647,12 @@ $
 
 &lt;h3 id=&#34;zabbix-serverへのアクセス:d408cd6d355b48aec871928776dae66b&#34;&gt;Zabbix Serverへのアクセス&lt;/h3&gt;
 
-&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスする。&lt;/p&gt;
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスします。&lt;/p&gt;
 
-&lt;p&gt;Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。&lt;/p&gt;
+&lt;p&gt;Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行います。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;1.Welcome&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;1.Welcome&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
@@ -863,7 +1668,7 @@ $
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-02.png&#34; alt=&#34;zabbix-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;3.Configure DB connection&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;3.Configure DB connection&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;以下の情報を入力し、&lt;code&gt;Test connection&lt;/code&gt;をクリックします。&lt;code&gt;OK&lt;/code&gt;が表示されることを確認して、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
@@ -879,7 +1684,7 @@ Password: zabbix_password
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-05.png&#34; alt=&#34;zabbix-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;4.Zabbix server details&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;4.Zabbix server details&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;以下の情報を確認し、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
@@ -892,7 +1697,7 @@ Name:
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170108_01/zabbix-install-06.png&#34; alt=&#34;zabbix-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;5.Pre-Installation summary&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;5.Pre-Installation summary&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;表示内容に間違いがないことを確認し、&lt;code&gt;Next&lt;/code&gt;をクリックします。&lt;/p&gt;
@@ -986,7 +1791,7 @@ $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
 &amp;gt; #$ActionQueueType Direct
 $
 $ sudo vi /etc/rsyslog.d/network-device.conf
-$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&amp;quot;
+$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&amp;quot;
 if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -1506,7 +2311,7 @@ $
 8,275 kB を 22秒 で取得しました (376 kB/s)                                     
 パッケージを事前設定しています ...
 
-→rootアカウントのパスワードを設定します。
+↓rootアカウントのパスワードを設定します。
  ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
  │ 強制ではありませんが、MySQL を管理する &amp;quot;root&amp;quot; ユーザのパスワードを設定す  │ 
  │ ることを強くお勧めします。                                                │ 
@@ -1522,7 +2327,7 @@ $
  └───────────────────────────────────────────────────────────────────────────┘ 
 
 
-→再度rootアカウントのパスワードを入力します。
+↓再度rootアカウントのパスワードを入力します。
  ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
  │                                                  │ 
  │                                                  │ 
@@ -3367,6 +4172,7 @@ $
 19.5 kB を 2秒 で取得しました (7,989 B/s)      
 パッケージを事前設定しています ...
 
+↓&amp;lt;はい&amp;gt;を選択してEnter
  ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
  │                                                                           │ 
  │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v4 に保存で  │ 
@@ -3382,9 +4188,9 @@ $
  │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
  │                                                                           │ 
  └───────────────────────────────────────────────────────────────────────────┘ 
-「はい」を選択
 
-┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
+↓&amp;lt;いいえ&amp;gt;を選択してEnter
+ ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
  │                                                                           │ 
  │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v6 に保存で  │ 
  │ きます。このルールは、システムの起動時に自動的に読み込まれるようになりま  │ 
@@ -3399,7 +4205,6 @@ $
  │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
  │                                                                           │ 
  └───────────────────────────────────────────────────────────────────────────┘ 
-「いいえ」を選択
 
 以前に未選択のパッケージ netfilter-persistent を選択しています。
 (データベースを読み込んでいます ... 現在 34741 個のファイルとディレクトリがインストールされています。)
@@ -5459,497 +6264,6 @@ server ntp.jst.mfeed.ad.jp iburst
 &lt;/ul&gt;
 
 &lt;p&gt;具体的な構築内容は次回から記載します。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
-      <link>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</link>
-      <pubDate>Wed, 24 Aug 2016 19:15:14 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
-Raspbianの基本的な設定は完了している前提です。&lt;/p&gt;
-
-&lt;h2 id=&#34;bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;bind9のインストール&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install bind9 dnsutils
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cat /etc/bind/named.conf.options
-controls {
-	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
-};
-include &amp;quot;/etc/bind/rndc.key&amp;quot;;
-
-acl &amp;quot;internal-network&amp;quot; {
-	localhost;
-	127.0.0.1/32;
-	192.168.10.0/24;
-	192.168.20.0/24;
-	192.168.30.0/24;
-	192.168.40.0/24;
-};
-
-options {
-	version &amp;quot;unknown&amp;quot;;
-
-	directory &amp;quot;/var/cache/bind&amp;quot;;
-
-	listen-on {
-		internal-network;
-	};
-
-	querylog yes;
-	allow-query {
-		internal-network;
-	};
-
-	recursion yes;
-	allow-recursion {
-		internal-network;
-	};
-
-	forwarders {
-		192.168.100.1;
-	};
-
-	notify no;
-
-	max-ncache-ttl	300;
-	max-cache-ttl	3600;
-	recursive-clients	300;
-	cleaning-interval	60;
-	lame-ttl	600;
-	max-cache-size	256m;
-
-	allow-transfer {
-		none;
-	};
-
-	allow-update {
-		none;
-	};
-};
-
-logging {
-	channel &amp;quot;log_default&amp;quot; {
-		file &amp;quot;/var/log/bind/named.log&amp;quot; versions 5 size 5m;
-		print-time yes;
-		severity info;
-		print-category yes;
-	};
-	channel &amp;quot;alert&amp;quot; {
-		file &amp;quot;/var/log/bind/alert.log&amp;quot; versions 8 size 4m;
-		severity info;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-	channel &amp;quot;query&amp;quot; {
-		file &amp;quot;/var/log/bind/query.log&amp;quot; versions 8 size 50m;
-		severity debug;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-
-	category default { &amp;quot;log_default&amp;quot;; };
-	category security { &amp;quot;alert&amp;quot;; };
-	category queries { &amp;quot;query&amp;quot;; };
-	category lame-servers { null; };
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンフィグの不備を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo named-checkconf /etc/bind/named.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ログ保存先のディレクトリを作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo mkdir -p /var/log/bind
-$ sudo chown bind:bind /var/log/bind
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9を再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart bind9
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;iptablesの設定&lt;/h2&gt;
-
-&lt;p&gt;iptablesでfirewallを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-
-$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
-$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;dnsの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;DNSの設定&lt;/h2&gt;
-
-&lt;p&gt;キャッシュDNSを使用するように設定変更を行う。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-static domain_name_servers=127.0.0.1
-$ sudo systemctl restart dhcpcd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspbian(Jessie)にSquidをインストールする</title>
-      <link>http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/</link>
-      <pubDate>Mon, 22 Aug 2016 22:24:35 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspbianの初期設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Raspbianの初期設定&lt;/h2&gt;
-
-&lt;p&gt;過去のブログ記事を参考に初期設定を実施する。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;パッケージの最新化&lt;/li&gt;
-&lt;li&gt;パッケージのインストール
-&amp;ndash; chkconfig
-&amp;ndash; tcpdump
-&amp;ndash; telnet
-&amp;ndash; dnsutils&lt;/li&gt;
-&lt;li&gt;IPアドレスの固定化&lt;/li&gt;
-&lt;li&gt;NTP設定&lt;/li&gt;
-&lt;li&gt;rpi-configの設定
-&amp;ndash; ディスク拡張
-&amp;ndash; 文字コード設定
-&amp;ndash; タイムゾーン設定
-&amp;ndash; Wifiの国設定
-&amp;ndash; ホスト名変更&lt;/li&gt;
-&lt;li&gt;公開鍵認証方式の設定&lt;/li&gt;
-&lt;li&gt;IPv6の無効化&lt;/li&gt;
-&lt;li&gt;SELinuxの無効化&lt;/li&gt;
-&lt;li&gt;iptablesの設定&lt;/li&gt;
-&lt;li&gt;logwatchのインストール&lt;/li&gt;
-&lt;li&gt;Zabbix Agentのインストール・監視登録&lt;/li&gt;
-&lt;li&gt;SNMPDのインストール・Cacti登録&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;squidのインストール:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Squidのインストール&lt;/h2&gt;
-
-&lt;p&gt;Squidをインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install squid
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/squid/squid.conf{,.org}
-$ sudo vi /etc/squid/squid.conf
-$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
-609,611c609,616
-&amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
-&amp;lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
-&amp;lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
----
-&amp;gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
-&amp;gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
-&amp;gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
-&amp;gt; acl localnet src 192.168.10.0/24
-&amp;gt; acl localnet src 192.168.20.0/24
-&amp;gt; acl localnet src 192.168.30.0/24
-&amp;gt; acl localnet src 192.168.40.0/24
-&amp;gt; 
-676c681
-&amp;lt; #http_access allow localnet
----
-&amp;gt; http_access allow localnet
-1738a1744
-&amp;gt; cache_mem 256 MB
-1747a1754
-&amp;gt; maximum_object_size_in_memory 512 KB
-1945a1953
-&amp;gt; cache_dir ufs /var/spool/squid 10000 16 256
-1988a1997
-&amp;gt; maximum_object_size 20480 KB
-2097a2107
-&amp;gt; logformat combined %&amp;gt;a %ui %un [%tl] &amp;quot;%rm %ru HTTP/%rv&amp;quot; %Hs %&amp;lt;st &amp;quot;%{Referer}&amp;gt;h&amp;quot; &amp;quot;%{User-Agent}&amp;gt;h&amp;quot; %Ss:%Sh
-2121c2131,2132
-&amp;lt; access_log /var/log/squid/access.log squid
----
-&amp;gt; #access_log /var/log/squid/access.log squid
-&amp;gt; access_log /var/log/squid/access.log combined
-2217a2229
-&amp;gt; emulate_httpd_log off
-2751c2763,2768
-&amp;lt; refresh_pattern .		0	20%	4320
----
-&amp;gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
-&amp;gt; refresh_pattern . 45 20% 4320
-2944a2962
-&amp;gt; via off
-3100a3119,3122
-&amp;gt; header_access Referer deny all
-&amp;gt; header_access X-Forwarded-For deny all
-&amp;gt; header_access Via deny all
-&amp;gt; header_access Cache-Control deny all
-3392a3415
-&amp;gt; visible_hostname unknown
-4699a4723
-&amp;gt; forwarded_for off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidの設定に不備がないか確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo squid -k parse
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidの設定を有効にする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl reload squid
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/squid.html&#34;&gt;CentOS Squidの設定&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://tech.ckme.co.jp/proxy.shtml&#34;&gt;Proxyサーバの設定（squid）：tech.ckme.co.jp&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid&#34;&gt;Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://blog.asial.co.jp/1076&#34;&gt;Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;iptablesの通信許可設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;iptablesの通信許可設定&lt;/h2&gt;
-
-&lt;p&gt;内部NWからSquidへの通信を許可する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 3128 -j ACCEPT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ブラウザのプロキシ設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;ブラウザのプロキシ設定&lt;/h2&gt;
-
-&lt;p&gt;ブラウザ使用するプロキシ設定をSquidに変更する。&lt;/p&gt;
-
-&lt;p&gt;Squidのログを確認してSquid経由でWebアクセスができていることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cat /var/log/squid/access.log
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;raspbianのプロキシ設定:b44e2973592bad70879d3cac4bdad4df&#34;&gt;Raspbianのプロキシ設定&lt;/h2&gt;
-
-&lt;p&gt;起動時にプロキシを使用するように設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/profile.d/proxy.sh
-PROXY=&amp;quot;192.168.20.10:3128&amp;quot;
-export http_proxy=&amp;quot;http://${PROXY}&amp;quot;
-export https_proxy=&amp;quot;http://${PROXY}&amp;quot;
-export no_proxy=&amp;quot;localhost,127.0.0.1,192.168.*&amp;quot;
-
-export HTTP_PROXY=&amp;quot;${http_proxy}&amp;quot;
-export HTTPS_PROXY=&amp;quot;${https_proxy}&amp;quot;
-export NO_PROXY=&amp;quot;${no_proxy}&amp;quot;
-$source /etc/profile.d/proxy.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には&lt;code&gt;-E&lt;/code&gt;オプションを指定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get update
-$ sudo -E apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Cactiにデバイスを登録する</title>
-      <link>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</link>
-      <pubDate>Sun, 21 Aug 2016 11:05:38 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</guid>
-      <description>
-
-&lt;p&gt;Cactiに新規デバイスを登録するメモです。
-SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
-
-&lt;h2 id=&#34;snmpdのインストール:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;snmpdのインストール&lt;/h2&gt;
-
-&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install snmpd snmp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成する。
-SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
-
-The following installed configuration files were found:
-
-   1:  /etc/snmp/snmp.conf
-   2:  /etc/snmp/snmpd.conf
-
-Would you like me to read them in?  Their content will be merged with the
-output files created by this session.
-
-Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
-
-Read in which (default = all): 2
-************************************************ 
-*** Beginning basic system information setup ***
-************************************************ 
-Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
-************************************** 
-*** BEGINNING ACCESS CONTROL SETUP ***
-************************************** 
-Do you want to configure the agent&#39;s access control? (default = y): y
-Do you want to allow SNMPv3 read-write user based access (default = y): n
-Do you want to allow SNMPv3 read-only user based access (default = y): y
-
-Configuring: rouser
-Description:
-  a SNMPv3 read-only user
-    arguments:  user [noauth|auth|priv] [restriction_oid]
-
-Enter the SNMPv3 user that should have read-only access to the system: snmpuser
-The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
-The OID that this community should be restricted to [if appropriate]: 
-
-Finished Output: rouser  snmpuser priv 
-Do another rouser line? (default = y): n
-Do you want to allow SNMPv1/v2c read-write community access (default = y): n
-Do you want to allow SNMPv1/v2c read-only community access (default = y): n
-**************************************** 
-*** Beginning trap destination setup ***
-**************************************** 
-Do you want to configure where and if the agent will send traps? (default = y): n
-**************************************** 
-*** Beginning monitoring setup ***
-**************************************** 
-Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
-
-
-The following files were created:
-
-  snmpd.conf  
-
-These files should be moved to /usr/share/snmp if you
-want them used by everyone on the system.  In the future, if you add 
-the -i option to the command line I&#39;ll copy them there automatically for you.
-
-Or, if you want them for your personal use only, copy them to
-/home/pi/.snmp .  In the future, if you add the -p option to the
-command line I&#39;ll copy them there automatically for you.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;snmpd.confを設置する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/snmp/snmpd.conf{,.org}
-$ sudo cp snmpd.conf /etc/snmp/snmpd.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SNMPv3ユーザを作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
-$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
-$ sudo vi /var/lib/snmp/snmpd.conf
-createUser snmpuser SHA snmp_pass AES snmp_pass
-$ sudo systemctl start snmpd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SNMPv3で値を取得できることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;iptablesの通信許可&lt;/h2&gt;
-
-&lt;p&gt;CactiからのSNMP通信を許可する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;##INPUTチェーン
-#SNMPは許可
-$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;cactiにデバイス-server-を登録:96919d4705cb30bdfea22f7f270ecaaf&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
-
-&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_01.png&#34; alt=&#34;cacti_register_01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_02.png&#34; alt=&#34;cacti_register_02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_03.png&#34; alt=&#34;cacti_register_03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_04.png&#34; alt=&#34;cacti_register_04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認する。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_05.png&#34; alt=&#34;cacti_register_05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_06.png&#34; alt=&#34;cacti_register_06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓グラフが作成されたことを確認する。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_07.png&#34; alt=&#34;cacti_register_07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_08.png&#34; alt=&#34;cacti_register_08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_09.png&#34; alt=&#34;cacti_register_09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックする。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_10.png&#34; alt=&#34;cacti_register_10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認する。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_11.png&#34; alt=&#34;cacti_register_11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20160821_01/cacti_register_12.png&#34; alt=&#34;cacti_register_12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
 </description>
     </item>
     

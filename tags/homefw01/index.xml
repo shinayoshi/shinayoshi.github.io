@@ -68,7 +68,7 @@ $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf
 &amp;gt; #$ActionQueueType Direct
 $
 $ sudo vi /etc/rsyslog.d/network-device.conf
-$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&amp;quot;
+$template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&amp;quot;
 if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
 &lt;/code&gt;&lt;/pre&gt;
 

@@ -74,8 +74,107 @@
               <h1>Homemon1</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その15</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                     , 
+                    homepxy1
+                    
+                     , 
+                    homepot1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。 $ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB] 取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB] 取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB] 取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB] 3,836 kB を 2秒 で取得しました (1,283 kB/s) パッケージを事前設定しています ...
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その14</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 今回はhomemon1、homemon2にCactiを導入します。 Cactiのインストール Cactiをインストールします。 途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答します。 $ sudo -E apt-get install cacti cacti-spine パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp rrdtool snmp 提案パッケージ: moreutils snmp-mibs-downloader php5-adodb librrds-perl 以下のパッケージが新たにインストールされます: cacti cacti-spine dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp rrdtool snmp アップグレード: 0 個、新規インストール: 26 個、削除: 0 個、保留: 1 個。 6,777 kB のアーカイブを取得する必要があります。 この操作後に追加で 16.6 MB のディスク容量が消費されます。 続行しますか?
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その13</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                     , 
+                    homepxy1
+                    
+                     , 
+                    homepot1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回はZabbix Serverを導入しました。 今回はhomenas1、homemon1、homemon2、homepxy1、homepot1にZabbix Agentを導入していきます。 Zabbix Agentのインストール Zabbix Agentをインストールします。 $ sudo -E apt-get install zabbix-agent パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libcurl3-gnutls libpci3 pciutils 以下のパッケージが新たにインストールされます: libcurl3-gnutls libpci3 pciutils zabbix-agent アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。 819 kB のアーカイブを取得する必要があります。 この操作後に追加で 2,344 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB] 取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB] 819 kB を 2秒 で取得しました (346 kB/s) 以前に未選択のパッケージ libpci3:armhf を選択しています。 (データベースを読み込んでいます ...
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">
-                  <h2 class="list-group-item-heading">家庭内インターネット環境を構築する その12</h2>
+                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する その12</h2>
                   <p class="list-group-item-text">
                     <span class="label label-primary">Sun Jan 8, 2017</span> in
                     
@@ -127,7 +226,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomemon1、homemon2を構築していきます。 FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。 rsyslogの設定 ネットワーク機器のSyslogを保存する用の設定 ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。 例）/var/log/network-device/ホスト名/ホスト名.log $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf.org $ $ sudo vi /etc/rsyslog.conf #$ModLoad imudp #$UDPServerRun 514 $ModLoad imudp $UDPServerRun 514 $WorkDirectory /var/spool/rsyslog # # Queue # $MainMsgQueueType LinkedList #$ActionQueueType Direct $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf 16,17c16,17 &lt; #$ModLoad imudp &lt; #$UDPServerRun 514 --- &gt; $ModLoad imudp &gt; $UDPServerRun 514 46a47,52 &gt; &gt; # &gt; # Queue &gt; # &gt; $MainMsgQueueType LinkedList &gt; #$ActionQueueType Direct $ $ sudo vi /etc/rsyslog.d/network-device.conf $template NetworkDeviceFileName,&quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%.log&quot; if $fromhost-ip != '127.0.0.1' then ?NetworkDeviceFileName rsyslogの再起動 $ sudo systemctl restart rsyslog 20.4.
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomemon1、homemon2を構築していきます。 FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。 rsyslogの設定 ネットワーク機器のSyslogを保存する用の設定 ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。 例）/var/log/network-device/ホスト名/ホスト名.log $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf.org $ $ sudo vi /etc/rsyslog.conf #$ModLoad imudp #$UDPServerRun 514 $ModLoad imudp $UDPServerRun 514 $WorkDirectory /var/spool/rsyslog # # Queue # $MainMsgQueueType LinkedList #$ActionQueueType Direct $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf 16,17c16,17 &lt; #$ModLoad imudp &lt; #$UDPServerRun 514 --- &gt; $ModLoad imudp &gt; $UDPServerRun 514 46a47,52 &gt; &gt; # &gt; # Queue &gt; # &gt; $MainMsgQueueType LinkedList &gt; #$ActionQueueType Direct $ $ sudo vi /etc/rsyslog.d/network-device.conf $template NetworkDeviceFileName,&quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&quot; if $fromhost-ip != '127.0.0.1' then ?NetworkDeviceFileName rsyslogの再起動 $ sudo systemctl restart rsyslog 20.4.
                   </p>
                 </a>
                 
@@ -222,7 +321,13 @@
   <div id="recent_posts" class="list-group">
     
       
-      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット環境を構築する その12 [ 2017-01-08 ]</a>
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">家庭内インターネット接続環境を構築する その14 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">家庭内インターネット接続環境を構築する その13 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット接続環境を構築する その12 [ 2017-01-08 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
       
@@ -235,12 +340,6 @@
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
     
   </div>
@@ -255,7 +354,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">31</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">34</span>server</a>
     
   </div>
 </section>
@@ -300,7 +399,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (12)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (15)</a>
     
     
     
@@ -308,23 +407,23 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (4)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
     
     
     
@@ -344,7 +443,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (27)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (30)</a>
     
     
     

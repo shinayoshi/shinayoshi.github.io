@@ -3,8 +3,23 @@
   
   <url>
     <loc>http://www.shinayoshi.net/</loc>
-    <lastmod>2017-01-08T20:40:44+09:00</lastmod>
+    <lastmod>2017-01-09T17:30:57+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</loc>
+    <lastmod>2017-01-09T17:30:57+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.shinayoshi.net/post/2017/01/09/setting-cacti/</loc>
+    <lastmod>2017-01-09T14:45:15+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</loc>
+    <lastmod>2017-01-09T12:04:12+09:00</lastmod>
   </url>
   
   <url>

@@ -74,6 +74,78 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Kippo-GraphをインストールしてCowrieのログを可視化する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    jessie
+                    
+                     , 
+                    cowrie
+                    
+                     , 
+                    kippo-graph
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Kippo-Graphの公式(Kippo-Graph - BruteForce Lab&rsquo;s Blog)を参考にKippo-Graphをインストールするまでのメモです。 MySQLのインストールと初期設定 MySQLをインストールする。 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。 $ sudo apt-get update $ sudo apt-get install mysql-server MySQLのセキュア設定 $ mysql_secure_installation NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL SERVERS IN PRODUCTION USE! PLEASE READ EACH STEP CAREFULLY! In order to log into MySQL to secure it, we'll need the current password for the root user. If you've just installed MySQL, and you haven't set the root password yet, the password will be blank, so you should just press enter here.
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にCowrieをインストールする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Aug 15, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    cowrie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。 はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。 個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。 Raspbianの初期設定 Raspbianの初期設定として以下を行いました。 パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= NTP設定 NTP同期先を設定する。 $ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst NTPサーバを再起動する。 $ sudo systemctl restart ntp 時刻同期の状態を確認する。 $ ntpq -p raspi-config関連 $ sudo raspi-config ディスク拡張 文字コード設定 タイムゾーン設定 Wifiの国設定 ホスト名変更 公開鍵認証方式の設定 $ ssh-keygen -t rsa Generating public/private rsa key pair.
+                  </p>
+                </a>
+                
+                <a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Aug 13, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    FGT-60D
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。 MIBファイルのアップロード FortiGateのプライベートMIB(FORTINET-CORE-MIB.mib、FORTINET-FORTIGATE-MIB.mib)を/home/pi直下にアップロードします。 プライベートMIBの設定 プライベートMIBファイルを/usr/share/snmp/mibs/vendorに移動する。 $ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-* プライベートMIBを使用するようにsnmp.confを設定する。 $ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。 $ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29 以上
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/" class="list-group-item">
                   <h2 class="list-group-item-heading">ZabbixでSNMPデバイスの監視を行う</h2>
                   <p class="list-group-item-text">
@@ -230,66 +302,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jul 9, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。 パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade Updating and Upgrading Raspbian - Raspberry Pi Documentation IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= &ldquo;man dhcpcd.conf&rdquo; USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。 $ sudo vi /boot/config.txt #Add the following line max_usb_current=1 RPiconfig - eLinux.org NTP設定 NTP同期先を設定する。 $ sudo vi /etc/ntp.conf
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jul 9, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    jessie
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。 使用したもの Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用) Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。 Download Raspbian for Raspberry Pi Raspbian書き込み SDカードにRaspbianのイメージを書き込む。 SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。 $ sudo dd bs=1m if=2016-05-27-raspbian-jessie.img of=/dev/rdisk1 Password: 958+1 records in 958+1 records out 4019191808 bytes transferred in 269.163670 secs (14932148 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk /dev/disk1 ejected Raspbian起動 Raspbianのイメージを書き込んだSDカードをRaspberry Pi 3にセットして電源を入れる。 Raspberry Pi 3には有線LANも接続しておく。 Raspbian接続 Raspberry Pi 3のIPアドレスを確認する。 $ arp -a ?
-                  </p>
-                </a>
-                
-                <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
-                  <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sun May 15, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    centos
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    ApacheでWebサイトを公開するまでの手順のメモです。 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。 # yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。 # vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。 $ sudo systemctl start httpd $ sudo systemctl enable
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -358,7 +370,13 @@
   <div id="recent_posts" class="list-group">
     
       
-      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット環境を構築する その12 [ 2017-01-08 ]</a>
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">家庭内インターネット接続環境を構築する その14 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">家庭内インターネット接続環境を構築する その13 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット接続環境を構築する その12 [ 2017-01-08 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
       
@@ -371,12 +389,6 @@
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
     
   </div>
@@ -391,7 +403,7 @@
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">31</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">34</span>server</a>
     
   </div>
 </section>
@@ -436,7 +448,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (12)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (15)</a>
     
     
     
@@ -444,23 +456,23 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (4)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
     
     
     
@@ -480,7 +492,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (27)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (30)</a>
     
     
     

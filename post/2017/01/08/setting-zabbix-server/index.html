@@ -73,7 +73,7 @@
             <div class="page-content col-md-9">
               <article>
                 <div class="title">
-                  <h1>家庭内インターネット環境を構築する その12</h1>
+                  <h1>家庭内インターネット接続環境を構築する その12</h1>
                   <p>
                     <span class="label label-primary">Sun Jan 8, 2017</span> in
                     
@@ -250,7 +250,7 @@
 パッケージからテンプレートを展開しています: 100%
 パッケージを事前設定しています ...
 
-→rootアカウントのパスワードを設定します。
+↓rootアカウントのパスワードを設定します。
  ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
  │ 強制ではありませんが、MySQL を管理する &quot;root&quot; ユーザのパスワードを設定す  │ 
  │ ることを強くお勧めします。                                                │ 
@@ -265,7 +265,7 @@
  │                                                                           │ 
  └───────────────────────────────────────────────────────────────────────────┘ 
 
-→再度rootアカウントのパスワードを入力します。
+↓再度rootアカウントのパスワードを入力します。
  ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
  │                                                  │ 
  │                                                  │ 
@@ -945,12 +945,12 @@ $
 
 <h3 id="zabbix-serverへのアクセス:d408cd6d355b48aec871928776dae66b">Zabbix Serverへのアクセス</h3>
 
-<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスする。</p>
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスします。</p>
 
-<p>Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
+<p>Zabbixの初期設定画面が表示されるので、画面の指示に従いながら設定を行います。</p>
 
 <ul>
-<li>1.Welcome<br /></li>
+<li>1.Welcome</li>
 </ul>
 
 <p><code>Next</code>をクリックします。</p>
@@ -966,7 +966,7 @@ $
 <p><img src="/img/20170108_01/zabbix-install-02.png" alt="zabbix-install-02" width="320px" /></p>
 
 <ul>
-<li>3.Configure DB connection<br /></li>
+<li>3.Configure DB connection</li>
 </ul>
 
 <p>以下の情報を入力し、<code>Test connection</code>をクリックします。<code>OK</code>が表示されることを確認して、<code>Next</code>をクリックします。</p>
@@ -982,7 +982,7 @@ Password: zabbix_password
 <p><img src="/img/20170108_01/zabbix-install-05.png" alt="zabbix-install-05" width="320px" /></p>
 
 <ul>
-<li>4.Zabbix server details<br /></li>
+<li>4.Zabbix server details</li>
 </ul>
 
 <p>以下の情報を確認し、<code>Next</code>をクリックします。</p>
@@ -995,7 +995,7 @@ Name:
 <p><img src="/img/20170108_01/zabbix-install-06.png" alt="zabbix-install-06" width="320px" /></p>
 
 <ul>
-<li>5.Pre-Installation summary<br /></li>
+<li>5.Pre-Installation summary</li>
 </ul>
 
 <p>表示内容に間違いがないことを確認し、<code>Next</code>をクリックします。</p>
@@ -1052,6 +1052,8 @@ $
                   
                   <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/">家庭内インターネット接続環境を構築する その11</a></li>
                   
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/">家庭内インターネット接続環境を構築する その13</a></li>
                   
                 </ul>
               </div>
@@ -1110,7 +1112,13 @@ $
   <div id="recent_posts" class="list-group">
     
       
-      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット環境を構築する その12 [ 2017-01-08 ]</a>
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">家庭内インターネット接続環境を構築する その14 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">家庭内インターネット接続環境を構築する その13 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット接続環境を構築する その12 [ 2017-01-08 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
       
@@ -1123,12 +1131,6 @@ $
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
-      
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
     
   </div>
@@ -1143,7 +1145,7 @@ $
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">31</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">34</span>server</a>
     
   </div>
 </section>
@@ -1188,7 +1190,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (12)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (15)</a>
     
     
     
@@ -1196,23 +1198,23 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (4)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (3)</a>
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (2)</a>
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
     
     
     
@@ -1232,7 +1234,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (27)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (30)</a>
     
     
     

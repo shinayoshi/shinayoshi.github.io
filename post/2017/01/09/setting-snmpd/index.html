@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>家庭内インターネット接続環境を構築する その15</h1>
+                  <p>
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homemon1">homemon1</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homemon2">homemon2</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homepxy1">homepxy1</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homepot1">homepot1</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a">snmpdのインストール</a></li>
+<li><a href="#iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a">iptablesの通信許可</a></li>
+<li><a href="#cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a">Cactiにデバイス(Server)を登録</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>前回はCactiを導入しました。
+今回はCactiに<code>homenas1</code>、<code>homemon1</code>、<code>homemon2</code>、<code>homepxy1</code>、<code>homepot1</code>を登録していきます。SNMPv3を使用してSNMPの値を取得します。</p>
+
+<h2 id="snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a">snmpdのインストール</h2>
+
+<p>追加するデバイス(Server)にsnmpdをインストールする。</p>
+
+<pre><code>$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp' は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre>
+
+<p>snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。</p>
+
+<pre><code>$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent's access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent's ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I'll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I'll copy them there automatically for you.
+$
+</code></pre>
+
+<p>snmpd.confを設置します。</p>
+
+<pre><code>$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+</code></pre>
+
+<p>SNMPv3ユーザを作成します。</p>
+
+<pre><code>$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+</code></pre>
+
+<p>SNMPv3で値を取得できることを確認します。</p>
+
+<pre><code>$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+</code></pre>
+
+<ul>
+<li><a href="http://www.infraexpert.com/study/tcpip21.html">TCP/IP - SNMPとは</a></li>
+</ul>
+
+<h2 id="iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a">iptablesの通信許可</h2>
+
+<p>CactiからのSNMP通信を許可します。</p>
+
+<pre><code>##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存します。</p>
+
+<pre><code>$ sudo netfilter-persistent save
+</code></pre>
+
+<h2 id="cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a">Cactiにデバイス(Server)を登録</h2>
+
+<p>↓Cactiにログイン。<code>User Name</code>と<code>Password</code>を入力して<code>Login</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-01.png" alt="register-cacti-01" width="320px" /></p>
+
+<p>↓Cactiログイン後の画面。<code>Devices</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-02.png" alt="register-cacti-02" width="320px" /></p>
+
+<p>↓デバイスの管理画面。<code>Add</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-03.png" alt="register-cacti-03" width="320px" /></p>
+
+<p>↓デバイスの登録画面。必要事項を入力して<code>Create</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-04.png" alt="register-cacti-04" width="320px" /></p>
+
+<p>↓デバイスの登録完了画面。<code>SNMP Information</code>にデバイスの情報が表示されていることを確認します。<code>Create Graphs for this Host</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-05.png" alt="register-cacti-05" width="320px" /></p>
+
+<p>↓作成したいグラフを選択して<code>Create</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-06.png" alt="register-cacti-06" width="320px" /></p>
+
+<p>↓グラフが作成されたことを確認します。</p>
+
+<p><img src="/img/20170109_03/register-cacti-07.png" alt="register-cacti-07" width="320px" /></p>
+
+<p>↓左のメニューから<code>Graph Trees</code>をクリックし、<code>Default Tree</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-08.png" alt="register-cacti-08" width="320px" /></p>
+
+<p>↓ツリーの管理画面。<code>Add</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-09.png" alt="register-cacti-09" width="320px" /></p>
+
+<p>↓ツリーへのデバイス登録画面。必要事項を入力して<code>Create</code>をクリックします。</p>
+
+<p><img src="/img/20170109_03/register-cacti-10.png" alt="register-cacti-10" width="320px" /></p>
+
+<p>↓ツリーの管理画面。デバイスが登録されたことを確認します。</p>
+
+<p><img src="/img/20170109_03/register-cacti-11.png" alt="register-cacti-11" width="320px" /></p>
+
+<p>↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。</p>
+
+<p><img src="/img/20170109_03/register-cacti-12.png" alt="register-cacti-12" width="320px" /></p>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/">家庭内インターネット接続環境を構築する その14</a></li>
+                  
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">家庭内インターネット接続環境を構築する その14 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">家庭内インターネット接続環境を構築する その13 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット接続環境を構築する その12 [ 2017-01-08 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">34</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (15)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (4)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (30)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2016 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

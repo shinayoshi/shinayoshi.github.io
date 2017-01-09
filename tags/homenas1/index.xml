@@ -7,8 +7,420 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2016 shinayoshi</copyright>
-    <lastBuildDate>Mon, 02 Jan 2017 20:30:05 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/tags/homenas1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その15</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
+      <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はCactiを導入しました。
+今回はCactiに&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;を登録していきます。SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp&#39; は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-01.png&#34; alt=&#34;register-cacti-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-02.png&#34; alt=&#34;register-cacti-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-03.png&#34; alt=&#34;register-cacti-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-04.png&#34; alt=&#34;register-cacti-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認します。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-05.png&#34; alt=&#34;register-cacti-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-06.png&#34; alt=&#34;register-cacti-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-07.png&#34; alt=&#34;register-cacti-07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-08.png&#34; alt=&#34;register-cacti-08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-09.png&#34; alt=&#34;register-cacti-09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-10.png&#34; alt=&#34;register-cacti-10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-11.png&#34; alt=&#34;register-cacti-11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-12.png&#34; alt=&#34;register-cacti-12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その13</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
+      <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はZabbix Serverを導入しました。
+今回は&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;にZabbix Agentを導入していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;zabbix-agentのインストール:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentのインストール&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Agentをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install zabbix-agent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libcurl3-gnutls libpci3 pciutils
+以下のパッケージが新たにインストールされます:
+  libcurl3-gnutls libpci3 pciutils zabbix-agent
+アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。
+819 kB のアーカイブを取得する必要があります。
+この操作後に追加で 2,344 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB]
+819 kB を 2秒 で取得しました (346 kB/s)
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 33530 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ pciutils を選択しています。
+.../pciutils_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+pciutils (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ zabbix-agent を選択しています。
+.../zabbix-agent_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+pciutils (1:3.2.1-3) を設定しています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_agentd.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-agentの設定:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentの設定&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Agentを設定します。
+以下では&lt;code&gt;homepxy1&lt;/code&gt;を設定した際の例を記載します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/zabbix/zabbix_agentd.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_agentd.conf*
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_agentd.conf
+#Server=127.0.0.1
+Server=192.168.30.10,192.168.30.20
+
+#ServerActive=127.0.0.1
+ServerActive=192.168.30.10,192.168.30.20
+
+#Hostname=Zabbix server
+Hostname=homepxy1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Zabbix Agentを再起動します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-agent
+$ sudo systemctl enable zabbix-agent
+Synchronizing state for zabbix-agent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-agent defaults
+Executing /usr/sbin/update-rc.d zabbix-agent enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;iptablesの通信許可-iptablesを設定しているホストのみ:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;iptablesの通信許可(iptablesを設定しているホストのみ)&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Serverとの通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverでの監視登録:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Serverでの監視登録&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Zabbixへのログイン&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスしてログインします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-01.png&#34; alt=&#34;zabbix-agent-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; -&amp;gt; &lt;code&gt;Hosts&lt;/code&gt;を選択します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-02.png&#34; alt=&#34;zabbix-agent-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Create host&lt;/code&gt;を選択し、&lt;code&gt;Host&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host name: homepxy1
+Groups: Linux servers
+Agent interfaces: 192.168.20.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-03.png&#34; alt=&#34;zabbix-agent-install-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Templates&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Linked templates: Template OS Linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-04.png&#34; alt=&#34;zabbix-agent-install-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Save&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加確認&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Hosts&lt;/code&gt;のリストに追加したホスト名が表示されていること、StatusがMonitoredになっていることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-05.png&#34; alt=&#34;zabbix-agent-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下は対象ホストをすべて登録した状態になります。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-06.png&#34; alt=&#34;zabbix-agent-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その4</title>
