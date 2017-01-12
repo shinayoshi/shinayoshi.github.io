@@ -151,6 +151,14 @@ $ rsync -a /backup/localhost/weekly.0/localhost/. /mnt/nas/
 $ rsync -a /backup/localhost/daily.0/localhost/. /mnt/nas/
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;h2 id=&#34;参考:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://rsnapshot.org/&#34;&gt;rsnapshot | rsnapshot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://workaround.org/rsnapshot-and-usb-drives/&#34;&gt;Backups with rsnaphot to external USB drives&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://wiki.gentoo.org/wiki/A_simple_backup_scheme_using_rsnapshot&#34;&gt;A simple backup scheme using rsnapshot - Gentoo Wiki&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;p&gt;以上&lt;/p&gt;
 </description>
     </item>
