@@ -1,0 +1,1877 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Homenas1 on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/homenas1/</link>
+    <description>Recent content in Homenas1 on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <lastBuildDate>Thu, 12 Jan 2017 17:52:47 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/homenas1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その16</title>
+      <link>http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/</link>
+      <pubDate>Thu, 12 Jan 2017 17:52:47 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;にrsnapshotを導入してファイルバックアップを行う設定を行います。&lt;/p&gt;
+
+&lt;p&gt;なおバックアップ元は&lt;code&gt;/mnt/nas/&lt;/code&gt;、バックアップ先は&lt;code&gt;/backup/&lt;/code&gt;を想定しています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ df -h
+/dev/sdc1        917G   72M  871G    1% /backup
+/dev/md0         394G   71M  374G    1% /mnt/nas
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;rsnapshotのインストール:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;rsnapshotのインストール&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install rsnapshot
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  liblchown-perl rsync
+以下のパッケージが新たにインストールされます:
+  liblchown-perl rsnapshot rsync
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+507 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,133 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.1.1-3 [373 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsnapshot all 1.3.1-4+deb8u1 [125 kB]
+507 kB を 1秒 で取得しました (286 kB/s)
+以前に未選択のパッケージ liblchown-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33129 個のファイルとディレクトリがインストールされています。)
+.../liblchown-perl_1.01-2+b1_armhf.deb を展開する準備をしています ...
+liblchown-perl (1.01-2+b1) を展開しています...
+以前に未選択のパッケージ rsync を選択しています。
+.../rsync_3.1.1-3_armhf.deb を展開する準備をしています ...
+rsync (3.1.1-3) を展開しています...
+以前に未選択のパッケージ rsnapshot を選択しています。
+.../rsnapshot_1.3.1-4+deb8u1_all.deb を展開する準備をしています ...
+rsnapshot (1.3.1-4+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblchown-perl (1.01-2+b1) を設定しています ...
+rsync (3.1.1-3) を設定しています ...
+rsnapshot (1.3.1-4+deb8u1) を設定しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;rsnapshotの設定:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;rsnapshotの設定&lt;/h2&gt;
+
+&lt;p&gt;rsnapshot.confの設定変更&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/rsnapshot.conf{,.org}
+$ ls -l /etc/rsnapshot.conf*
+-rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf
+-rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf.org
+$
+#snapshot_root  /var/cache/rsnapshot/
+snapshot_root   /backup/
+
+#retain         hourly  6
+retain          daily   7
+retain          weekly  4
+retain  monthly 3
+
+#backup /home/          localhost/
+#backup /etc/           localhost/
+#backup /usr/local/     localhost/
+backup	/mnt/nas/	localhost/
+$
+$ diff /etc/rsnapshot.conf.org /etc/rsnapshot.conf
+27c27,28
+&amp;lt; snapshot_root	/var/cache/rsnapshot/
+---
+&amp;gt; #snapshot_root	/var/cache/rsnapshot/
+&amp;gt; snapshot_root	/backup/
+97c98
+&amp;lt; retain		hourly	6
+---
+&amp;gt; #retain		hourly	6
+100c101
+&amp;lt; #retain	monthly	3
+---
+&amp;gt; retain	monthly	3
+230,232c231,233
+&amp;lt; backup	/home/		localhost/
+&amp;lt; backup	/etc/		localhost/
+&amp;lt; backup	/usr/local/	localhost/
+---
+&amp;gt; #backup	/home/		localhost/
+&amp;gt; #backup	/etc/		localhost/
+&amp;gt; #backup	/usr/local/	localhost/
+239a241
+&amp;gt; backup	/mnt/nas/	localhost/
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsnapshot.confのコンフィグテスト&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo rsnapshot configtest
+Syntax OK
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;crontabの設定変更&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo crontab -l &amp;gt; crontab.backup20170112
+no crontab for root
+$
+$ sudo crontab -e
+50 2 * * * /usr/bin/rsnapshot daily
+40 2 * * 1 /usr/bin/rsnapshot weekly
+30 2 1 * * /usr/bin/rsnapshot monthly
+$
+$ sudo crontab -l &amp;gt; crontab.backup20170112-01
+$ diff crontab.backup20170112 crontab.backup20170112-01
+&amp;gt; 50 2 * * * /usr/bin/rsnapshot daily
+&amp;gt; 40 2 * * 1 /usr/bin/rsnapshot weekly
+&amp;gt; 30 2 1 * * /usr/bin/rsnapshot monthly
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;restoreについて:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;Restoreについて&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ rsync -a /backup/localhost/monthly.0/localhost/. /mnt/nas/
+$ rsync -a /backup/localhost/weekly.0/localhost/. /mnt/nas/
+$ rsync -a /backup/localhost/daily.0/localhost/. /mnt/nas/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その15</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
+      <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はCactiを導入しました。
+今回はCactiに&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;を登録していきます。SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp&#39; は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-01.png&#34; alt=&#34;register-cacti-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-02.png&#34; alt=&#34;register-cacti-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-03.png&#34; alt=&#34;register-cacti-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-04.png&#34; alt=&#34;register-cacti-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認します。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-05.png&#34; alt=&#34;register-cacti-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-06.png&#34; alt=&#34;register-cacti-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-07.png&#34; alt=&#34;register-cacti-07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-08.png&#34; alt=&#34;register-cacti-08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-09.png&#34; alt=&#34;register-cacti-09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-10.png&#34; alt=&#34;register-cacti-10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-11.png&#34; alt=&#34;register-cacti-11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-12.png&#34; alt=&#34;register-cacti-12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その13</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
+      <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はZabbix Serverを導入しました。
+今回は&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;にZabbix Agentを導入していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;zabbix-agentのインストール:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentのインストール&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Agentをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install zabbix-agent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libcurl3-gnutls libpci3 pciutils
+以下のパッケージが新たにインストールされます:
+  libcurl3-gnutls libpci3 pciutils zabbix-agent
+アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。
+819 kB のアーカイブを取得する必要があります。
+この操作後に追加で 2,344 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB]
+819 kB を 2秒 で取得しました (346 kB/s)
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 33530 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ pciutils を選択しています。
+.../pciutils_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+pciutils (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ zabbix-agent を選択しています。
+.../zabbix-agent_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+pciutils (1:3.2.1-3) を設定しています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_agentd.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-agentの設定:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentの設定&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Agentを設定します。
+以下では&lt;code&gt;homepxy1&lt;/code&gt;を設定した際の例を記載します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/zabbix/zabbix_agentd.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_agentd.conf*
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_agentd.conf
+#Server=127.0.0.1
+Server=192.168.30.10,192.168.30.20
+
+#ServerActive=127.0.0.1
+ServerActive=192.168.30.10,192.168.30.20
+
+#Hostname=Zabbix server
+Hostname=homepxy1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Zabbix Agentを再起動します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-agent
+$ sudo systemctl enable zabbix-agent
+Synchronizing state for zabbix-agent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-agent defaults
+Executing /usr/sbin/update-rc.d zabbix-agent enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;iptablesの通信許可-iptablesを設定しているホストのみ:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;iptablesの通信許可(iptablesを設定しているホストのみ)&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Serverとの通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverでの監視登録:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Serverでの監視登録&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Zabbixへのログイン&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスしてログインします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-01.png&#34; alt=&#34;zabbix-agent-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; -&amp;gt; &lt;code&gt;Hosts&lt;/code&gt;を選択します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-02.png&#34; alt=&#34;zabbix-agent-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Create host&lt;/code&gt;を選択し、&lt;code&gt;Host&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host name: homepxy1
+Groups: Linux servers
+Agent interfaces: 192.168.20.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-03.png&#34; alt=&#34;zabbix-agent-install-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Templates&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Linked templates: Template OS Linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-04.png&#34; alt=&#34;zabbix-agent-install-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Save&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加確認&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Hosts&lt;/code&gt;のリストに追加したホスト名が表示されていること、StatusがMonitoredになっていることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-05.png&#34; alt=&#34;zabbix-agent-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下は対象ホストをすべて登録した状態になります。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-06.png&#34; alt=&#34;zabbix-agent-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その4</title>
+      <link>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</link>
+      <pubDate>Mon, 02 Jan 2017 20:30:05 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築-nfs-samba:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Raspberry Pi 2でファイルサーバ構築(NFS/Samba)&lt;/h2&gt;
+
+&lt;p&gt;前回はUSB Storageを使用してRAIDデバイスを設定しました。
+今回はNFSやSambaの設定を行っていきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;nfsの設定:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;NFSの設定&lt;/h2&gt;
+
+&lt;p&gt;NFSのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install nfs-kernel-server
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下のパッケージが新たにインストールされます:
+  nfs-kernel-server
+アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。
+101 kB のアーカイブを取得する必要があります。
+この操作後に追加で 373 kB のディスク容量が消費されます。
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB]
+101 kB を 1秒 で取得しました (66.7 kB/s)  
+以前に未選択のパッケージ nfs-kernel-server を選択しています。
+(データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。)
+.../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ...
+nfs-kernel-server (1:1.2.8-9) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+nfs-kernel-server (1:1.2.8-9) を設定しています ...
+
+Creating config file /etc/exports with new version
+
+Creating config file /etc/default/nfs-kernel-server with new version
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NFSの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/exports{,.org}
+$ ls -l /etc/exports*
+-rw-r--r-- 1 root root 389  8月 13  2014 /etc/exports
+-rw-r--r-- 1 root root 389  8月 13  2014 /etc/exports.org
+$
+$ sudo vi /etc/exports
+/mnt/rpibackup	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
+/mnt/syslog	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
+$
+$ diff /etc/exports.org /etc/exports
+10a11,12
+&amp;gt; /mnt/rpibackup	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
+&amp;gt; /mnt/syslog	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;dl&gt;
+    &lt;dt&gt;rw&lt;/dt&gt;
+    &lt;dd&gt;ファイルシステムに対して変更(読み込み/書き込み)ができるようにする&lt;/dd&gt;
+    &lt;dt&gt;sync&lt;/dt&gt;
+    &lt;dd&gt;ディスクへの書き込みを同期する&lt;/dd&gt;
+    &lt;dt&gt;insecure&lt;/dt&gt;
+    &lt;dd&gt;クライアントからのアクセスに使用するポートを制限しない&lt;/dd&gt;
+    &lt;dt&gt;all_squash&lt;/dt&gt;
+    &lt;dd&gt;すべてのuidとgidをanonymousにマッピングする&lt;/dd&gt;
+    &lt;dt&gt;no_subtree_check&lt;/dt&gt;
+    &lt;dd&gt;サブツリーのチェックを無効にする&lt;/dd&gt;
+&lt;/dl&gt;
+
+&lt;p&gt;NFSの起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl start rpcbind
+$ sudo systemctl enable rpcbind
+Synchronizing state for rpcbind.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d rpcbind defaults
+insserv: warning: current start runlevel(s) (empty) of script `rpcbind&#39; overrides LSB defaults (S).
+insserv: warning: current stop runlevel(s) (0 1 6 S) of script `rpcbind&#39; overrides LSB defaults (0 1 6).
+Executing /usr/sbin/update-rc.d rpcbind enable
+$
+$ sudo systemctl restart nfs-kernel-server
+$ sudo systemctl enable nfs-kernel-server
+Synchronizing state for nfs-kernel-server.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d nfs-kernel-server defaults
+Executing /usr/sbin/update-rc.d nfs-kernel-server enable
+$
+$ sudo showmount -e
+Export list for homenas1:
+/mnt/syslog    172.31.10.0/24
+/mnt/rpibackup 172.31.10.0/24
+$
+$ sudo exportfs -v
+/mnt/rpibackup	172.31.10.0/24(rw,wdelay,insecure,root_squash,all_squash,no_subtree_check,sec=sys,rw,root_squash,all_squash)
+/mnt/syslog   	172.31.10.0/24(rw,wdelay,insecure,root_squash,all_squash,no_subtree_check,sec=sys,rw,root_squash,all_squash)
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;NFSクライアント側の設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install -y nfs-client
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+Note, selecting &#39;nfs-common&#39; instead of &#39;nfs-client&#39;
+nfs-common はすでに最新版です。
+アップグレード: 0 個、新規インストール: 0 個、削除: 0 個、保留: 1 個。
+$
+$ sudo mkdir /mnt/rpibackup
+$ sudo mkdir /mnt/syslog
+$
+$ sudo cp -p /etc/fstab{,.org}
+$ ls -l /etc/fstab*
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab.org
+$
+$ sudo vi /etc/fstab
+172.31.10.110:/mnt/rpibackup	/mnt/rpibackup	nfs	defaults,nofail	0	0
+172.31.10.110:/mnt/syslog	/mnt/syslog	nfs	defaults,nofail	0	0
+$
+$ sudo mount -a
+$ df -h
+ファイルシス                 サイズ  使用  残り 使用% マウント位置
+/dev/root                       29G  963M   27G    4% /
+devtmpfs                       459M     0  459M    0% /dev
+tmpfs                          463M     0  463M    0% /dev/shm
+tmpfs                          463M  6.2M  457M    2% /run
+tmpfs                          5.0M  4.0K  5.0M    1% /run/lock
+tmpfs                          463M     0  463M    0% /sys/fs/cgroup
+/dev/mmcblk0p1                  63M   21M   43M   34% /boot
+172.31.10.110:/mnt/rpibackup   325G   67M  308G    1% /mnt/rpibackup
+172.31.10.110:/mnt/syslog      197G   60M  187G    1% /mnt/syslog
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;sambaの設定:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Sambaの設定&lt;/h2&gt;
+
+&lt;p&gt;Sambaのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install samba
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  attr libaio1 libasn1-8-heimdal libavahi-client3 libcups2
+  libfile-copy-recursive-perl libhcrypto4-heimdal libhdb9-heimdal
+  libheimbase1-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldb1 libntdb1
+  libroken18-heimdal libtdb1 libtevent0 libwind0-heimdal python-crypto
+  python-dnspython python-ldb python-ntdb python-samba python-talloc
+  python-tdb samba-common-bin samba-dsdb-modules samba-libs samba-vfs-modules
+  tdb-tools update-inetd
+提案パッケージ:
+  cups-common python-crypto-dbg python-crypto-doc bind9 bind9utils ctdb
+  ldb-tools smbldap-tools winbind heimdal-clients
+以下のパッケージが新たにインストールされます:
+  attr libaio1 libasn1-8-heimdal libavahi-client3 libcups2
+  libfile-copy-recursive-perl libhcrypto4-heimdal libhdb9-heimdal
+  libheimbase1-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldb1 libntdb1
+  libroken18-heimdal libtdb1 libtevent0 libwind0-heimdal python-crypto
+  python-dnspython python-ldb python-ntdb python-samba python-talloc
+  python-tdb samba samba-common-bin samba-dsdb-modules samba-libs
+  samba-vfs-modules tdb-tools update-inetd
+アップグレード: 0 個、新規インストール: 31 個、削除: 0 個、保留: 1 個。
+8,999 kB のアーカイブを取得する必要があります。
+この操作後に追加で 44.6 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libroken18-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [56.6 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libasn1-8-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [161 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libavahi-client3 armhf 0.6.31-5 [50.6 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcups2 armhf 1.7.5-11+deb8u1 [253 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhcrypto4-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [98.3 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libheimbase1-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [46.4 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libwind0-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [71.0 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhx509-5-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [111 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libkrb5-26-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [188 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhdb9-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [73.6 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtdb1 armhf 1.3.6-0+deb8u1 [37.1 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtevent0 armhf 0.9.28-0+deb8u1 [23.5 kB]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main libldb1 armhf 2:1.1.20-0+deb8u1 [90.9 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main libntdb1 armhf 1.0-5 [37.8 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-ldb armhf 2:1.1.20-0+deb8u1 [26.0 kB]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-talloc armhf 2.1.2-0+deb8u1 [9,912 B]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-dnspython all 1.12.0-1 [101 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-ntdb armhf 1.0-5 [8,372 B]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-tdb armhf 1.3.6-0+deb8u1 [14.0 kB]
+取得:21 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-crypto armhf 2.6.1-5 [248 kB]
+取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-libs armhf 2:4.2.14+dfsg-0+deb8u2 [4,244 kB]
+取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-samba armhf 2:4.2.14+dfsg-0+deb8u2 [850 kB]
+取得:24 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-common-bin armhf 2:4.2.14+dfsg-0+deb8u2 [562 kB]
+取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-dsdb-modules armhf 2:4.2.14+dfsg-0+deb8u2 [276 kB]
+取得:26 http://mirrordirector.raspbian.org/raspbian/ jessie/main tdb-tools armhf 1.3.6-0+deb8u1 [25.5 kB]
+取得:27 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfile-copy-recursive-perl all 0.38-1 [20.6 kB]
+取得:28 http://mirrordirector.raspbian.org/raspbian/ jessie/main update-inetd all 4.43 [21.8 kB]
+取得:29 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba armhf 2:4.2.14+dfsg-0+deb8u2 [939 kB]
+取得:30 http://mirrordirector.raspbian.org/raspbian/ jessie/main attr armhf 1:2.4.47-2 [41.3 kB]
+取得:31 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-vfs-modules armhf 2:4.2.14+dfsg-0+deb8u2 [303 kB]
+8,999 kB を 1分 8秒 で取得しました (131 kB/s)                                  
+パッケージからテンプレートを展開しています: 100%
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libaio1:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 31562 個のファイルとディレクトリがインストールされています。)
+.../libaio1_0.3.110-1_armhf.deb を展開する準備をしています ...
+libaio1:armhf (0.3.110-1) を展開しています...
+以前に未選択のパッケージ libroken18-heimdal:armhf を選択しています。
+.../libroken18-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libroken18-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libasn1-8-heimdal:armhf を選択しています。
+.../libasn1-8-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libasn1-8-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libavahi-client3:armhf を選択しています。
+.../libavahi-client3_0.6.31-5_armhf.deb を展開する準備をしています ...
+libavahi-client3:armhf (0.6.31-5) を展開しています...
+以前に未選択のパッケージ libcups2:armhf を選択しています。
+.../libcups2_1.7.5-11+deb8u1_armhf.deb を展開する準備をしています ...
+libcups2:armhf (1.7.5-11+deb8u1) を展開しています...
+以前に未選択のパッケージ libhcrypto4-heimdal:armhf を選択しています。
+.../libhcrypto4-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libhcrypto4-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libheimbase1-heimdal:armhf を選択しています。
+.../libheimbase1-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libheimbase1-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libwind0-heimdal:armhf を選択しています。
+.../libwind0-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libwind0-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libhx509-5-heimdal:armhf を選択しています。
+.../libhx509-5-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libhx509-5-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libkrb5-26-heimdal:armhf を選択しています。
+.../libkrb5-26-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libkrb5-26-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libhdb9-heimdal:armhf を選択しています。
+.../libhdb9-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
+libhdb9-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
+以前に未選択のパッケージ libtdb1:armhf を選択しています。
+.../libtdb1_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
+libtdb1:armhf (1.3.6-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libtevent0:armhf を選択しています。
+.../libtevent0_0.9.28-0+deb8u1_armhf.deb を展開する準備をしています ...
+libtevent0:armhf (0.9.28-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libldb1:armhf を選択しています。
+.../libldb1_2%3a1.1.20-0+deb8u1_armhf.deb を展開する準備をしています ...
+libldb1:armhf (2:1.1.20-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libntdb1:armhf を選択しています。
+.../libntdb1_1.0-5_armhf.deb を展開する準備をしています ...
+libntdb1:armhf (1.0-5) を展開しています...
+以前に未選択のパッケージ python-ldb を選択しています。
+.../python-ldb_2%3a1.1.20-0+deb8u1_armhf.deb を展開する準備をしています ...
+python-ldb (2:1.1.20-0+deb8u1) を展開しています...
+以前に未選択のパッケージ python-talloc を選択しています。
+.../python-talloc_2.1.2-0+deb8u1_armhf.deb を展開する準備をしています ...
+python-talloc (2.1.2-0+deb8u1) を展開しています...
+以前に未選択のパッケージ python-dnspython を選択しています。
+.../python-dnspython_1.12.0-1_all.deb を展開する準備をしています ...
+python-dnspython (1.12.0-1) を展開しています...
+以前に未選択のパッケージ python-ntdb を選択しています。
+.../python-ntdb_1.0-5_armhf.deb を展開する準備をしています ...
+python-ntdb (1.0-5) を展開しています...
+以前に未選択のパッケージ python-tdb を選択しています。
+.../python-tdb_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
+python-tdb (1.3.6-0+deb8u1) を展開しています...
+以前に未選択のパッケージ python-crypto を選択しています。
+.../python-crypto_2.6.1-5_armhf.deb を展開する準備をしています ...
+python-crypto (2.6.1-5) を展開しています...
+以前に未選択のパッケージ samba-libs:armhf を選択しています。
+.../samba-libs_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+samba-libs:armhf (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+以前に未選択のパッケージ python-samba を選択しています。
+.../python-samba_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+python-samba (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+以前に未選択のパッケージ samba-common-bin を選択しています。
+.../samba-common-bin_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+samba-common-bin (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+以前に未選択のパッケージ samba-dsdb-modules を選択しています。
+.../samba-dsdb-modules_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+samba-dsdb-modules (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+以前に未選択のパッケージ tdb-tools を選択しています。
+.../tdb-tools_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
+tdb-tools (1.3.6-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libfile-copy-recursive-perl を選択しています。
+.../libfile-copy-recursive-perl_0.38-1_all.deb を展開する準備をしています ...
+libfile-copy-recursive-perl (0.38-1) を展開しています...
+以前に未選択のパッケージ update-inetd を選択しています。
+.../update-inetd_4.43_all.deb を展開する準備をしています ...
+update-inetd (4.43) を展開しています...
+以前に未選択のパッケージ samba を選択しています。
+.../samba_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+samba (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+以前に未選択のパッケージ attr を選択しています。
+.../attr_1%3a2.4.47-2_armhf.deb を展開する準備をしています ...
+attr (1:2.4.47-2) を展開しています...
+以前に未選択のパッケージ samba-vfs-modules を選択しています。
+.../samba-vfs-modules_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
+samba-vfs-modules (2:4.2.14+dfsg-0+deb8u2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libaio1:armhf (0.3.110-1) を設定しています ...
+libroken18-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libasn1-8-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libavahi-client3:armhf (0.6.31-5) を設定しています ...
+libcups2:armhf (1.7.5-11+deb8u1) を設定しています ...
+libhcrypto4-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libheimbase1-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libwind0-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libhx509-5-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libkrb5-26-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libhdb9-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
+libtdb1:armhf (1.3.6-0+deb8u1) を設定しています ...
+libtevent0:armhf (0.9.28-0+deb8u1) を設定しています ...
+libldb1:armhf (2:1.1.20-0+deb8u1) を設定しています ...
+libntdb1:armhf (1.0-5) を設定しています ...
+python-ldb (2:1.1.20-0+deb8u1) を設定しています ...
+python-talloc (2.1.2-0+deb8u1) を設定しています ...
+python-dnspython (1.12.0-1) を設定しています ...
+python-ntdb (1.0-5) を設定しています ...
+python-tdb (1.3.6-0+deb8u1) を設定しています ...
+python-crypto (2.6.1-5) を設定しています ...
+samba-libs:armhf (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+python-samba (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+samba-common-bin (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+samba-dsdb-modules (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+tdb-tools (1.3.6-0+deb8u1) を設定しています ...
+update-alternatives: /usr/bin/tdbbackup (tdbbackup) を提供するために自動モードで /usr/bin/tdbbackup.tdbtools を使います
+libfile-copy-recursive-perl (0.38-1) を設定しています ...
+update-inetd (4.43) を設定しています ...
+samba (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+グループ `sambashare&#39; (グループ ID 115) を追加しています...
+完了。
+attr (1:2.4.47-2) を設定しています ...
+samba-vfs-modules (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sambaの設定(後日見直し要素)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/samba/smb.conf{,.org}
+$ ls -l /etc/samba/smb.conf*
+-rw-r--r-- 1 root root 9231 12月 31 18:33 /etc/samba/smb.conf
+-rw-r--r-- 1 root root 9231 12月 31 18:33 /etc/samba/smb.conf.org
+$
+$ sudo vi /etc/samba/smb.conf
+[global]
+   dos charset = CP932
+   unix charset = UTF-8
+   unix extensions = no
+
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+
+;   interfaces = 127.0.0.0/8 eth0
+   interfaces = 127.0.0.0/8 192.168.40.0/24 eth0
+   hosts allow = 192.168.40.0/24
+
+;   map to guest = bad user
+   map to guest = never
+
+;   usershare allow guests = yes
+   usershare allow guests = no
+
+;[homes]
+;   comment = Home Directories
+;   browseable = no
+
+;   read only = yes
+
+;   create mask = 0700
+
+;   directory mask = 0700
+
+;   valid users = %S
+
+;[printers]
+;   comment = All Printers
+;   browseable = no
+;   path = /var/spool/samba
+;   printable = yes
+;   guest ok = no
+;   read only = yes
+;   create mask = 0700
+
+;[print$]
+;   comment = Printer Drivers
+;   path = /var/lib/samba/printers
+;   browseable = yes
+;   read only = yes
+;   guest ok = no
+
+[share]
+   path = /mnt/nas
+   writable = yes
+   valid users = @sambashare
+   force user = root
+   force group = adm
+   create mask = 0664
+   directory mask = 0775
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Sambaを起動する&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ testparm /etc/samba/smb.conf
+Load smb config files from /etc/samba/smb.conf
+Processing section &amp;quot;[share]&amp;quot;
+Loaded services file OK.
+Server role: ROLE_STANDALONE
+
+Press enter to see a dump of your service definitions
+
+# Global parameters
+[global]
+	dos charset = CP932
+	interfaces = 127.0.0.0/8 192.168.40.0/24 eth0
+	server role = standalone server
+	obey pam restrictions = Yes
+	pam password change = Yes
+	passwd program = /usr/bin/passwd %u
+	passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+	unix password sync = Yes
+	syslog = 0
+	log file = /var/log/samba/log.%m
+	max log size = 1000
+	unix extensions = No
+	load printers = No
+	printcap name = /dev/null
+	dns proxy = No
+	panic action = /usr/share/samba/panic-action %d
+	idmap config * : backend = tdb
+	hosts allow = 192.168.40.0/24
+	printing = bsd
+
+
+[share]
+	path = /mnt/nas
+	valid users = @sambashare
+	force user = root
+	force group = adm
+	read only = No
+	create mask = 0664
+	directory mask = 0775
+$
+$ sudo systemctl restart smbd
+$ sudo systemctl restart nmbd
+$
+$ sudo systemctl enable smbd
+Synchronizing state for smbd.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d smbd defaults
+Executing /usr/sbin/update-rc.d smbd enable
+$
+$ sudo systemctl enable nmbd
+Synchronizing state for nmbd.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d nmbd defaults
+Executing /usr/sbin/update-rc.d nmbd enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Samba接続用のユーザ作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo useradd samba -u 1100 -g sambashare -s /bin/false
+$ sudo passwd -l samba
+passwd: パスワード期限切れ情報を変更しました
+$
+$ sudo pdbedit -a -u samba
+new password:
+retype new password:
+Unix username:        samba
+NT username:          
+Account Flags:        [U          ]
+User SID:             S-1-5-21-4142804337-213291639-510360124-1000
+Primary Group SID:    S-1-5-21-4142804337-213291639-510360124-513
+Full Name:            
+Home Directory:       \\homenas1\samba
+HomeDir Drive:        
+Logon Script:         
+Profile Path:         \\homenas1\samba\profile
+Domain:               HOMENAS1
+Account desc:         
+Workstations:         
+Munged dial:          
+Logon time:           0
+Logoff time:          never
+Kickoff time:         never
+Password last set:    月, 02  1月 2017 23:15:52 JST
+Password can change:  月, 02  1月 2017 23:15:52 JST
+Password must change: never
+Last bad password   : 0
+Bad password count  : 0
+Logon hours         : FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+$
+$ sudo pdbedit -Lw
+samba:1100:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:016FADE2356324CBD21E6685516D4A24:[U          ]:LCT-586A6098:
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MacからSambaに接続&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Finderを開く&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Command + K&lt;/code&gt;を入力する&lt;/li&gt;
+&lt;li&gt;サーバアドレスに&lt;code&gt;smb://192.168.40.10/share&lt;/code&gt;を入力する&lt;/li&gt;
+&lt;li&gt;ユーザの種類に&lt;code&gt;登録ユーザ&lt;/code&gt;を選択、名前に&lt;code&gt;samba&lt;/code&gt;、パスワードに&lt;code&gt;sambaユーザのパスワード&lt;/code&gt;を入力して接続をクリックする&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;参考url:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;参考URL&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://denshikousaku.net/raspberry-pi-file-server-part1-basic-samba&#34;&gt;Raspberry Piでファイルサーバ、Part1 Samba基本編 | ものづくりエクスペリメント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://ossfan.net/setup/samba-03.html&#34;&gt;Samba 4.2.3をCentOS 7.2にインストールしてファイルサーバとして設定 | OSSでLinuxサーバ構築 | OSS Fan&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.virment.com/config-sambaserver/&#34;&gt;sambaサーバによるファイル共有環境の構築手順&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その3</title>
+      <link>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</link>
+      <pubDate>Sun, 01 Jan 2017 18:28:38 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築-mdadm:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;Raspberry Pi 2でファイルサーバ構築(mdadm)&lt;/h2&gt;
+
+&lt;p&gt;家庭内インターネット接続環境で使用するファイルサーバを構築します。
+ファイルサーバの利用目的は以下の3つです。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;LAN内のファイル共有&lt;/li&gt;
+&lt;li&gt;Raspberry Piバックアップ&lt;/li&gt;
+&lt;li&gt;Syslog等のログ保管&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;今回はUSB Storageを使用する準備までを行います。
+次回はNFSやSambaの設定を行っていきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;用意したもの:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;用意したもの&lt;/h2&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;品名&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;台数&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;Raspberry Pi 2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1台&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;USB Storage 1TB&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3台&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;USB Hub&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1台&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;物理構成:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;物理構成&lt;/h2&gt;
+
+&lt;p&gt;物理構成は以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170101_01/physical_composition.png&#34; alt=&#34;physical composition&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;設定:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;設定&lt;/h2&gt;
+
+&lt;h3 id=&#34;mdadmのインストール:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;mdadmのインストール&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install mdadm
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light liblockfile-bin
+  liblockfile1
+提案パッケージ:
+  mail-reader eximon4 exim4-doc-html exim4-doc-info spf-tools-perl swaks
+推奨パッケージ:
+  mailx default-mta mail-transport-agent
+以下のパッケージが新たにインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light liblockfile-bin
+  liblockfile1 mdadm
+アップグレード: 0 個、新規インストール: 7 個、削除: 0 個、保留: 1 個。
+2,630 kB のアーカイブを取得する必要があります。
+この操作後に追加で 4,960 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile-bin armhf 1.09-6 [18.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile1 armhf 1.09-6 [14.7 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-config all 4.84.2-2+deb8u2 [503 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-base armhf 4.84.2-2+deb8u2 [1,046 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-daemon-light armhf 4.84.2-2+deb8u2 [578 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main bsd-mailx armhf 8.1.2-0.20141216cvs-2 [74.3 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main mdadm armhf 3.3.2-5+deb8u1 [397 kB]
+2,630 kB を 5秒 で取得しました (467 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ liblockfile-bin を選択しています。
+(データベースを読み込んでいます ... 現在 31247 個のファイルとディレクトリがインストールされています。)
+.../liblockfile-bin_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile-bin (1.09-6) を展開しています...
+以前に未選択のパッケージ liblockfile1:armhf を選択しています。
+.../liblockfile1_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile1:armhf (1.09-6) を展開しています...
+以前に未選択のパッケージ exim4-config を選択しています。
+.../exim4-config_4.84.2-2+deb8u2_all.deb を展開する準備をしています ...
+exim4-config (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-base を選択しています。
+.../exim4-base_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-base (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-daemon-light を選択しています。
+.../exim4-daemon-light_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-daemon-light (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ bsd-mailx を選択しています。
+.../bsd-mailx_8.1.2-0.20141216cvs-2_armhf.deb を展開する準備をしています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を展開しています...
+以前に未選択のパッケージ mdadm を選択しています。
+.../mdadm_3.3.2-5+deb8u1_armhf.deb を展開する準備をしています ...
+mdadm (3.3.2-5+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblockfile-bin (1.09-6) を設定しています ...
+liblockfile1:armhf (1.09-6) を設定しています ...
+exim4-config (4.84.2-2+deb8u2) を設定しています ...
+Adding system-user for exim (v4)
+exim4-base (4.84.2-2+deb8u2) を設定しています ...
+exim: DB upgrade, deleting hints-db
+exim4-daemon-light (4.84.2-2+deb8u2) を設定しています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を設定しています ...
+update-alternatives: /usr/bin/mailx (mailx) を提供するために自動モードで /usr/bin/bsd-mailx を使います
+mdadm (3.3.2-5+deb8u1) を設定しています ...
+ ┌────────────────────────┤ mdadm を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ あなたのシステムのルートファイルシステムが MD アレイ (RAID) 上に配置され  | 
+ │ ているならば、ブートシーケンスの初期段階で MD アレイを開始する必要があり  | 
+ │ ます。ルートファイルシステムが MD のような論理ボリューム (LVM) 上にある   | 
+ │ 場合は、構成しているアレイ全ての開始が必要です。                          | 
+ │                                                                           | 
+ │ どのアレイがルートファイルシステムの立ち上げに必要かを正確に知っており、  | 
+ │ ブートシーケンスの後の時点まで意図しているもの以外全てのアレイ起動を遅ら  | 
+ │ せたい場合、ここで最初に起動するアレイを入力してください。そうでない場合  | 
+ │ 、&#39;all&#39; と入力して単に全ての利用可能なアレイを最初に立ち上げてください。  | 
+ │                                                                           | 
+ │ ルートファイルシステムのために、どのアレイも必要ない、あるいはどのアレイ  | 
+ │ も起動したくは無いという場合は、空白のままに (あるいは &#39;none&#39; と入力) し  | 
+ │ てください。これは、カーネルで自動的に起動される場合や起動時にはアレイは  | 
+ │ 不要であるという場合です。                                                | 
+ │                                                                           | 
+ │                                  &amp;lt;了解&amp;gt;                                   | 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+ ┌─────────┤ mdadm を設定しています ├─────────┐
+ │ ルートファイルシステムに必要な MD アレイ:  │ 
+ │                                            │ 
+ │ all_______________________________________ │ 
+ │                                            │ 
+ │                   &amp;lt;了解&amp;gt;                   │ 
+ │                                            │ 
+ └────────────────────────────────────────────┘ 
+Generating mdadm.conf... done.
+update-initramfs: deferring update (trigger activated)
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+initramfs-tools (0.120+deb8u2) のトリガを処理しています ...
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;usbストレージの初期化:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;USBストレージの初期化&lt;/h3&gt;
+
+&lt;p&gt;1つ目のUSBストレージを接続して、フォーマットを行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[ 8792.405426] sd 0:0:0:0: [sda] Spinning up disk...
+[ 8792.412833] sd 0:0:0:0: Attached scsi generic sg0 type 0
+[ 8798.460733] sd 0:0:0:0: [sda] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[ 8798.461289] sd 0:0:0:0: [sda] Write Protect is off
+[ 8798.461313] sd 0:0:0:0: [sda] Mode Sense: 47 00 10 08
+[ 8798.461831] sd 0:0:0:0: [sda] No Caching mode page found
+[ 8798.461853] sd 0:0:0:0: [sda] Assuming drive cache: write through
+[ 8798.526543] sd 0:0:0:0: [sda] Attached SCSI disk
+$ sudo fdisk /dev/sda
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0x21f377b8.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): +838860800
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 400 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (2-4, default 2): 
+First sector (838862848-1953458175, default 838862848):  
+Last sector, +sectors or +size{K,M,G,T,P} (838862848-1953458175, default 1953458175): +692060160
+
+Created a new partition 2 of type &#39;Linux&#39; and of size 330 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (3,4, default 3): 
+First sector (1530923008-1953458175, default 1530923008): 
+Last sector, +sectors or +size{K,M,G,T,P} (1530923008-1953458175, default 1953458175): +419430400
+
+Created a new partition 3 of type &#39;Linux&#39; and of size 200 GiB.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sda1             2048  838862847 838860800  400G 83 Linux
+/dev/sda2        838862848 1530923007 692060160  330G 83 Linux
+/dev/sda3       1530923008 1950353407 419430400  200G 83 Linux
+
+
+Command (m for help): t
+Partition number (1-3, default 3): 1
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 2
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 3
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): p
+Disk /dev/sda: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x21f377b8
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sda1             2048  838862847 838860800  400G fd Linux raid autodetect
+/dev/sda2        838862848 1530923007 692060160  330G fd Linux raid autodetect
+/dev/sda3       1530923008 1950353407 419430400  200G fd Linux raid autodetect
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2つ目のUSBストレージを接続して、フォーマットを行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[11121.958187] sd 1:0:0:0: Attached scsi generic sg1 type 0
+[11121.959776] sd 1:0:0:0: [sdb] Spinning up disk...
+[11128.015762] sd 1:0:0:0: [sdb] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[11128.016326] sd 1:0:0:0: [sdb] Write Protect is off
+[11128.016352] sd 1:0:0:0: [sdb] Mode Sense: 47 00 10 08
+[11128.016885] sd 1:0:0:0: [sdb] No Caching mode page found
+[11128.016907] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[11128.078805] sd 1:0:0:0: [sdb] Attached SCSI disk
+$ sudo fdisk /dev/sdb
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0x09c6efcf.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): +838860800
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 400 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (2-4, default 2): 
+First sector (838862848-1953458175, default 838862848): 
+Last sector, +sectors or +size{K,M,G,T,P} (838862848-1953458175, default 1953458175): +692060160
+
+Created a new partition 2 of type &#39;Linux&#39; and of size 330 GiB.
+
+Command (m for help): n
+Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (3,4, default 3): 
+First sector (1530923008-1953458175, default 1530923008): 
+Last sector, +sectors or +size{K,M,G,T,P} (1530923008-1953458175, default 1953458175): +419430400
+
+Created a new partition 3 of type &#39;Linux&#39; and of size 200 GiB.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sdb1             2048  838862847 838860800  400G 83 Linux
+/dev/sdb2        838862848 1530923007 692060160  330G 83 Linux
+/dev/sdb3       1530923008 1950353407 419430400  200G 83 Linux
+
+
+Command (m for help): t
+Partition number (1-3, default 3): 1
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 2
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): t
+Partition number (1-3, default 3): 3
+Hex code (type L to list all codes): fd
+
+Changed type of partition &#39;Linux&#39; to &#39;Linux raid autodetect&#39;.
+
+Command (m for help): p
+Disk /dev/sdb: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x09c6efcf
+
+Device     Boot      Start        End   Sectors  Size Id Type
+/dev/sdb1             2048  838862847 838860800  400G fd Linux raid autodetect
+/dev/sdb2        838862848 1530923007 692060160  330G fd Linux raid autodetect
+/dev/sdb3       1530923008 1950353407 419430400  200G fd Linux raid autodetect
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;mdadmでraid1の構築:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;mdadmでraid1の構築&lt;/h3&gt;
+
+&lt;p&gt;デバイスIDを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ls -l /dev/disk/by-id/
+合計 0
+lrwxrwxrwx 1 root root 13 12月 31 18:34 mmc-USDU1_0x66f01af2 -&amp;gt; ../../mmcblk0
+lrwxrwxrwx 1 root root 15 12月 31 18:34 mmc-USDU1_0x66f01af2-part1 -&amp;gt; ../../mmcblk0p1
+lrwxrwxrwx 1 root root 15 12月 31 18:34 mmc-USDU1_0x66f01af2-part2 -&amp;gt; ../../mmcblk0p2
+lrwxrwxrwx 1 root root  9 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0 -&amp;gt; ../../sdb
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part1 -&amp;gt; ../../sdb1
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part2 -&amp;gt; ../../sdb2
+lrwxrwxrwx 1 root root 10 12月 31 21:43 usb-WD_Elements_10B8_575834314132354E3330594B-0:0-part3 -&amp;gt; ../../sdb3
+lrwxrwxrwx 1 root root  9 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0 -&amp;gt; ../../sda
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part1 -&amp;gt; ../../sda1
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part2 -&amp;gt; ../../sda2
+lrwxrwxrwx 1 root root 10 12月 31 21:37 usb-WD_Elements_25A2_57583731413736363234444E-0:0-part3 -&amp;gt; ../../sda3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;mdadmコマンドでraid1を構築する&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part1 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part1 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+$ sudo mdadm --create /dev/md1 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part2 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part2 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md1 started.
+$ sudo mdadm --create /dev/md2 --level=1 --raid-devices=2 /dev/disk/by-id/usb-WD_Elements_25A2_57583731413736363234444E-0\:0-part3 /dev/disk/by-id/usb-WD_Elements_10B8_575834314132354E3330594B-0\:0-part3 
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store &#39;/boot&#39; on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+Continue creating array? yes
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md2 started.
+$
+$ sudo cat /proc/mdstat 
+Personalities : [raid1] 
+md2 : active raid1 sdb3[1] sda3[0]
+      209584128 blocks super 1.2 [2/2] [UU]
+      	resync=DELAYED
+      bitmap: 2/2 pages [8KB], 65536KB chunk
+
+md1 : active raid1 sdb2[1] sda2[0]
+      345899008 blocks super 1.2 [2/2] [UU]
+      	resync=DELAYED
+      bitmap: 3/3 pages [12KB], 65536KB chunk
+
+md0 : active raid1 sdb1[1] sda1[0]
+      419299328 blocks super 1.2 [2/2] [UU]
+      [&amp;gt;....................]  resync =  0.5% (2202240/419299328) finish=403.4min speed=17230K/sec
+      bitmap: 4/4 pages [16KB], 65536KB chunk
+
+unused devices: &amp;lt;none&amp;gt;
+$
+$ sudo mdadm --detail /dev/md*
+mdadm: /dev/md does not appear to be an md device
+/dev/md0:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:50:28 2016
+     Raid Level : raid1
+     Array Size : 419299328 (399.88 GiB 429.36 GB)
+  Used Dev Size : 419299328 (399.88 GiB 429.36 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:53:07 2016
+          State : clean, resyncing 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+  Resync Status : 0% complete
+
+           Name : homenas1:0  (local to host homenas1)
+           UUID : ff0b51a1:559b9e27:476e5946:50ee7174
+         Events : 31
+
+    Number   Major   Minor   RaidDevice State
+       0       8        1        0      active sync   /dev/sda1
+       1       8       17        1      active sync   /dev/sdb1
+/dev/md1:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:51:17 2016
+     Raid Level : raid1
+     Array Size : 345899008 (329.88 GiB 354.20 GB)
+  Used Dev Size : 345899008 (329.88 GiB 354.20 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:51:17 2016
+          State : clean, resyncing (DELAYED) 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : homenas1:1  (local to host homenas1)
+           UUID : 8ae07a1b:967f0164:d564ec68:7e77c145
+         Events : 0
+
+    Number   Major   Minor   RaidDevice State
+       0       8        2        0      active sync   /dev/sda2
+       1       8       18        1      active sync   /dev/sdb2
+/dev/md2:
+        Version : 1.2
+  Creation Time : Sat Dec 31 21:51:43 2016
+     Raid Level : raid1
+     Array Size : 209584128 (199.88 GiB 214.61 GB)
+  Used Dev Size : 209584128 (199.88 GiB 214.61 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+  Intent Bitmap : Internal
+
+    Update Time : Sat Dec 31 21:51:43 2016
+          State : clean, resyncing (DELAYED) 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : homenas1:2  (local to host homenas1)
+           UUID : 3cb34c46:3ace2238:e6c98f2e:6aa29e8e
+         Events : 0
+
+    Number   Major   Minor   RaidDevice State
+       0       8        3        0      active sync   /dev/sda3
+       1       8       19        1      active sync   /dev/sdb3
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1のフォーマット:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;raid1のフォーマット&lt;/h3&gt;
+
+&lt;p&gt;raid1デバイスをext4でフォーマットする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkfs -t ext4 /dev/md0 
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 104824832 4k blocks and 26206208 inodes
+Filesystem UUID: 29e7e530-5125-48b9-a0c7-539e285dbac3
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+	102400000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$
+$ sudo mkfs -t ext4 /dev/md1
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 86474752 4k blocks and 21618688 inodes
+Filesystem UUID: 3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$
+$ sudo mkfs -t ext4 /dev/md2
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 52396032 4k blocks and 13099008 inodes
+Filesystem UUID: 2968a01e-1116-4895-b06c-c70208ecd6a4
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1デバイスをマウント:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;raid1デバイスをマウント&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /mnt/nas
+$ sudo mount -t ext4 /dev/md0 /mnt/nas
+$ sudo chmod 775 /mnt/nas
+$ sudo chown root:adm /mnt/nas
+$ 
+$ sudo mkdir /mnt/rpibackup
+$ sudo mount -t ext4 /dev/md1 /mnt/rpibackup
+$ sudo chmod 775 /mnt/rpibackup
+$ sudo chown root:adm /mnt/rpibackup
+$ 
+$ sudo mkdir /mnt/syslog
+$ sudo mount -t ext4 /dev/md2 /mnt/syslog
+$ sudo chmod 775 /mnt/syslog
+$ sudo chown root:adm /mnt/syslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;起動時にraid1デバイスをマウントする:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;起動時にraid1デバイスをマウントする&lt;/h3&gt;
+
+&lt;p&gt;起動時にraid1デバイスをマウントするためにfstabを設定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo blkid
+/dev/md0: UUID=&amp;quot;29e7e530-5125-48b9-a0c7-539e285dbac3&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+/dev/md1: UUID=&amp;quot;3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+/dev/md2: UUID=&amp;quot;2968a01e-1116-4895-b06c-c70208ecd6a4&amp;quot; TYPE=&amp;quot;ext4&amp;quot;
+$
+$ sudo cp -p /etc/fstab{,.org}
+$ ls -l /etc/fstab*
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab
+-rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab.org
+$
+$ sudo vi /etc/fstab
+UUID=&amp;quot;29e7e530-5125-48b9-a0c7-539e285dbac3&amp;quot;     /mnt/nas        ext4    defaults,nofail 0       0
+UUID=&amp;quot;3cf0d3fe-0d04-4fe0-8fe2-b383a669fc3e&amp;quot;     /mnt/rpibackup  ext4    defaults,nofail 0       0
+UUID=&amp;quot;2968a01e-1116-4895-b06c-c70208ecd6a4&amp;quot;     /mnt/syslog     ext4    defaults,nofail 0       0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;USBストレージのUUIDが判明するまでマウント作業を遅延させる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /boot/cmdline.txt{,.org}
+$ ls -l /boot/cmdline.txt*
+-rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt
+-rwxr-xr-x 1 root root 136  1月  1  1980 /boot/cmdline.txt.org
+$
+$ sudo vi /boot/cmdline.txt
+dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait rootdelay=10
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;RAID1デバイスの同期速度を変更する&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat /proc/sys/dev/raid/speed_limit_min 
+1000
+$ sudo sh -c &amp;quot;echo 50000 &amp;gt; /proc/sys/dev/raid/speed_limit_min&amp;quot;
+$ cat /proc/sys/dev/raid/speed_limit_min
+50000
+$
+$ sudo cp -p /etc/sysctl.conf{,.org}
+$ ls -l /etc/sysctl.conf*
+-rw-r--r-- 1 root root 2084  3月  7  2015 /etc/sysctl.conf
+-rw-r--r-- 1 root root 2084  3月  7  2015 /etc/sysctl.conf.org
+$ sudo vi /etc/sysctl.conf
+dev.raid.speed_limit_min = 50000
+dev.raid.speed_limit_max = 200000
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;raid1-backup用ストレージの設定:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;RAID1 Backup用ストレージの設定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ dmesg | grep sd
+[ 7875.564180] sd 2:0:0:0: Attached scsi generic sg2 type 0
+[ 7875.571270] sd 2:0:0:0: [sdc] Spinning up disk...
+[ 7880.622204] sd 2:0:0:0: [sdc] 1953458176 512-byte logical blocks: (1.00 TB/931 GiB)
+[ 7880.622788] sd 2:0:0:0: [sdc] Write Protect is off
+[ 7880.622813] sd 2:0:0:0: [sdc] Mode Sense: 47 00 10 08
+[ 7880.623346] sd 2:0:0:0: [sdc] No Caching mode page found
+[ 7880.623368] sd 2:0:0:0: [sdc] Assuming drive cache: write through
+[ 7880.638880] sd 2:0:0:0: [sdc] Attached SCSI disk
+$
+$ sudo fdisk /dev/sdc 
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): p
+Disk /dev/sdc: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x6c9f0b39
+
+
+
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (1-4, default 1): 
+First sector (2048-1953458175, default 2048): 
+Last sector, +sectors or +size{K,M,G,T,P} (2048-1953458175, default 1953458175): 
+
+Created a new partition 1 of type &#39;Linux&#39; and of size 931.5 GiB.
+
+Command (m for help): p
+Disk /dev/sdc: 931.5 GiB, 1000170586112 bytes, 1953458176 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x6c9f0b39
+
+Device     Boot Start        End    Sectors   Size Id Type
+/dev/sdc1        2048 1953458175 1953456128 931.5G 83 Linux
+
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+$
+$ sudo mkfs -t ext4 /dev/sdc1 
+mke2fs 1.42.12 (29-Aug-2014)
+Creating filesystem with 244182016 4k blocks and 61046784 inodes
+Filesystem UUID: 80e310e4-44d9-4de2-a3b7-a71915318f29
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968, 
+	102400000, 214990848
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done     
+
+$
+$ sudo mkdir /backup
+$ sudo mount -t ext4 /dev/sdc1 /backup/
+$ sudo chmod 775 /backup/
+$ sudo chown root:adm /backup/
+$
+$ sudo blkid
+/dev/sdc1: UUID=&amp;quot;80e310e4-44d9-4de2-a3b7-a71915318f29&amp;quot; TYPE=&amp;quot;ext4&amp;quot; PARTUUID=&amp;quot;6c9f0b39-01&amp;quot;
+$
+$ sudo vi /etc/fstab
+UUID=&amp;quot;80e310e4-44d9-4de2-a3b7-a71915318f29&amp;quot;     /backup ext4    defaults,nofail 0       0
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;参考url:edd1b43dbf3196488adbf69244ff43d1&#34;&gt;参考URL&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://projpi.com/diy-home-projects-with-a-raspberry-pi/raspberry-pi-raid-array-with-usb-hdds/&#34;&gt;Raspberry Pi raid array with USB HDDs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

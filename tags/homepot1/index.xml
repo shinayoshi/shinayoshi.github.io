@@ -1,0 +1,2800 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Homepot1 on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/homepot1/</link>
+    <description>Recent content in Homepot1 on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/homepot1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その15</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
+      <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はCactiを導入しました。
+今回はCactiに&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;を登録していきます。SNMPv3を使用してSNMPの値を取得します。&lt;/p&gt;
+
+&lt;h2 id=&#34;snmpdのインストール:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;snmpdのインストール&lt;/h2&gt;
+
+&lt;p&gt;追加するデバイス(Server)にsnmpdをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp&#39; は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent&#39;s access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent&#39;s ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I&#39;ll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I&#39;ll copy them there automatically for you.
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;snmpd.confを設置します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3ユーザを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SNMPv3で値を取得できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.infraexpert.com/study/tcpip21.html&#34;&gt;TCP/IP - SNMPとは&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;iptablesの通信許可:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;iptablesの通信許可&lt;/h2&gt;
+
+&lt;p&gt;CactiからのSNMP通信を許可します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;cactiにデバイス-server-を登録:f59bc3c40d42508a4e65c03888e7814a&#34;&gt;Cactiにデバイス(Server)を登録&lt;/h2&gt;
+
+&lt;p&gt;↓Cactiにログイン。&lt;code&gt;User Name&lt;/code&gt;と&lt;code&gt;Password&lt;/code&gt;を入力して&lt;code&gt;Login&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-01.png&#34; alt=&#34;register-cacti-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓Cactiログイン後の画面。&lt;code&gt;Devices&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-02.png&#34; alt=&#34;register-cacti-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-03.png&#34; alt=&#34;register-cacti-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-04.png&#34; alt=&#34;register-cacti-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓デバイスの登録完了画面。&lt;code&gt;SNMP Information&lt;/code&gt;にデバイスの情報が表示されていることを確認します。&lt;code&gt;Create Graphs for this Host&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-05.png&#34; alt=&#34;register-cacti-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓作成したいグラフを選択して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-06.png&#34; alt=&#34;register-cacti-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフが作成されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-07.png&#34; alt=&#34;register-cacti-07&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓左のメニューから&lt;code&gt;Graph Trees&lt;/code&gt;をクリックし、&lt;code&gt;Default Tree&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-08.png&#34; alt=&#34;register-cacti-08&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。&lt;code&gt;Add&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-09.png&#34; alt=&#34;register-cacti-09&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーへのデバイス登録画面。必要事項を入力して&lt;code&gt;Create&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-10.png&#34; alt=&#34;register-cacti-10&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓ツリーの管理画面。デバイスが登録されたことを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-11.png&#34; alt=&#34;register-cacti-11&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_03/register-cacti-12.png&#34; alt=&#34;register-cacti-12&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その13</title>
+      <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
+      <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回はZabbix Serverを導入しました。
+今回は&lt;code&gt;homenas1&lt;/code&gt;、&lt;code&gt;homemon1&lt;/code&gt;、&lt;code&gt;homemon2&lt;/code&gt;、&lt;code&gt;homepxy1&lt;/code&gt;、&lt;code&gt;homepot1&lt;/code&gt;にZabbix Agentを導入していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;zabbix-agentのインストール:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentのインストール&lt;/h2&gt;
+
+&lt;p&gt;Zabbix Agentをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install zabbix-agent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libcurl3-gnutls libpci3 pciutils
+以下のパッケージが新たにインストールされます:
+  libcurl3-gnutls libpci3 pciutils zabbix-agent
+アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。
+819 kB のアーカイブを取得する必要があります。
+この操作後に追加で 2,344 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB]
+819 kB を 2秒 で取得しました (346 kB/s)
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 33530 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ pciutils を選択しています。
+.../pciutils_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+pciutils (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ zabbix-agent を選択しています。
+.../zabbix-agent_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+pciutils (1:3.2.1-3) を設定しています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_agentd.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-agentの設定:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Agentの設定&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Agentを設定します。
+以下では&lt;code&gt;homepxy1&lt;/code&gt;を設定した際の例を記載します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/zabbix/zabbix_agentd.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_agentd.conf*
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_agentd.conf
+#Server=127.0.0.1
+Server=192.168.30.10,192.168.30.20
+
+#ServerActive=127.0.0.1
+ServerActive=192.168.30.10,192.168.30.20
+
+#Hostname=Zabbix server
+Hostname=homepxy1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Zabbix Agentを再起動します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart zabbix-agent
+$ sudo systemctl enable zabbix-agent
+Synchronizing state for zabbix-agent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-agent defaults
+Executing /usr/sbin/update-rc.d zabbix-agent enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;iptablesの通信許可-iptablesを設定しているホストのみ:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;iptablesの通信許可(iptablesを設定しているホストのみ)&lt;/h3&gt;
+
+&lt;p&gt;Zabbix Serverとの通信を許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;zabbix-serverでの監視登録:46d78a109e92aa27b1ca04b613e55e42&#34;&gt;Zabbix Serverでの監視登録&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Zabbixへのログイン&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ブラウザからZabbix ServerのURL(&lt;code&gt;http://IPアドレス/zabbix&lt;/code&gt;)にアクセスしてログインします。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-01.png&#34; alt=&#34;zabbix-agent-install-01&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Configuration&lt;/code&gt; -&amp;gt; &lt;code&gt;Hosts&lt;/code&gt;を選択します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-02.png&#34; alt=&#34;zabbix-agent-install-02&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Create host&lt;/code&gt;を選択し、&lt;code&gt;Host&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Host name: homepxy1
+Groups: Linux servers
+Agent interfaces: 192.168.20.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-03.png&#34; alt=&#34;zabbix-agent-install-03&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Templates&lt;/code&gt;タブの以下の項目を入力します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Linked templates: Template OS Linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-04.png&#34; alt=&#34;zabbix-agent-install-04&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Save&lt;/code&gt;をクリックします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;監視対象ホストの追加確認&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;Hosts&lt;/code&gt;のリストに追加したホスト名が表示されていること、StatusがMonitoredになっていることを確認します。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-05.png&#34; alt=&#34;zabbix-agent-install-05&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以下は対象ホストをすべて登録した状態になります。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20170109_01/zabbix-agent-install-06.png&#34; alt=&#34;zabbix-agent-install-06&#34; width=&#34;320px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その9</title>
+      <link>http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/</link>
+      <pubDate>Sat, 07 Jan 2017 01:02:37 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。
+Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;ipv6の無効化:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;IPv6の無効化&lt;/h2&gt;
+
+&lt;p&gt;IPv6は使用しないため、IPv6を無効化します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.all.disable_ipv6 = 1
+$
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6 = 1
+$
+$ sudo sysctl -a | grep disable_ipv6
+sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot;
+net.ipv6.conf.all.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot;
+net.ipv6.conf.default.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot;
+net.ipv6.conf.eth0.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot;
+net.ipv6.conf.eth1.disable_ipv6 = 1
+sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot;
+net.ipv6.conf.lo.disable_ipv6 = 1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再起動後もIPv6が無効化するように設定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;selinuxの無効化:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;SELinuxの無効化&lt;/h2&gt;
+
+&lt;p&gt;Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。&lt;/p&gt;
+
+&lt;h2 id=&#34;iptablesの設定:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;iptablesの設定&lt;/h2&gt;
+
+&lt;p&gt;iptablesでfirewallを設定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+##INPUTチェーン
+#IPスプーフィング対策
+$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+
+#セッションハイジャック対策
+$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#不正なパケット拒否
+$ sudo iptables -A INPUT -m state --state INVALID -j DROP
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+#$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+##OUTPUTチェーン
+#ループバックへの通信は通す
+$ sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#ICMP応答のパケットは通す
+$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#外部からの通信を始めた場合のパケットを許可
+$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#tcp-resetの通信は通す
+$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
+
+#ユーザrootが発したパケットは許可
+$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
+
+#NTPは許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+#$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信も拒否。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT DROP
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;iptablesの設定を保存します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351&#34;&gt;iptablesで鉄壁？の守りを実現する3つのTips&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/iptables.html&#34;&gt;CentOS iptablesによるパケットフィルタ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kassyjp.ninja-web.net/ras/jessie/iptables.htm&#34;&gt;2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ログ出力先をsyslogに変更:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;ログ出力先をsyslogに変更&lt;/h2&gt;
+
+&lt;p&gt;twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更します。&lt;/p&gt;
+
+&lt;p&gt;ログ保管用のディレクトリ作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == &#39;cowrie&#39; then /var/log/cowrie/cowrie.log
+&amp;amp; ~
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rsyslogの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart rsyslog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieのログ出力先変更&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd cowrie
+$ cp -p start.sh{,.backup20170107}
+$ ls -l start.sh*
+-rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh.backup20170105
+-rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh.backup20170107
+-rwxr-xr-x 1 cowrie cowrie 920  1月  4 19:05 start.sh.org
+$
+$ vi start.sh
+$ diff start.sh.backup20170107 start.sh
+35c35
+&amp;lt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     twistd $XARGS $DAEMONIZE --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
+37c37
+&amp;lt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     authbind --deep twistd $DAEMONIZE $XARGS --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;logrotateの設定:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;logrotateの設定&lt;/h2&gt;
+
+&lt;p&gt;logrotateをインストールします(通常はインストール済みのはずです)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install logrotate
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+logrotate はすでに最新版です。
+アップグレード: 0 個、新規インストール: 0 個、削除: 0 個、保留: 0 個。
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrie用のlogrotate設定を作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &amp;gt; /dev/null
+        endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logrotateをテスト実行し、エラーがないことを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logrotate -d /etc/logrotate.d/cowrie
+reading config file /etc/logrotate.d/cowrie
+
+Handling 1 logs
+
+rotating pattern: /var/log/cowrie/cowrie.log
+ after 1 days (92 rotations)
+empty log files are rotated, old logs are removed
+considering log /var/log/cowrie/cowrie.log
+  log /var/log/cowrie/cowrie.log does not exist -- skipping
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://server-setting.info/centos/loglotation.html&#34;&gt;ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://open-groove.net/linux/logrotate-test/&#34;&gt;logrotate（ログローテート）の動作確認 | OpenGroove&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;logwatchのインストール:cb5f0701b8057bc3422a1cfa2b48de88&#34;&gt;logwatchのインストール&lt;/h2&gt;
+
+&lt;p&gt;logwatchをインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install logwatch
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
+  liblockfile-bin liblockfile1 libsys-cpu-perl
+提案パッケージ:
+  mail-reader eximon4 exim4-doc-html exim4-doc-info spf-tools-perl swaks
+  fortune-mod
+推奨パッケージ:
+  mailx
+以下のパッケージが新たにインストールされます:
+  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
+  liblockfile-bin liblockfile1 libsys-cpu-perl logwatch
+アップグレード: 0 個、新規インストール: 9 個、削除: 0 個、保留: 0 個。
+3,532 kB のアーカイブを取得する必要があります。
+この操作後に追加で 17.1 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile-bin armhf 1.09-6 [18.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile1 armhf 1.09-6 [14.7 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-config all 4.84.2-2+deb8u2 [503 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-base armhf 4.84.2-2+deb8u2 [1,046 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-daemon-light armhf 4.84.2-2+deb8u2 [578 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main bsd-mailx armhf 8.1.2-0.20141216cvs-2 [74.3 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdate-manip-perl all 6.47-1 [923 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsys-cpu-perl armhf 0.61-1+b1 [9,800 B]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main logwatch all 7.4.1-2 [365 kB]
+3,532 kB を 48秒 で取得しました (72.9 kB/s)                                    
+パッケージを事前設定しています ...
+以前に未選択のパッケージ liblockfile-bin を選択しています。
+(データベースを読み込んでいます ... 現在 36617 個のファイルとディレクトリがインストールされています。)
+.../liblockfile-bin_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile-bin (1.09-6) を展開しています...
+以前に未選択のパッケージ liblockfile1:armhf を選択しています。
+.../liblockfile1_1.09-6_armhf.deb を展開する準備をしています ...
+liblockfile1:armhf (1.09-6) を展開しています...
+以前に未選択のパッケージ exim4-config を選択しています。
+.../exim4-config_4.84.2-2+deb8u2_all.deb を展開する準備をしています ...
+exim4-config (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-base を選択しています。
+.../exim4-base_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-base (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ exim4-daemon-light を選択しています。
+.../exim4-daemon-light_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
+exim4-daemon-light (4.84.2-2+deb8u2) を展開しています...
+以前に未選択のパッケージ bsd-mailx を選択しています。
+.../bsd-mailx_8.1.2-0.20141216cvs-2_armhf.deb を展開する準備をしています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を展開しています...
+以前に未選択のパッケージ libdate-manip-perl を選択しています。
+.../libdate-manip-perl_6.47-1_all.deb を展開する準備をしています ...
+libdate-manip-perl (6.47-1) を展開しています...
+以前に未選択のパッケージ libsys-cpu-perl を選択しています。
+.../libsys-cpu-perl_0.61-1+b1_armhf.deb を展開する準備をしています ...
+libsys-cpu-perl (0.61-1+b1) を展開しています...
+以前に未選択のパッケージ logwatch を選択しています。
+.../logwatch_7.4.1-2_all.deb を展開する準備をしています ...
+logwatch (7.4.1-2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblockfile-bin (1.09-6) を設定しています ...
+liblockfile1:armhf (1.09-6) を設定しています ...
+exim4-config (4.84.2-2+deb8u2) を設定しています ...
+Adding system-user for exim (v4)
+exim4-base (4.84.2-2+deb8u2) を設定しています ...
+exim: DB upgrade, deleting hints-db
+exim4-daemon-light (4.84.2-2+deb8u2) を設定しています ...
+bsd-mailx (8.1.2-0.20141216cvs-2) を設定しています ...
+update-alternatives: /usr/bin/mailx (mailx) を提供するために自動モードで /usr/bin/bsd-mailx を使います
+libdate-manip-perl (6.47-1) を設定しています ...
+libsys-cpu-perl (0.61-1+b1) を設定しています ...
+logwatch (7.4.1-2) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;logwatchの実行結果を確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo logwatch --output stdout
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その8</title>
+      <link>http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/</link>
+      <pubDate>Thu, 05 Jan 2017 03:34:58 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前回に引き続き&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;kippo-graphによるsshハニーポット-cowrie-の可視化:05481c997d19830c663ad9e91abca85e&#34;&gt;Kippo-GraphによるSSHハニーポット(Cowrie)の可視化&lt;/h2&gt;
+
+&lt;h3 id=&#34;mysqlのインストールと初期化:05481c997d19830c663ad9e91abca85e&#34;&gt;MySQLのインストールと初期化&lt;/h3&gt;
+
+&lt;p&gt;MySQLをインストールします。
+インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install mysql-server
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18
+  libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server-5.5
+  mysql-server-core-5.5
+提案パッケージ:
+  libclone-perl libmldbm-perl libnet-daemon-perl libsql-statement-perl
+  libipc-sharedcache-perl mailx tinyca
+以下のパッケージが新たにインストールされます:
+  libaio1 libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18
+  libterm-readkey-perl mysql-client-5.5 mysql-common mysql-server
+  mysql-server-5.5 mysql-server-core-5.5
+アップグレード: 0 個、新規インストール: 11 個、削除: 0 個、保留: 0 個。
+8,275 kB のアーカイブを取得する必要があります。
+この操作後に追加で 89.3 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-common all 5.5.53-0+deb8u1 [75.5 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient18 armhf 5.5.53-0+deb8u1 [617 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi-perl armhf 1.631-3+b1 [807 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbd-mysql-perl armhf 4.028-2+deb8u2 [113 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libterm-readkey-perl armhf 2.32-1+b2 [26.1 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-client-5.5 armhf 5.5.53-0+deb8u1 [1,447 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-core-5.5 armhf 5.5.53-0+deb8u1 [3,448 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server-5.5 armhf 5.5.53-0+deb8u1 [1,591 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhtml-template-perl all 2.95-1 [66.8 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main mysql-server all 5.5.53-0+deb8u1 [73.8 kB]
+8,275 kB を 22秒 で取得しました (376 kB/s)                                     
+パッケージを事前設定しています ...
+
+↓rootアカウントのパスワードを設定します。
+ ┌───────────────────┤ mysql-server-5.5 を設定しています ├───────────────────┐
+ │ 強制ではありませんが、MySQL を管理する &amp;quot;root&amp;quot; ユーザのパスワードを設定す  │ 
+ │ ることを強くお勧めします。                                                │ 
+ │                                                                           │ 
+ │ この値を空のままにしておいた場合は、パスワードは変更されません。          │ 
+ │                                                                           │ 
+ │ MySQL の &amp;quot;root&amp;quot; ユーザに対する新しいパスワード:                           │ 
+ │                                                                           │ 
+ │ _________________________________________________________________________ │ 
+ │                                                                           │ 
+ │                                  &amp;lt;了解&amp;gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+
+↓再度rootアカウントのパスワードを入力します。
+ ┌──────┤ mysql-server-5.5 を設定しています ├───────┐
+ │                                                  │ 
+ │                                                  │ 
+ │ MySQL の &amp;quot;root&amp;quot; ユーザに対する新しいパスワード:  │ 
+ │                                                  │ 
+ │ ****____________________________________________ │ 
+ │                                                  │ 
+ │                      &amp;lt;了解&amp;gt;                      │ 
+ │                                                  │ 
+ └──────────────────────────────────────────────────┘ 
+
+以前に未選択のパッケージ libaio1:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 35107 個のファイルとディレクトリがインストールされています。)
+.../libaio1_0.3.110-1_armhf.deb を展開する準備をしています ...
+libaio1:armhf (0.3.110-1) を展開しています...
+以前に未選択のパッケージ mysql-common を選択しています。
+.../mysql-common_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-common (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libmysqlclient18:armhf を選択しています。
+.../libmysqlclient18_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libdbi-perl を選択しています。
+.../libdbi-perl_1.631-3+b1_armhf.deb を展開する準備をしています ...
+libdbi-perl (1.631-3+b1) を展開しています...
+以前に未選択のパッケージ libdbd-mysql-perl を選択しています。
+.../libdbd-mysql-perl_4.028-2+deb8u2_armhf.deb を展開する準備をしています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を展開しています...
+以前に未選択のパッケージ libterm-readkey-perl を選択しています。
+.../libterm-readkey-perl_2.32-1+b2_armhf.deb を展開する準備をしています ...
+libterm-readkey-perl (2.32-1+b2) を展開しています...
+以前に未選択のパッケージ mysql-client-5.5 を選択しています。
+.../mysql-client-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ mysql-server-core-5.5 を選択しています。
+.../mysql-server-core-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+mysql-common (5.5.53-0+deb8u1) を設定しています ...
+以前に未選択のパッケージ mysql-server-5.5 を選択しています。
+(データベースを読み込んでいます ... 現在 35472 個のファイルとディレクトリがインストールされています。)
+.../mysql-server-5.5_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libhtml-template-perl を選択しています。
+.../libhtml-template-perl_2.95-1_all.deb を展開する準備をしています ...
+libhtml-template-perl (2.95-1) を展開しています...
+以前に未選択のパッケージ mysql-server を選択しています。
+.../mysql-server_5.5.53-0+deb8u1_all.deb を展開する準備をしています ...
+mysql-server (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libaio1:armhf (0.3.110-1) を設定しています ...
+libmysqlclient18:armhf (5.5.53-0+deb8u1) を設定しています ...
+libdbi-perl (1.631-3+b1) を設定しています ...
+libdbd-mysql-perl (4.028-2+deb8u2) を設定しています ...
+libterm-readkey-perl (2.32-1+b2) を設定しています ...
+mysql-client-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-core-5.5 (5.5.53-0+deb8u1) を設定しています ...
+mysql-server-5.5 (5.5.53-0+deb8u1) を設定しています ...
+170105  3:45:31 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+170105  3:45:31 [Note] Ignoring --secure-file-priv value as server is running with --bootstrap.
+170105  3:45:31 [Note] /usr/sbin/mysqld (mysqld 5.5.53-0+deb8u1) starting as process 6055 ...
+libhtml-template-perl (2.95-1) を設定しています ...
+mysql-server (5.5.53-0+deb8u1) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQLのセキュア設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql_secure_installation 
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we&#39;ll need the current
+password for the root user.  If you&#39;ve just installed MySQL, and
+you haven&#39;t set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer &#39;n&#39;.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from &#39;localhost&#39;.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named &#39;test&#39; that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can&#39;t drop database &#39;test&#39;; database doesn&#39;t exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you&#39;ve completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+
+
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MySQLの初期設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/mysql/my.cnf{,.org}
+$ ls -l /etc/mysql/my.cnf*
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf
+-rw-r--r-- 1 root root 3533 10月 17 17:49 /etc/mysql/my.cnf.org
+$
+$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+# Add the following line to last of mysqld section
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+# Add the following line to last of mysqldump section
+default-character-set=utf8
+
+[mysql]
+# Add the following line to last of mysql section
+default-character-set=utf8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html&#34;&gt;MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;MySQLの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart mysql
+$ sudo systemctl enable mysql
+Synchronizing state for mysql.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d mysql defaults
+Executing /usr/sbin/update-rc.d mysql enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieのログ出力先を変更:05481c997d19830c663ad9e91abca85e&#34;&gt;Cowrieのログ出力先を変更&lt;/h3&gt;
+
+&lt;p&gt;Cowrie用データベースの作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mysql -uroot -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 37
+Server version: 5.5.53-0+deb8u1 (Raspbian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+
+mysql&amp;gt; create database cowrie character set utf8 collate utf8_bin;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&amp;gt; grant all privileges on cowrie.* to cowrie@localhost identified by &#39;cowrie_password&#39;;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&amp;gt; quit
+Bye
+$
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
+Enter password:
+$
+$ mysql -ucowrie -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 39
+Server version: 5.5.53-0+deb8u1 (Raspbian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+
+mysql&amp;gt; use cowrie
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql&amp;gt; show tables;
++------------------+
+| Tables_in_cowrie |
++------------------+
+| auth             |
+| clients          |
+| downloads        |
+| input            |
+| keyfingerprints  |
+| sensors          |
+| sessions         |
+| ttylog           |
++------------------+
+8 rows in set (0.00 sec)
+
+mysql&amp;gt; 
+mysql&amp;gt; quit
+Bye
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力する事前準備&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libmysqlclient-dev
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下のパッケージが新たにインストールされます:
+  libmysqlclient-dev
+アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 0 個。
+889 kB のアーカイブを取得する必要があります。
+この操作後に追加で 4,866 kB のディスク容量が消費されます。
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmysqlclient-dev armhf 5.5.53-0+deb8u1 [889 kB]
+889 kB を 2秒 で取得しました (306 kB/s)     
+以前に未選択のパッケージ libmysqlclient-dev を選択しています。
+(データベースを読み込んでいます ... 現在 38240 個のファイルとディレクトリがインストールされています。)
+.../libmysqlclient-dev_5.5.53-0+deb8u1_armhf.deb を展開する準備をしています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+libmysqlclient-dev (5.5.53-0+deb8u1) を設定しています ...
+$
+$ sudo su - cowrie
+$ cd cowrie/
+$ source cowrie-env/bin/activate
+$ pip install mysql-python
+Downloading/unpacking mysql-python
+  Downloading MySQL-python-1.2.5.zip (108kB): 108kB downloaded
+  Running setup.py (path:/tmp/pip-build-prjaIE/mysql-python/setup.py) egg_info for package mysql-python
+Installing collected packages: mysql-python
+  Running setup.py install for mysql-python
+    building &#39;_mysql&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Dversion_info=(1,2,5,&#39;final&#39;,1) -D__version__=1.2.5 -I/usr/include/mysql -I/usr/include/python2.7 -c _mysql.c -o build/temp.linux-armv7l-2.7/_mysql.o -DBIG_JOINS=1 -fno-strict-aliasing -g -DNDEBUG
+    In file included from _mysql.c:44:0:
+    /usr/include/mysql/my_config.h:423:0: warning: &amp;quot;HAVE_WCSCOLL&amp;quot; redefined
+     #define HAVE_WCSCOLL
+     ^
+    In file included from /usr/include/python2.7/pyconfig.h:13:0,
+                     from /usr/include/python2.7/Python.h:8,
+                     from _mysql.c:29:
+    /usr/include/arm-linux-gnueabihf/python2.7/pyconfig.h:911:0: note: this is the location of the previous definition
+     #define HAVE_WCSCOLL 1
+     ^
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/_mysql.o -L/usr/lib/arm-linux-gnueabihf -lmysqlclient_r -lpthread -lz -lm -ldl -o build/lib.linux-armv7l-2.7/_mysql.so
+  Could not find .egg-info directory in install record for mysql-python
+Successfully installed mysql-python
+Cleaning up...
+$
+$ deactivate
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;CowrieのログをMySQLのデータベースに出力&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd cowrie/
+$ cp -p cowrie.cfg{,.backup20170105}
+$ ls -l cowrie.cfg*
+-rw-r--r-- 1 cowrie cowrie 11597  1月  4 20:16 cowrie.cfg
+-rw-r--r-- 1 cowrie cowrie 11597  1月  4 20:16 cowrie.cfg.backup20170105
+-rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg.dist
+$
+$ vi cowrie.cfg
+# Comment out the following line
+#[output_jsonlog]
+#logfile = log/cowrie.json
+
+# Remove &#39;#&#39;
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
+debug = false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo supervisorctl restart cowrie
+cowrie: stopped
+cowrie: started
+$
+$ sudo supervisorctl status cowrie
+cowrie                           RUNNING    pid 7848, uptime 0:00:02
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;apache2のインストール:05481c997d19830c663ad9e91abca85e&#34;&gt;Apache2のインストール&lt;/h3&gt;
+
+&lt;p&gt;Apache2をインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install apache2
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap liblua5.1-0 ssl-cert
+提案パッケージ:
+  www-browser apache2-doc apache2-suexec-pristine apache2-suexec-custom
+  openssl-blacklist
+以下のパッケージが新たにインストールされます:
+  apache2 apache2-bin apache2-data apache2-utils libapr1 libaprutil1
+  libaprutil1-dbd-sqlite3 libaprutil1-ldap liblua5.1-0 ssl-cert
+アップグレード: 0 個、新規インストール: 10 個、削除: 0 個、保留: 0 個。
+1,750 kB のアーカイブを取得する必要があります。
+この操作後に追加で 5,241 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapr1 armhf 1.5.1-3 [77.1 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1 armhf 1.5.4-1 [75.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-dbd-sqlite3 armhf 1.5.4-1 [17.7 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaprutil1-ldap armhf 1.5.4-1 [16.7 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblua5.1-0 armhf 5.1.5-7.1 [83.7 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-bin armhf 2.4.10-10+deb8u7 [893 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-utils armhf 2.4.10-10+deb8u7 [194 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2-data all 2.4.10-10+deb8u7 [163 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main apache2 armhf 2.4.10-10+deb8u7 [207 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main ssl-cert all 1.0.35 [20.9 kB]
+1,750 kB を 6秒 で取得しました (256 kB/s)                                      
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libapr1:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 35575 個のファイルとディレクトリがインストールされています。)
+.../libapr1_1.5.1-3_armhf.deb を展開する準備をしています ...
+libapr1:armhf (1.5.1-3) を展開しています...
+以前に未選択のパッケージ libaprutil1:armhf を選択しています。
+.../libaprutil1_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-dbd-sqlite3:armhf を選択しています。
+.../libaprutil1-dbd-sqlite3_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ libaprutil1-ldap:armhf を選択しています。
+.../libaprutil1-ldap_1.5.4-1_armhf.deb を展開する準備をしています ...
+libaprutil1-ldap:armhf (1.5.4-1) を展開しています...
+以前に未選択のパッケージ liblua5.1-0:armhf を選択しています。
+.../liblua5.1-0_5.1.5-7.1_armhf.deb を展開する準備をしています ...
+liblua5.1-0:armhf (5.1.5-7.1) を展開しています...
+以前に未選択のパッケージ apache2-bin を選択しています。
+.../apache2-bin_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-bin (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-utils を選択しています。
+.../apache2-utils_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2-utils (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2-data を選択しています。
+.../apache2-data_2.4.10-10+deb8u7_all.deb を展開する準備をしています ...
+apache2-data (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ apache2 を選択しています。
+.../apache2_2.4.10-10+deb8u7_armhf.deb を展開する準備をしています ...
+apache2 (2.4.10-10+deb8u7) を展開しています...
+以前に未選択のパッケージ ssl-cert を選択しています。
+.../ssl-cert_1.0.35_all.deb を展開する準備をしています ...
+ssl-cert (1.0.35) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libapr1:armhf (1.5.1-3) を設定しています ...
+libaprutil1:armhf (1.5.4-1) を設定しています ...
+libaprutil1-dbd-sqlite3:armhf (1.5.4-1) を設定しています ...
+libaprutil1-ldap:armhf (1.5.4-1) を設定しています ...
+liblua5.1-0:armhf (5.1.5-7.1) を設定しています ...
+apache2-bin (2.4.10-10+deb8u7) を設定しています ...
+apache2-utils (2.4.10-10+deb8u7) を設定しています ...
+apache2-data (2.4.10-10+deb8u7) を設定しています ...
+apache2 (2.4.10-10+deb8u7) を設定しています ...
+Enabling module mpm_event.
+Enabling module authz_core.
+Enabling module authz_host.
+Enabling module authn_core.
+Enabling module auth_basic.
+Enabling module access_compat.
+Enabling module authn_file.
+Enabling module authz_user.
+Enabling module alias.
+Enabling module dir.
+Enabling module autoindex.
+Enabling module env.
+Enabling module mime.
+Enabling module negotiation.
+Enabling module setenvif.
+Enabling module filter.
+Enabling module deflate.
+Enabling module status.
+Enabling conf charset.
+Enabling conf localized-error-pages.
+Enabling conf other-vhosts-access-log.
+Enabling conf security.
+Enabling conf serve-cgi-bin.
+Enabling site 000-default.
+ssl-cert (1.0.35) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のセキュリティ設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/apache2/conf-available/security.conf{,.org}
+$ ls -l /etc/apache2/conf-available/security.conf*
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf
+-rw-r--r-- 1 root root 2190  8月  7 19:56 /etc/apache2/conf-available/security.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の文字コード設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/apache2/conf-available/charset.conf{,.org}
+$ ls -l /etc/apache2/conf-available/charset.conf*
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf
+-rw-r--r-- 1 root root 315  7月  6  2016 /etc/apache2/conf-available/charset.conf.org
+$
+$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2のServerName設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo ServerName ${HOSTNAME} &amp;gt; /etc/apache2/conf-available/fqdn.conf&amp;quot;
+$ sudo a2enconf fqdn
+Enabling conf fqdn.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Apache2の再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$ sudo systemctl enable apache2
+Synchronizing state for apache2.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d apache2 defaults
+Executing /usr/sbin/update-rc.d apache2 enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;kippo-graphのインストール:05481c997d19830c663ad9e91abca85e&#34;&gt;Kippo-Graphのインストール&lt;/h3&gt;
+
+&lt;p&gt;Kippo-GraphのWebサイト(&lt;code&gt;https://bruteforce.gr/kippo-graph&lt;/code&gt;)を参考にKippo-Graphをインストールする。&lt;/p&gt;
+
+&lt;p&gt;関連パッケージのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  fontconfig-config fonts-dejavu-core libfontconfig1 libgd3 libjbig0 libonig2
+  libperl4-corelibs-perl libqdbm14 libtiff5 libvpx1 libxpm4 lsof php5-cli
+  php5-common php5-json php5-readline
+提案パッケージ:
+  php-pear libgd-tools php5-user-cache
+以下のパッケージが新たにインストールされます:
+  fontconfig-config fonts-dejavu-core libapache2-mod-php5 libfontconfig1
+  libgd3 libjbig0 libonig2 libperl4-corelibs-perl libqdbm14 libtiff5 libvpx1
+  libxpm4 lsof php5-cli php5-common php5-curl php5-gd php5-json php5-mysql
+  php5-readline
+アップグレード: 0 個、新規インストール: 20 個、削除: 0 個、保留: 0 個。
+7,989 kB のアーカイブを取得する必要があります。
+この操作後に追加で 26.1 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main fonts-dejavu-core all 2.34-1 [1,047 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main fontconfig-config all 2.11.0-6.3+deb8u1 [274 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfontconfig1 armhf 2.11.0-6.3+deb8u1 [312 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjbig0 armhf 2.1-3.1 [27.5 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtiff5 armhf 4.0.3-12.3+deb8u1 [194 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libvpx1 armhf 1.3.0-3+rvt [783 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxpm4 armhf 1:3.5.11-1 [41.7 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgd3 armhf 2.1.0-5+deb8u8 [127 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libonig2 armhf 5.9.5-3.2 [101 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl4-corelibs-perl all 0.003-1 [43.6 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main lsof armhf 4.86+dfsg-1 [321 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main libqdbm14 armhf 1.8.78-5+b1 [86.0 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-common armhf 5.6.29+dfsg-0+deb8u1 [720 kB]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-json armhf 1.3.6-1 [16.9 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-cli armhf 5.6.29+dfsg-0+deb8u1 [1,904 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main libapache2-mod-php5 armhf 5.6.29+dfsg-0+deb8u1 [1,879 kB]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-curl armhf 5.6.29+dfsg-0+deb8u1 [24.5 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-gd armhf 5.6.29+dfsg-0+deb8u1 [23.2 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-mysql armhf 5.6.29+dfsg-0+deb8u1 [52.2 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-readline armhf 5.6.29+dfsg-0+deb8u1 [11.2 kB]
+7,989 kB を 19秒 で取得しました (403 kB/s)                                     
+パッケージを事前設定しています ...
+以前に未選択のパッケージ fonts-dejavu-core を選択しています。
+(データベースを読み込んでいます ... 現在 36265 個のファイルとディレクトリがインストールされています。)
+.../fonts-dejavu-core_2.34-1_all.deb を展開する準備をしています ...
+fonts-dejavu-core (2.34-1) を展開しています...
+以前に未選択のパッケージ fontconfig-config を選択しています。
+.../fontconfig-config_2.11.0-6.3+deb8u1_all.deb を展開する準備をしています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libfontconfig1:armhf を選択しています。
+.../libfontconfig1_2.11.0-6.3+deb8u1_armhf.deb を展開する準備をしています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libjbig0:armhf を選択しています。
+.../libjbig0_2.1-3.1_armhf.deb を展開する準備をしています ...
+libjbig0:armhf (2.1-3.1) を展開しています...
+以前に未選択のパッケージ libtiff5:armhf を選択しています。
+.../libtiff5_4.0.3-12.3+deb8u1_armhf.deb を展開する準備をしています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libvpx1:armhf を選択しています。
+.../libvpx1_1.3.0-3+rvt_armhf.deb を展開する準備をしています ...
+libvpx1:armhf (1.3.0-3+rvt) を展開しています...
+以前に未選択のパッケージ libxpm4:armhf を選択しています。
+.../libxpm4_1%3a3.5.11-1_armhf.deb を展開する準備をしています ...
+libxpm4:armhf (1:3.5.11-1) を展開しています...
+以前に未選択のパッケージ libgd3:armhf を選択しています。
+.../libgd3_2.1.0-5+deb8u8_armhf.deb を展開する準備をしています ...
+libgd3:armhf (2.1.0-5+deb8u8) を展開しています...
+以前に未選択のパッケージ libonig2:armhf を選択しています。
+.../libonig2_5.9.5-3.2_armhf.deb を展開する準備をしています ...
+libonig2:armhf (5.9.5-3.2) を展開しています...
+以前に未選択のパッケージ libperl4-corelibs-perl を選択しています。
+.../libperl4-corelibs-perl_0.003-1_all.deb を展開する準備をしています ...
+libperl4-corelibs-perl (0.003-1) を展開しています...
+以前に未選択のパッケージ lsof を選択しています。
+.../lsof_4.86+dfsg-1_armhf.deb を展開する準備をしています ...
+lsof (4.86+dfsg-1) を展開しています...
+以前に未選択のパッケージ libqdbm14 を選択しています。
+.../libqdbm14_1.8.78-5+b1_armhf.deb を展開する準備をしています ...
+libqdbm14 (1.8.78-5+b1) を展開しています...
+以前に未選択のパッケージ php5-common を選択しています。
+.../php5-common_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-json を選択しています。
+.../php5-json_1.3.6-1_armhf.deb を展開する準備をしています ...
+php5-json (1.3.6-1) を展開しています...
+以前に未選択のパッケージ php5-cli を選択しています。
+.../php5-cli_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-cli (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ libapache2-mod-php5 を選択しています。
+.../libapache2-mod-php5_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-curl を選択しています。
+.../php5-curl_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-curl (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-gd を選択しています。
+.../php5-gd_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-gd (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-mysql を選択しています。
+.../php5-mysql_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-mysql (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ php5-readline を選択しています。
+.../php5-readline_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-readline (5.6.29+dfsg-0+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+fonts-dejavu-core (2.34-1) を設定しています ...
+fontconfig-config (2.11.0-6.3+deb8u1) を設定しています ...
+libfontconfig1:armhf (2.11.0-6.3+deb8u1) を設定しています ...
+libjbig0:armhf (2.1-3.1) を設定しています ...
+libtiff5:armhf (4.0.3-12.3+deb8u1) を設定しています ...
+libvpx1:armhf (1.3.0-3+rvt) を設定しています ...
+libxpm4:armhf (1:3.5.11-1) を設定しています ...
+libgd3:armhf (2.1.0-5+deb8u8) を設定しています ...
+libonig2:armhf (5.9.5-3.2) を設定しています ...
+libperl4-corelibs-perl (0.003-1) を設定しています ...
+lsof (4.86+dfsg-1) を設定しています ...
+libqdbm14 (1.8.78-5+b1) を設定しています ...
+php5-common (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/pdo.ini with new version
+php5_invoke: Enable module pdo for apache2 SAPI
+php5_invoke: Enable module pdo for cli SAPI
+
+Creating config file /etc/php5/mods-available/opcache.ini with new version
+php5_invoke: Enable module opcache for apache2 SAPI
+php5_invoke: Enable module opcache for cli SAPI
+php5-json (1.3.6-1) を設定しています ...
+php5_invoke: Enable module json for apache2 SAPI
+php5_invoke: Enable module json for cli SAPI
+php5-cli (5.6.29+dfsg-0+deb8u1) を設定しています ...
+update-alternatives: /usr/bin/php (php) を提供するために自動モードで /usr/bin/php5 を使います
+update-alternatives: /usr/bin/phar (phar) を提供するために自動モードで /usr/bin/phar5 を使います
+
+Creating config file /etc/php5/cli/php.ini with new version
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/apache2/php.ini with new version
+Module mpm_event disabled.
+Enabling module mpm_prefork.
+apache2_switch_mpm Switch to prefork
+apache2_invoke: Enable module php5
+php5-curl (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/curl.ini with new version
+php5_invoke: Enable module curl for apache2 SAPI
+php5_invoke: Enable module curl for cli SAPI
+php5-gd (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/gd.ini with new version
+php5_invoke: Enable module gd for apache2 SAPI
+php5_invoke: Enable module gd for cli SAPI
+php5-mysql (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/mysql.ini with new version
+php5_invoke: Enable module mysql for apache2 SAPI
+php5_invoke: Enable module mysql for cli SAPI
+
+Creating config file /etc/php5/mods-available/mysqli.ini with new version
+php5_invoke: Enable module mysqli for apache2 SAPI
+php5_invoke: Enable module mysqli for cli SAPI
+
+Creating config file /etc/php5/mods-available/pdo_mysql.ini with new version
+php5_invoke: Enable module pdo_mysql for apache2 SAPI
+php5_invoke: Enable module pdo_mysql for cli SAPI
+php5-readline (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/readline.ini with new version
+php5_invoke: Enable module readline for apache2 SAPI
+php5_invoke: Enable module readline for cli SAPI
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+$
+$ sudo -E apt-get install dnsutils
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+提案パッケージ:
+  rblcheck
+以下のパッケージが新たにインストールされます:
+  dnsutils
+アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 0 個。
+113 kB のアーカイブを取得する必要があります。
+この操作後に追加で 325 kB のディスク容量が消費されます。
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB]
+113 kB を 2秒 で取得しました (46.6 kB/s)
+以前に未選択のパッケージ dnsutils を選択しています。
+(データベースを読み込んでいます ... 現在 36608 個のファイルとディレクトリがインストールされています。)
+.../dnsutils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+dnsutils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
+$
+$ sudo systemctl restart apache2
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Kippo-Graphのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+--2017-01-05 04:54:31--  http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+192.168.20.10:3128 に接続しています... 接続しました。
+Proxy による接続要求を送信しました、応答を待っています... 200 OK
+長さ: 17800301 (17M) [application/x-gzip]
+`kippo-graph-1.5.1.tar.gz&#39; に保存中
+
+kippo-graph-1.5.1.t 100%[=====================&amp;gt;]  16.98M   147KB/s 時間 1m 57s 
+
+2017-01-05 04:56:28 (149 KB/s) - `kippo-graph-1.5.1.tar.gz&#39; へ保存完了 [17800301/17800301]
+
+$
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+kippo-graph-1.5.1/
+kippo-graph-1.5.1/.gitignore
+kippo-graph-1.5.1/.htaccess
+kippo-graph-1.5.1/LICENSE.txt
+kippo-graph-1.5.1/README.md
+kippo-graph-1.5.1/TODO.txt
+kippo-graph-1.5.1/class/
+kippo-graph-1.5.1/class/KippoGeo.class.php
+kippo-graph-1.5.1/class/KippoGraph.class.php
+kippo-graph-1.5.1/class/KippoIP.class.php
+kippo-graph-1.5.1/class/KippoInput.class.php
+kippo-graph-1.5.1/class/KippoPlayLog.class.php
+kippo-graph-1.5.1/config.php.dist
+kippo-graph-1.5.1/favicon.ico
+kippo-graph-1.5.1/gallery.php
+kippo-graph-1.5.1/generated-graphs/
+kippo-graph-1.5.1/generated-graphs/index.php
+kippo-graph-1.5.1/gpl.txt
+kippo-graph-1.5.1/images/
+kippo-graph-1.5.1/images/alienvault.ico
+kippo-graph-1.5.1/images/bg.gif
+kippo-graph-1.5.1/images/dshield.ico
+kippo-graph-1.5.1/images/first.png
+kippo-graph-1.5.1/images/fortiguard.ico
+kippo-graph-1.5.1/images/index.php
+kippo-graph-1.5.1/images/ip_tracer.png
+kippo-graph-1.5.1/images/ipvoid.ico
+kippo-graph-1.5.1/images/kippo-graph-img.png
+kippo-graph-1.5.1/images/last.png
+kippo-graph-1.5.1/images/mcafee.ico
+kippo-graph-1.5.1/images/next.png
+kippo-graph-1.5.1/images/novirusthanks.ico
+kippo-graph-1.5.1/images/play.ico
+kippo-graph-1.5.1/images/prev.png
+kippo-graph-1.5.1/images/robtex.ico
+kippo-graph-1.5.1/images/virustotal.ico
+kippo-graph-1.5.1/images/warning.png
+kippo-graph-1.5.1/images/watchguard.ico
+kippo-graph-1.5.1/include/
+kippo-graph-1.5.1/include/export.php
+kippo-graph-1.5.1/include/geoplugin/
+kippo-graph-1.5.1/include/geoplugin/geoplugin.class.php
+kippo-graph-1.5.1/include/index.php
+kippo-graph-1.5.1/include/kippo-ip.ajax.php
+kippo-graph-1.5.1/include/languages/
+kippo-graph-1.5.1/include/languages/lang.ar.php
+kippo-graph-1.5.1/include/languages/lang.cs.php
+kippo-graph-1.5.1/include/languages/lang.de.php
+kippo-graph-1.5.1/include/languages/lang.el.php
+kippo-graph-1.5.1/include/languages/lang.en.php
+kippo-graph-1.5.1/include/languages/lang.es.php
+kippo-graph-1.5.1/include/languages/lang.et.php
+kippo-graph-1.5.1/include/languages/lang.fr.php
+kippo-graph-1.5.1/include/languages/lang.it.php
+kippo-graph-1.5.1/include/languages/lang.nl.php
+kippo-graph-1.5.1/include/languages/lang.pl.php
+kippo-graph-1.5.1/include/languages/lang.sk.php
+kippo-graph-1.5.1/include/languages/lang.sv.php
+kippo-graph-1.5.1/include/libchart/
+kippo-graph-1.5.1/include/libchart/COPYING
+kippo-graph-1.5.1/include/libchart/ChangeLog
+kippo-graph-1.5.1/include/libchart/README
+kippo-graph-1.5.1/include/libchart/classes/
+kippo-graph-1.5.1/include/libchart/classes/libchart.php
+kippo-graph-1.5.1/include/libchart/classes/model/
+kippo-graph-1.5.1/include/libchart/classes/model/ChartConfig.php
+kippo-graph-1.5.1/include/libchart/classes/model/DataSet.php
+kippo-graph-1.5.1/include/libchart/classes/model/Point.php
+kippo-graph-1.5.1/include/libchart/classes/model/XYDataSet.php
+kippo-graph-1.5.1/include/libchart/classes/model/XYSeriesDataSet.php
+kippo-graph-1.5.1/include/libchart/classes/view/
+kippo-graph-1.5.1/include/libchart/classes/view/axis/
+kippo-graph-1.5.1/include/libchart/classes/view/axis/Axis.php
+kippo-graph-1.5.1/include/libchart/classes/view/axis/Bound.php
+kippo-graph-1.5.1/include/libchart/classes/view/caption/
+kippo-graph-1.5.1/include/libchart/classes/view/caption/Caption.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/
+kippo-graph-1.5.1/include/libchart/classes/view/chart/BarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/Chart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/HorizontalBarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/LineChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/PieChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/chart/VerticalBarChart.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/
+kippo-graph-1.5.1/include/libchart/classes/view/color/Color.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/ColorSet.php
+kippo-graph-1.5.1/include/libchart/classes/view/color/Palette.php
+kippo-graph-1.5.1/include/libchart/classes/view/plot/
+kippo-graph-1.5.1/include/libchart/classes/view/plot/Plot.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Padding.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Primitive.php
+kippo-graph-1.5.1/include/libchart/classes/view/primitive/Rectangle.php
+kippo-graph-1.5.1/include/libchart/classes/view/text/
+kippo-graph-1.5.1/include/libchart/classes/view/text/Text.php
+kippo-graph-1.5.1/include/libchart/doc/
+kippo-graph-1.5.1/include/libchart/doc/DEJAVU_LICENSE
+kippo-graph-1.5.1/include/libchart/doc/GNU_GPL_V3
+kippo-graph-1.5.1/include/libchart/fonts/
+kippo-graph-1.5.1/include/libchart/fonts/DejaVuSansCondensed-Bold.ttf
+kippo-graph-1.5.1/include/libchart/fonts/DejaVuSansCondensed.ttf
+kippo-graph-1.5.1/include/libchart/fonts/OpenSans-Bold.ttf
+kippo-graph-1.5.1/include/libchart/fonts/OpenSans-Regular.ttf
+kippo-graph-1.5.1/include/libchart/images/
+kippo-graph-1.5.1/include/libchart/images/PoweredBy.png
+kippo-graph-1.5.1/include/maxmind/
+kippo-graph-1.5.1/include/maxmind/GeoLite2-City.mmdb
+kippo-graph-1.5.1/include/maxmind/geoip2.phar
+kippo-graph-1.5.1/include/misc/
+kippo-graph-1.5.1/include/misc/ip2host.php
+kippo-graph-1.5.1/include/misc/versionCheck.php
+kippo-graph-1.5.1/include/misc/xss_clean.php
+kippo-graph-1.5.1/include/play.php
+kippo-graph-1.5.1/include/qgooglevisualapi/
+kippo-graph-1.5.1/include/qgooglevisualapi/QAnnotatedtimelineGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QApikeyGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QAreachartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QBarchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QColumnchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QConfig.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QGaugeGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QInflector.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QIntensitymapGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QLinechartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMagictableGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMapGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMixupGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QMotionchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QOrgchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QPiechartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QScatterchartGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QTableGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QTool.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QVizualisationGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/QWordcloudGoogleGraph.class.php
+kippo-graph-1.5.1/include/qgooglevisualapi/config.inc.php
+kippo-graph-1.5.1/include/qgooglevisualapi/readme.txt
+kippo-graph-1.5.1/include/rb.php
+kippo-graph-1.5.1/include/sql.php
+kippo-graph-1.5.1/include/tor/
+kippo-graph-1.5.1/include/tor/tor.class.php
+kippo-graph-1.5.1/include/tor/tor_exit_node_list.txt
+kippo-graph-1.5.1/index.php
+kippo-graph-1.5.1/kippo-geo.php
+kippo-graph-1.5.1/kippo-graph.php
+kippo-graph-1.5.1/kippo-input.php
+kippo-graph-1.5.1/kippo-ip.php
+kippo-graph-1.5.1/kippo-playlog.php
+kippo-graph-1.5.1/kippo-scanner.php
+kippo-graph-1.5.1/robots.txt
+kippo-graph-1.5.1/scripts/
+kippo-graph-1.5.1/scripts/BinFileReader.js
+kippo-graph-1.5.1/scripts/fancybox/
+kippo-graph-1.5.1/scripts/fancybox/blank.gif
+kippo-graph-1.5.1/scripts/fancybox/fancy_close.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_loading.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_nav_left.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_nav_right.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_e.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_n.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_ne.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_nw.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_s.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_se.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_sw.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_shadow_w.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_left.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_main.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_over.png
+kippo-graph-1.5.1/scripts/fancybox/fancy_title_right.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox-x.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox-y.png
+kippo-graph-1.5.1/scripts/fancybox/fancybox.png
+kippo-graph-1.5.1/scripts/fancybox/index.php
+kippo-graph-1.5.1/scripts/fancybox/jquery.easing-1.3.pack.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.css
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.pack.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.fancybox-1.3.2.setup.js
+kippo-graph-1.5.1/scripts/fancybox/jquery.mousewheel-3.0.4.pack.js
+kippo-graph-1.5.1/scripts/hoverIntent.js
+kippo-graph-1.5.1/scripts/index.php
+kippo-graph-1.5.1/scripts/jquery-1.4.1.min.js
+kippo-graph-1.5.1/scripts/jquery-1.4.4.min.js
+kippo-graph-1.5.1/scripts/jquery.getUrlParam.js
+kippo-graph-1.5.1/scripts/jquery.tablesorter.js
+kippo-graph-1.5.1/scripts/jquery.tablesorter.pager.js
+kippo-graph-1.5.1/scripts/jspl.js
+kippo-graph-1.5.1/scripts/superfish.js
+kippo-graph-1.5.1/styles/
+kippo-graph-1.5.1/styles/forms.css
+kippo-graph-1.5.1/styles/gallery.css
+kippo-graph-1.5.1/styles/homepage.css
+kippo-graph-1.5.1/styles/index.php
+kippo-graph-1.5.1/styles/layout.css
+kippo-graph-1.5.1/styles/navi.css
+kippo-graph-1.5.1/styles/playlog.css
+kippo-graph-1.5.1/styles/portfolio.css
+kippo-graph-1.5.1/styles/tables.css
+kippo-graph-1.5.1/styles/tablesorter.css
+$
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&amp;lt;IfModule mod_alias.c&amp;gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&amp;lt;/IfModule&amp;gt;
+$
+$ sudo a2enconf kippo-graph
+Enabling conf kippo-graph.
+To activate the new configuration, you need to run:
+  service apache2 reload
+$
+$ sudo apachectl configtest
+Syntax OK
+$
+$ sudo systemctl restart apache2
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Kippo-Graphの設定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ ls -l /usr/share/kippo-graph-1.5.1/config.php*
+-rw-rw-r-- 1 root root 3777  6月 22  2015 /usr/share/kippo-graph-1.5.1/config.php
+-rw-rw-r-- 1 root root 3777  6月 22  2015 /usr/share/kippo-graph-1.5.1/config.php.dist
+$
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define(&#39;DB_HOST&#39;, &#39;localhost&#39;);
+define(&#39;DB_USER&#39;, &#39;cowrie&#39;);
+define(&#39;DB_PASS&#39;, &#39;cowrie_password&#39;);
+define(&#39;DB_NAME&#39;, &#39;cowrie&#39;);
+define(&#39;DB_PORT&#39;, &#39;3306&#39;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;kippo-graphの修正:05481c997d19830c663ad9e91abca85e&#34;&gt;Kippo-Graphの修正&lt;/h3&gt;
+
+&lt;p&gt;KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)がありました。&lt;/p&gt;
+
+&lt;p&gt;PLAYLOGを再生するために以下のファイルを修正しました。一応、PLAYLOGが再生できるようになりましたが、他の部分に影響がないかは不明です。。。試すとしても自己責任でお願いします。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;class/KippoPlayLog.class.php&lt;/code&gt;の修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php{,.org}
+$ ls -l class/KippoPlayLog.class.php*
+-rw-rw-r-- 1 root root 2134  6月 22  2015 class/KippoPlayLog.class.php
+-rw-rw-r-- 1 root root 2134  6月 22  2015 class/KippoPlayLog.class.php.org
+$
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&amp;lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&amp;gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;include/play.php&lt;/code&gt;の修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php{,.org}
+$ls -l include/play.php*
+-rw-rw-r-- 1 root root 10994  6月 22  2015 include/play.php
+-rw-rw-r-- 1 root root 10994  6月 22  2015 include/play.php.org
+$
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&amp;lt;                 $log = base64_encode($row[&#39;ttylog&#39;]);
+---
+&amp;gt;                 $log = base64_encode(file_get_contents($row[&#39;ttylog&#39;]));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ttylogへのシンボリックリンク作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s /home/cowrie/cowrie/log/ log
+$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+$ ls -dl /home/cowrie/cowrie/log/tty
+drwxr-sr-x 2 cowrie www-data 4096  1月  4 19:05 /home/cowrie/cowrie/log/tty
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrie起動スクリプトの修正&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo su - cowrie
+$ cd cowrie
+$ cp -p start.sh{,.backup20170105}
+$ ls -l start.sh*
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh
+-rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh.backup20170105
+-rwxr-xr-x 1 cowrie cowrie 920  1月  4 19:05 start.sh.org
+$
+$ vi start.sh
+$ diff start.sh.org start.sh
+7c7
+&amp;lt; DAEMONIZE=&amp;quot;&amp;quot;
+---
+&amp;gt; DAEMONIZE=&amp;quot;-n&amp;quot;
+35c35
+&amp;lt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0077 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+37c37
+&amp;lt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0077 --pidfile ${PIDFILE} cowrie
+---
+&amp;gt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieの再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo supervisorctl restart cowrie
+cowrie: stopped
+cowrie: started
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その7</title>
+      <link>http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/</link>
+      <pubDate>Wed, 04 Jan 2017 17:53:55 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/</guid>
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homepot1&lt;/code&gt;を構築していきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;raspberry-pi-2でsshハニーポット-cowrie-構築:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Raspberry Pi 2でSSHハニーポット(Cowrie)構築&lt;/h2&gt;
+
+&lt;p&gt;インターネットの怖さを知るためにSSHハニーポットを構築します。&lt;/p&gt;
+
+&lt;h3 id=&#34;公開鍵認証方式の設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;公開鍵認証方式の設定&lt;/h3&gt;
+
+&lt;p&gt;公開鍵・秘密鍵の作成&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
+Created directory &#39;/home/pi/.ssh&#39;.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/pi/.ssh/id_rsa.
+Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
+The key fingerprint is:
+XX:XX:XX:39:e2:be:63:99:e1:a2:a5:32:f4:XX:XX:XX pi@homepot1
+The key&#39;s randomart image is:
++---[RSA 2048]----+
+|                 |
+|                 |
+|                 |
+|                 |
+|    . . S        |
+|.o E.. .         |
+|= +. +.          |
+|++..B .o         |
+|+o.***+.         |
++-----------------+
+$
+$ cd ~/.ssh/
+$ cat id_rsa.pub &amp;gt;&amp;gt; authorized_keys
+$ chmod 600 authorized_keys
+$ ls -l authorized_keys 
+-rw------- 1 pi pi 393  1月  4 18:04 authorized_keys
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;homepot1で作成した秘密鍵をローカルPCにコピー&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/pi@homepot1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;公開鍵認証方式でsshログインできることを確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;sshサーバの設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;SSHサーバの設定&lt;/h3&gt;
+
+&lt;p&gt;Cowrieで&lt;code&gt;22/tcp&lt;/code&gt;を使用するため、SSHサーバのポートを変更します。またパスワード認証を無効化します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ssh/sshd_config{,.org}
+$ sudo ls -l /etc/ssh/sshd_config*
+-rw-r--r-- 1 root root 2541 11月 26 02:28 /etc/ssh/sshd_config
+-rw-r--r-- 1 root root 2541 11月 26 02:28 /etc/ssh/sshd_config.org
+$
+$ sudo vi /etc/ssh/sshd_config
+#Port 22
+Port 20022
+
+#RSAAuthentication yes
+RSAAuthentication no
+
+#PermitRootLogin without-password
+PermitRootLogin no
+
+ChallengeResponseAuthentication no
+
+#PasswordAuthentication yes
+PasswordAuthentication no
+$
+$ diff /etc/ssh/sshd_config.org /etc/ssh/sshd_config
+5c5,6
+&amp;lt; Port 22
+---
+&amp;gt; #Port 22
+&amp;gt; Port 10122
+28c29,30
+&amp;lt; PermitRootLogin without-password
+---
+&amp;gt; #PermitRootLogin without-password
+&amp;gt; PermitRootLogin no
+31c33,34
+&amp;lt; RSAAuthentication yes
+---
+&amp;gt; #RSAAuthentication yes
+&amp;gt; RSAAuthentication no
+52a56
+&amp;gt; PasswordAuthentication no
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SSHサーバの設定を再起動する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ssh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;ユーザ設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;ユーザ設定&lt;/h3&gt;
+
+&lt;p&gt;rootユーザが無効化されていることを確認する(2列目が&lt;code&gt;L&lt;/code&gt;であることを確認)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo passwd -S root
+root L 11/25/2016 0 99999 7 -1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cowrieユーザを作成する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo adduser --disabled-password cowrie
+ユーザ `cowrie&#39; を追加しています...
+新しいグループ `cowrie&#39; (1001) を追加しています...
+新しいユーザ `cowrie&#39; (1001) をグループ `cowrie&#39; として追加しています...
+ホームディレクトリ `/home/cowrie&#39; を作成しています...
+`/etc/skel&#39; からファイルをコピーしています...
+cowrie のユーザ情報を変更中
+新しい値を入力してください。標準設定値を使うならリターンを押してください
+	フルネーム []: 
+	部屋番号 []: 
+	職場電話番号 []: 
+	自宅電話番号 []: 
+	その他 []: 
+以上で正しいですか? [Y/n] y
+$
+$ sudo passwd -S cowrie
+cowrie L 01/04/2017 0 99999 7 -1
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieのインストール:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieのインストール&lt;/h3&gt;
+
+&lt;p&gt;Cowrienの公式サイトの&lt;a href=&#34;https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md&#34;&gt;INSTALL.md&lt;/a&gt;を参考にインストールを行う。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install git virtualenv libmpfr-dev libssl-dev libmpc-dev libffi-dev build-essential libpython-dev python2.7-minimal
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+build-essential はすでに最新版です。
+python2.7-minimal はすでに最新版です。
+python2.7-minimal は手動でインストールしたと設定されました。
+以下の追加パッケージがインストールされます:
+  dh-python git-man libcurl3-gnutls liberror-perl libexpat1-dev libgmp-dev
+  libgmpxx4ldbl libmpdec2 libpython2.7-dev libpython3-stdlib
+  libpython3.4-minimal libpython3.4-stdlib libssl-doc python-chardet-whl
+  python-colorama-whl python-distlib-whl python-html5lib-whl python-pip-whl
+  python-requests-whl python-setuptools-whl python-six-whl python-urllib3-whl
+  python3 python3-minimal python3-pkg-resources python3-virtualenv python3.4
+  python3.4-minimal rsync
+提案パッケージ:
+  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn libgmp10-doc
+  libmpfr-doc python3-doc python3-tk python3-venv python3-setuptools
+  python3.4-venv python3.4-doc binfmt-support
+以下のパッケージが新たにインストールされます:
+  dh-python git git-man libcurl3-gnutls liberror-perl libexpat1-dev libffi-dev
+  libgmp-dev libgmpxx4ldbl libmpc-dev libmpdec2 libmpfr-dev libpython-dev
+  libpython2.7-dev libpython3-stdlib libpython3.4-minimal libpython3.4-stdlib
+  libssl-dev libssl-doc python-chardet-whl python-colorama-whl
+  python-distlib-whl python-html5lib-whl python-pip-whl python-requests-whl
+  python-setuptools-whl python-six-whl python-urllib3-whl python3
+  python3-minimal python3-pkg-resources python3-virtualenv python3.4
+  python3.4-minimal rsync virtualenv
+アップグレード: 0 個、新規インストール: 36 個、削除: 0 個、保留: 0 個。
+31.7 MB のアーカイブを取得する必要があります。
+この操作後に追加で 76.3 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgmpxx4ldbl armhf 2:6.0.0+dfsg-6+rpi1 [21.6 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpdec2 armhf 2.4.1-1 [65.8 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libexpat1-dev armhf 2.1.0-6+deb8u3 [115 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython2.7-dev armhf 2.7.9-2+deb8u1 [17.9 MB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3.4-minimal armhf 3.4.2-1 [483 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3.4-stdlib armhf 3.4.2-1 [2,011 kB]
+取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3.4-minimal armhf 3.4.2-1 [1,355 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3.4 armhf 3.4.2-1 [204 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-minimal armhf 3.4.2-2 [34.7 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3-stdlib armhf 3.4.2-2 [18.1 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3 armhf 3.4.2-2 [21.2 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main dh-python all 1.20141111-2 [66.4 kB]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main libffi-dev armhf 3.1-2 [152 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgmp-dev armhf 2:6.0.0+dfsg-6+rpi1 [552 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpfr-dev armhf 3.1.2-2 [540 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython-dev armhf 2.7.9-1 [19.6 kB]
+取得:21 http://mirrordirector.raspbian.org/raspbian/ jessie/main libssl-dev armhf 1.0.1t-1+deb8u5 [1,094 kB]
+取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main libssl-doc all 1.0.1t-1+deb8u5 [1,167 kB]
+取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-pkg-resources all 5.5.1-1 [34.2 kB]
+取得:24 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-chardet-whl all 2.3.0-1 [170 kB]
+取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-colorama-whl all 0.3.2-1 [20.2 kB]
+取得:26 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-distlib-whl all 0.1.9-1 [141 kB]
+取得:27 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-html5lib-whl all 0.999-3 [112 kB]
+取得:28 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-six-whl all 1.8.0-1 [14.8 kB]
+取得:29 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-urllib3-whl all 1.9.1-3 [76.8 kB]
+取得:30 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-requests-whl all 2.4.3-6 [241 kB]
+取得:31 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-setuptools-whl all 5.5.1-1 [233 kB]
+取得:32 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-pip-whl all 1.5.6-5 [126 kB]
+取得:33 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-virtualenv all 1.11.6+ds-1 [60.5 kB]
+取得:34 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.1.1-3 [373 kB]
+取得:35 http://mirrordirector.raspbian.org/raspbian/ jessie/main virtualenv all 1.11.6+ds-1 [17.2 kB]
+取得:36 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpc-dev armhf 1.0.2-1 [39.1 kB]
+31.7 MB を 1分 8秒 で取得しました (463 kB/s)                                   
+パッケージからテンプレートを展開しています: 100%
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 31276 個のファイルとディレクトリがインストールされています。)
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ libgmpxx4ldbl:armhf を選択しています。
+.../libgmpxx4ldbl_2%3a6.0.0+dfsg-6+rpi1_armhf.deb を展開する準備をしています ...
+libgmpxx4ldbl:armhf (2:6.0.0+dfsg-6+rpi1) を展開しています...
+以前に未選択のパッケージ libmpdec2:armhf を選択しています。
+.../libmpdec2_2.4.1-1_armhf.deb を展開する準備をしています ...
+libmpdec2:armhf (2.4.1-1) を展開しています...
+以前に未選択のパッケージ libexpat1-dev:armhf を選択しています。
+.../libexpat1-dev_2.1.0-6+deb8u3_armhf.deb を展開する準備をしています ...
+libexpat1-dev:armhf (2.1.0-6+deb8u3) を展開しています...
+以前に未選択のパッケージ libpython2.7-dev:armhf を選択しています。
+.../libpython2.7-dev_2.7.9-2+deb8u1_armhf.deb を展開する準備をしています ...
+libpython2.7-dev:armhf (2.7.9-2+deb8u1) を展開しています...
+以前に未選択のパッケージ libpython3.4-minimal:armhf を選択しています。
+.../libpython3.4-minimal_3.4.2-1_armhf.deb を展開する準備をしています ...
+libpython3.4-minimal:armhf (3.4.2-1) を展開しています...
+以前に未選択のパッケージ libpython3.4-stdlib:armhf を選択しています。
+.../libpython3.4-stdlib_3.4.2-1_armhf.deb を展開する準備をしています ...
+libpython3.4-stdlib:armhf (3.4.2-1) を展開しています...
+以前に未選択のパッケージ python3.4-minimal を選択しています。
+.../python3.4-minimal_3.4.2-1_armhf.deb を展開する準備をしています ...
+python3.4-minimal (3.4.2-1) を展開しています...
+以前に未選択のパッケージ python3.4 を選択しています。
+.../python3.4_3.4.2-1_armhf.deb を展開する準備をしています ...
+python3.4 (3.4.2-1) を展開しています...
+以前に未選択のパッケージ python3-minimal を選択しています。
+.../python3-minimal_3.4.2-2_armhf.deb を展開する準備をしています ...
+python3-minimal (3.4.2-2) を展開しています...
+以前に未選択のパッケージ libpython3-stdlib:armhf を選択しています。
+.../libpython3-stdlib_3.4.2-2_armhf.deb を展開する準備をしています ...
+libpython3-stdlib:armhf (3.4.2-2) を展開しています...
+以前に未選択のパッケージ python3 を選択しています。
+.../python3_3.4.2-2_armhf.deb を展開する準備をしています ...
+python3 (3.4.2-2) を展開しています...
+以前に未選択のパッケージ dh-python を選択しています。
+.../dh-python_1.20141111-2_all.deb を展開する準備をしています ...
+dh-python (1.20141111-2) を展開しています...
+以前に未選択のパッケージ liberror-perl を選択しています。
+.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
+liberror-perl (0.17-1.1) を展開しています...
+以前に未選択のパッケージ git-man を選択しています。
+.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
+git-man (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ git を選択しています。
+.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
+git (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ libffi-dev:armhf を選択しています。
+.../libffi-dev_3.1-2_armhf.deb を展開する準備をしています ...
+libffi-dev:armhf (3.1-2) を展開しています...
+以前に未選択のパッケージ libgmp-dev:armhf を選択しています。
+.../libgmp-dev_2%3a6.0.0+dfsg-6+rpi1_armhf.deb を展開する準備をしています ...
+libgmp-dev:armhf (2:6.0.0+dfsg-6+rpi1) を展開しています...
+以前に未選択のパッケージ libmpfr-dev:armhf を選択しています。
+.../libmpfr-dev_3.1.2-2_armhf.deb を展開する準備をしています ...
+libmpfr-dev:armhf (3.1.2-2) を展開しています...
+以前に未選択のパッケージ libpython-dev:armhf を選択しています。
+.../libpython-dev_2.7.9-1_armhf.deb を展開する準備をしています ...
+libpython-dev:armhf (2.7.9-1) を展開しています...
+以前に未選択のパッケージ libssl-dev:armhf を選択しています。
+.../libssl-dev_1.0.1t-1+deb8u5_armhf.deb を展開する準備をしています ...
+libssl-dev:armhf (1.0.1t-1+deb8u5) を展開しています...
+以前に未選択のパッケージ libssl-doc を選択しています。
+.../libssl-doc_1.0.1t-1+deb8u5_all.deb を展開する準備をしています ...
+libssl-doc (1.0.1t-1+deb8u5) を展開しています...
+以前に未選択のパッケージ python3-pkg-resources を選択しています。
+.../python3-pkg-resources_5.5.1-1_all.deb を展開する準備をしています ...
+python3-pkg-resources (5.5.1-1) を展開しています...
+以前に未選択のパッケージ python-chardet-whl を選択しています。
+.../python-chardet-whl_2.3.0-1_all.deb を展開する準備をしています ...
+python-chardet-whl (2.3.0-1) を展開しています...
+以前に未選択のパッケージ python-colorama-whl を選択しています。
+.../python-colorama-whl_0.3.2-1_all.deb を展開する準備をしています ...
+python-colorama-whl (0.3.2-1) を展開しています...
+以前に未選択のパッケージ python-distlib-whl を選択しています。
+.../python-distlib-whl_0.1.9-1_all.deb を展開する準備をしています ...
+python-distlib-whl (0.1.9-1) を展開しています...
+以前に未選択のパッケージ python-html5lib-whl を選択しています。
+.../python-html5lib-whl_0.999-3_all.deb を展開する準備をしています ...
+python-html5lib-whl (0.999-3) を展開しています...
+以前に未選択のパッケージ python-six-whl を選択しています。
+.../python-six-whl_1.8.0-1_all.deb を展開する準備をしています ...
+python-six-whl (1.8.0-1) を展開しています...
+以前に未選択のパッケージ python-urllib3-whl を選択しています。
+.../python-urllib3-whl_1.9.1-3_all.deb を展開する準備をしています ...
+python-urllib3-whl (1.9.1-3) を展開しています...
+以前に未選択のパッケージ python-requests-whl を選択しています。
+.../python-requests-whl_2.4.3-6_all.deb を展開する準備をしています ...
+python-requests-whl (2.4.3-6) を展開しています...
+以前に未選択のパッケージ python-setuptools-whl を選択しています。
+.../python-setuptools-whl_5.5.1-1_all.deb を展開する準備をしています ...
+python-setuptools-whl (5.5.1-1) を展開しています...
+以前に未選択のパッケージ python-pip-whl を選択しています。
+.../python-pip-whl_1.5.6-5_all.deb を展開する準備をしています ...
+python-pip-whl (1.5.6-5) を展開しています...
+以前に未選択のパッケージ python3-virtualenv を選択しています。
+.../python3-virtualenv_1.11.6+ds-1_all.deb を展開する準備をしています ...
+python3-virtualenv (1.11.6+ds-1) を展開しています...
+以前に未選択のパッケージ rsync を選択しています。
+.../rsync_3.1.1-3_armhf.deb を展開する準備をしています ...
+rsync (3.1.1-3) を展開しています...
+以前に未選択のパッケージ virtualenv を選択しています。
+.../virtualenv_1.11.6+ds-1_all.deb を展開する準備をしています ...
+virtualenv (1.11.6+ds-1) を展開しています...
+以前に未選択のパッケージ libmpc-dev:armhf を選択しています。
+.../libmpc-dev_1.0.2-1_armhf.deb を展開する準備をしています ...
+libmpc-dev:armhf (1.0.2-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+mime-support (3.58) のトリガを処理しています ...
+install-info (5.2.0.dfsg.1-6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+libgmpxx4ldbl:armhf (2:6.0.0+dfsg-6+rpi1) を設定しています ...
+libmpdec2:armhf (2.4.1-1) を設定しています ...
+libexpat1-dev:armhf (2.1.0-6+deb8u3) を設定しています ...
+libpython2.7-dev:armhf (2.7.9-2+deb8u1) を設定しています ...
+libpython3.4-minimal:armhf (3.4.2-1) を設定しています ...
+libpython3.4-stdlib:armhf (3.4.2-1) を設定しています ...
+python3.4-minimal (3.4.2-1) を設定しています ...
+python3.4 (3.4.2-1) を設定しています ...
+python3-minimal (3.4.2-2) を設定しています ...
+libpython3-stdlib:armhf (3.4.2-2) を設定しています ...
+liberror-perl (0.17-1.1) を設定しています ...
+git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
+git (1:2.1.4-2.1+deb8u2) を設定しています ...
+libffi-dev:armhf (3.1-2) を設定しています ...
+libgmp-dev:armhf (2:6.0.0+dfsg-6+rpi1) を設定しています ...
+libmpfr-dev:armhf (3.1.2-2) を設定しています ...
+libpython-dev:armhf (2.7.9-1) を設定しています ...
+libssl-dev:armhf (1.0.1t-1+deb8u5) を設定しています ...
+libssl-doc (1.0.1t-1+deb8u5) を設定しています ...
+python-colorama-whl (0.3.2-1) を設定しています ...
+python-distlib-whl (0.1.9-1) を設定しています ...
+python-html5lib-whl (0.999-3) を設定しています ...
+python-six-whl (1.8.0-1) を設定しています ...
+python-urllib3-whl (1.9.1-3) を設定しています ...
+python-requests-whl (2.4.3-6) を設定しています ...
+python-setuptools-whl (5.5.1-1) を設定しています ...
+rsync (3.1.1-3) を設定しています ...
+libmpc-dev:armhf (1.0.2-1) を設定しています ...
+dh-python (1.20141111-2) を設定しています ...
+python3 (3.4.2-2) を設定しています ...
+running python rtupdate hooks for python3.4...
+running python post-rtupdate hooks for python3.4...
+python3-pkg-resources (5.5.1-1) を設定しています ...
+python-chardet-whl (2.3.0-1) を設定しています ...
+python-pip-whl (1.5.6-5) を設定しています ...
+python3-virtualenv (1.11.6+ds-1) を設定しています ...
+virtualenv (1.11.6+ds-1) を設定しています ...
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+$ sudo su - cowrie
+$
+$ git clone http://github.com/micheloosterhof/cowrie
+Cloning into &#39;cowrie&#39;...
+remote: Counting objects: 7457, done.
+remote: Total 7457 (delta 0), reused 0 (delta 0), pack-reused 7457
+Receiving objects: 100% (7457/7457), 6.43 MiB | 202.00 KiB/s, done.
+Resolving deltas: 100% (5060/5060), done.
+Checking connectivity... done.
+$
+$ cd cowrie/
+$
+$ pwd
+/home/cowrie/cowrie
+$
+$ virtualenv cowrie-env
+Running virtualenv with interpreter /usr/bin/python2
+New python executable in cowrie-env/bin/python2
+Also creating executable in cowrie-env/bin/python
+Installing setuptools, pip...done.
+$
+$ source cowrie-env/bin/activate
+(cowrie-env) $ pip install -r requirements.txt 
+Downloading/unpacking twisted&amp;gt;=15.2.1 (from -r requirements.txt (line 1))
+  Downloading Twisted-16.6.0.tar.bz2 (3.0MB): 3.0MB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/twisted/setup.py) egg_info for package twisted
+    no previously-included directories found matching &#39;.travis&#39;
+    no previously-included directories found matching &#39;tests&#39;
+    warning: no previously-included files found matching &#39;examplesetup.py&#39;
+    no previously-included directories found matching &#39;src/exampleproj&#39;
+    no previously-included directories found matching &#39;src/incremental/newsfragments&#39;
+    
+    Installed /tmp/pip-build-BjW0UZ/twisted/incremental-16.10.1-py2.7.egg
+    
+    warning: no previously-included files matching &#39;*.misc&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.bugfix&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.doc&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.feature&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.removal&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;NEWS&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;README&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;topfiles&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files found matching &#39;src/twisted/topfiles/CREDITS&#39;
+    warning: no previously-included files found matching &#39;src/twisted/topfiles/ChangeLog.Old&#39;
+    warning: no previously-included files found matching &#39;codecov.yml&#39;
+    warning: no previously-included files found matching &#39;appveyor.yml&#39;
+    no previously-included directories found matching &#39;bin&#39;
+    no previously-included directories found matching &#39;admin&#39;
+    no previously-included directories found matching &#39;.travis&#39;
+    warning: no previously-included files found matching &#39;docs/historic/2003&#39;
+    warning: no previously-included files matching &#39;*&#39; found under directory &#39;docs/historic/2003&#39;
+Downloading/unpacking cryptography (from -r requirements.txt (line 2))
+  Downloading cryptography-1.7.1.tar.gz (420kB): 420kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/cryptography/setup.py) egg_info for package cryptography
+    
+    no previously-included directories found matching &#39;docs/_build&#39;
+    warning: no previously-included files matching &#39;*&#39; found under directory &#39;vectors&#39;
+Downloading/unpacking configparser (from -r requirements.txt (line 3))
+  Downloading configparser-3.5.0.tar.gz
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/configparser/setup.py) egg_info for package configparser
+    
+Downloading/unpacking pyopenssl (from -r requirements.txt (line 4))
+  Downloading pyOpenSSL-16.2.0-py2.py3-none-any.whl (43kB): 43kB downloaded
+Downloading/unpacking gmpy2 (from -r requirements.txt (line 5))
+  Downloading gmpy2-2.0.8.zip (280kB): 280kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/gmpy2/setup.py) egg_info for package gmpy2
+    
+Downloading/unpacking service-identity (from -r requirements.txt (line 6))
+  Downloading service_identity-16.0.0-py2.py3-none-any.whl
+Downloading/unpacking pycrypto (from -r requirements.txt (line 7))
+  Downloading pycrypto-2.6.1.tar.gz (446kB): 446kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/pycrypto/setup.py) egg_info for package pycrypto
+    
+Downloading/unpacking python-dateutil (from -r requirements.txt (line 8))
+  Downloading python_dateutil-2.6.0-py2.py3-none-any.whl (194kB): 194kB downloaded
+Downloading/unpacking tftpy (from -r requirements.txt (line 9))
+  Downloading tftpy-0.6.2.tar.gz
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/tftpy/setup.py) egg_info for package tftpy
+    
+Downloading/unpacking zope.interface&amp;gt;=3.6.0 (from twisted&amp;gt;=15.2.1-&amp;gt;-r requirements.txt (line 1))
+  Downloading zope.interface-4.3.3.tar.gz (150kB): 150kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/zope.interface/setup.py) egg_info for package zope.interface
+    
+    warning: no previously-included files matching &#39;*.dll&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.pyc&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.pyo&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.so&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;coverage.xml&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;appveyor.yml&#39; found anywhere in distribution
+    no previously-included directories found matching &#39;docs/_build&#39;
+Downloading/unpacking constantly&amp;gt;=15.1 (from twisted&amp;gt;=15.2.1-&amp;gt;-r requirements.txt (line 1))
+  Downloading constantly-15.1.0-py2.py3-none-any.whl
+Downloading/unpacking incremental&amp;gt;=16.10.1 (from twisted&amp;gt;=15.2.1-&amp;gt;-r requirements.txt (line 1))
+  Downloading incremental-16.10.1-py2.py3-none-any.whl
+Downloading/unpacking idna&amp;gt;=2.0 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading idna-2.2-py2.py3-none-any.whl (55kB): 55kB downloaded
+Downloading/unpacking pyasn1&amp;gt;=0.1.8 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading pyasn1-0.1.9-py2.py3-none-any.whl
+Downloading/unpacking six&amp;gt;=1.4.1 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading six-1.10.0-py2.py3-none-any.whl
+Downloading/unpacking setuptools&amp;gt;=11.3 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading setuptools-32.3.1-py2.py3-none-any.whl (479kB): 479kB downloaded
+Downloading/unpacking enum34 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading enum34-1.1.6-py2-none-any.whl
+Downloading/unpacking ipaddress (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading ipaddress-1.0.17-py2-none-any.whl
+Downloading/unpacking cffi&amp;gt;=1.4.1 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading cffi-1.9.1.tar.gz (407kB): 407kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/cffi/setup.py) egg_info for package cffi
+    
+Downloading/unpacking pyasn1-modules (from service-identity-&amp;gt;-r requirements.txt (line 6))
+  Downloading pyasn1_modules-0.0.8-py2.py3-none-any.whl
+Downloading/unpacking attrs (from service-identity-&amp;gt;-r requirements.txt (line 6))
+  Downloading attrs-16.3.0-py2.py3-none-any.whl
+Downloading/unpacking pycparser (from cffi&amp;gt;=1.4.1-&amp;gt;cryptography-&amp;gt;-r requirements.txt (line 2))
+  Downloading pycparser-2.17.tar.gz (231kB): 231kB downloaded
+  Running setup.py (path:/tmp/pip-build-BjW0UZ/pycparser/setup.py) egg_info for package pycparser
+    
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;examples&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;examples&#39;
+Installing collected packages: twisted, cryptography, configparser, pyopenssl, gmpy2, service-identity, pycrypto, python-dateutil, tftpy, zope.interface, constantly, incremental, idna, pyasn1, six, setuptools, enum34, ipaddress, cffi, pyasn1-modules, attrs, pycparser
+  Running setup.py install for twisted
+    
+    warning: no previously-included files matching &#39;*.misc&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.bugfix&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.doc&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.feature&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;*.removal&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;NEWS&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;README&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files matching &#39;topfiles&#39; found under directory &#39;src/twisted&#39;
+    warning: no previously-included files found matching &#39;src/twisted/topfiles/CREDITS&#39;
+    warning: no previously-included files found matching &#39;src/twisted/topfiles/ChangeLog.Old&#39;
+    warning: no previously-included files found matching &#39;codecov.yml&#39;
+    warning: no previously-included files found matching &#39;appveyor.yml&#39;
+    no previously-included directories found matching &#39;bin&#39;
+    no previously-included directories found matching &#39;admin&#39;
+    no previously-included directories found matching &#39;.travis&#39;
+    warning: no previously-included files found matching &#39;docs/historic/2003&#39;
+    warning: no previously-included files matching &#39;*&#39; found under directory &#39;docs/historic/2003&#39;
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c conftest.c -o conftest.o
+    building &#39;twisted.test.raiser&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/test/raiser.c -o build/temp.linux-armv7l-2.7/src/twisted/test/raiser.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/test/raiser.o -o build/lib.linux-armv7l-2.7/twisted/test/raiser.so
+    building &#39;twisted.python._sendmsg&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/python/_sendmsg.c -o build/temp.linux-armv7l-2.7/src/twisted/python/_sendmsg.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/python/_sendmsg.o -o build/lib.linux-armv7l-2.7/twisted/python/_sendmsg.so
+    building &#39;twisted.runner.portmap&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/runner/portmap.c -o build/temp.linux-armv7l-2.7/src/twisted/runner/portmap.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/runner/portmap.o -o build/lib.linux-armv7l-2.7/twisted/runner/portmap.so
+    Installing trial script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing conch script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing ckeygen script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing twist script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing pyhtmlizer script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing mailmail script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing tkconch script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing twistd script to /home/cowrie/cowrie/cowrie-env/bin
+    Installing cftp script to /home/cowrie/cowrie/cowrie-env/bin
+  Running setup.py install for cryptography
+    
+    Installed /tmp/pip-build-BjW0UZ/cryptography/cffi-1.9.1-py2.7-linux-armv7l.egg
+    Searching for pycparser
+    Reading https://pypi.python.org/simple/pycparser/
+    Best match: pycparser 2.17
+    Downloading https://pypi.python.org/packages/be/64/1bb257ffb17d01f4a38d7ce686809a736837ad4371bcc5c42ba7a715c3ac/pycparser-2.17.tar.gz#md5=ca98dcb50bc1276f230118f6af5a40c7
+    Processing pycparser-2.17.tar.gz
+    Writing /tmp/easy_install-fNPifv/pycparser-2.17/setup.cfg
+    Running pycparser-2.17/setup.py -q bdist_egg --dist-dir /tmp/easy_install-fNPifv/pycparser-2.17/egg-dist-tmp-rWDLWz
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;examples&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;examples&#39;
+    zip_safe flag not set; analyzing archive contents...
+    pycparser.ply.ygen: module references __file__
+    pycparser.ply.yacc: module references __file__
+    pycparser.ply.yacc: module MAY be using inspect.getsourcefile
+    pycparser.ply.yacc: module MAY be using inspect.stack
+    pycparser.ply.lex: module references __file__
+    pycparser.ply.lex: module MAY be using inspect.getsourcefile
+    
+    Installed /tmp/pip-build-BjW0UZ/cryptography/pycparser-2.17-py2.7.egg
+    
+    no previously-included directories found matching &#39;docs/_build&#39;
+    warning: no previously-included files matching &#39;*&#39; found under directory &#39;vectors&#39;
+    generating cffi module &#39;build/temp.linux-armv7l-2.7/_padding.c&#39;
+    generating cffi module &#39;build/temp.linux-armv7l-2.7/_constant_time.c&#39;
+    generating cffi module &#39;build/temp.linux-armv7l-2.7/_openssl.c&#39;
+    building &#39;_openssl&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_openssl.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_openssl.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_openssl.o -lssl -lcrypto -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_openssl.so
+    building &#39;_constant_time&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_constant_time.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_constant_time.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_constant_time.o -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_constant_time.so
+    building &#39;_padding&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_padding.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_padding.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_padding.o -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_padding.so
+  Running setup.py install for configparser
+    
+    Skipping installation of /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/backports/__init__.py (namespace package)
+    Installing /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/configparser-3.5.0-py2.7-nspkg.pth
+  Running setup.py install for gmpy2
+    building &#39;gmpy2&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -DWITHMPFR -DWITHMPC -I/usr/include/python2.7 -c src/gmpy2.c -o build/temp.linux-armv7l-2.7/src/gmpy2.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/gmpy2.o -lgmp -lmpfr -lmpc -o build/lib.linux-armv7l-2.7/gmpy2.so
+    
+  Running setup.py install for pycrypto
+    checking for gcc... gcc
+    checking whether the C compiler works... yes
+    checking for C compiler default output file name... a.out
+    checking for suffix of executables...
+    checking whether we are cross compiling... no
+    checking for suffix of object files... o
+    checking whether we are using the GNU C compiler... yes
+    checking whether gcc accepts -g... yes
+    checking for gcc option to accept ISO C89... none needed
+    checking for __gmpz_init in -lgmp... yes
+    checking for __gmpz_init in -lmpir... no
+    checking whether mpz_powm is declared... yes
+    checking whether mpz_powm_sec is declared... yes
+    checking how to run the C preprocessor... gcc -E
+    checking for grep that handles long lines and -e... /bin/grep
+    checking for egrep... /bin/grep -E
+    checking for ANSI C header files... yes
+    checking for sys/types.h... yes
+    checking for sys/stat.h... yes
+    checking for stdlib.h... yes
+    checking for string.h... yes
+    checking for memory.h... yes
+    checking for strings.h... yes
+    checking for inttypes.h... yes
+    checking for stdint.h... yes
+    checking for unistd.h... yes
+    checking for inttypes.h... (cached) yes
+    checking limits.h usability... yes
+    checking limits.h presence... yes
+    checking for limits.h... yes
+    checking stddef.h usability... yes
+    checking stddef.h presence... yes
+    checking for stddef.h... yes
+    checking for stdint.h... (cached) yes
+    checking for stdlib.h... (cached) yes
+    checking for string.h... (cached) yes
+    checking wchar.h usability... yes
+    checking wchar.h presence... yes
+    checking for wchar.h... yes
+    checking for inline... inline
+    checking for int16_t... yes
+    checking for int32_t... yes
+    checking for int64_t... yes
+    checking for int8_t... yes
+    checking for size_t... yes
+    checking for uint16_t... yes
+    checking for uint32_t... yes
+    checking for uint64_t... yes
+    checking for uint8_t... yes
+    checking for stdlib.h... (cached) yes
+    checking for GNU libc compatible malloc... yes
+    checking for memmove... yes
+    checking for memset... yes
+    configure: creating ./config.status
+    config.status: creating src/config.h
+    building &#39;Crypto.PublicKey._fastmath&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/ -I/usr/include/python2.7 -c src/_fastmath.c -o build/temp.linux-armv7l-2.7/src/_fastmath.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/_fastmath.o -lgmp -o build/lib.linux-armv7l-2.7/Crypto/PublicKey/_fastmath.so
+    building &#39;Crypto.Hash._MD2&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/MD2.c -o build/temp.linux-armv7l-2.7/src/MD2.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/MD2.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_MD2.so
+    building &#39;Crypto.Hash._MD4&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/MD4.c -o build/temp.linux-armv7l-2.7/src/MD4.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/MD4.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_MD4.so
+    building &#39;Crypto.Hash._SHA256&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA256.c -o build/temp.linux-armv7l-2.7/src/SHA256.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA256.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA256.so
+    building &#39;Crypto.Hash._SHA224&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA224.c -o build/temp.linux-armv7l-2.7/src/SHA224.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA224.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA224.so
+    building &#39;Crypto.Hash._SHA384&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA384.c -o build/temp.linux-armv7l-2.7/src/SHA384.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA384.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA384.so
+    building &#39;Crypto.Hash._SHA512&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA512.c -o build/temp.linux-armv7l-2.7/src/SHA512.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA512.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA512.so
+    building &#39;Crypto.Hash._RIPEMD160&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -DPCT_LITTLE_ENDIAN=1 -Isrc/ -I/usr/include/python2.7 -c src/RIPEMD160.c -o build/temp.linux-armv7l-2.7/src/RIPEMD160.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/RIPEMD160.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_RIPEMD160.so
+    building &#39;Crypto.Cipher._AES&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/AES.c -o build/temp.linux-armv7l-2.7/src/AES.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/AES.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_AES.so
+    building &#39;Crypto.Cipher._ARC2&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/ARC2.c -o build/temp.linux-armv7l-2.7/src/ARC2.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/ARC2.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_ARC2.so
+    building &#39;Crypto.Cipher._Blowfish&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/Blowfish.c -o build/temp.linux-armv7l-2.7/src/Blowfish.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/Blowfish.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_Blowfish.so
+    building &#39;Crypto.Cipher._CAST&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/CAST.c -o build/temp.linux-armv7l-2.7/src/CAST.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/CAST.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_CAST.so
+    building &#39;Crypto.Cipher._DES&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -Isrc/libtom/ -I/usr/include/python2.7 -c src/DES.c -o build/temp.linux-armv7l-2.7/src/DES.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/DES.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_DES.so
+    building &#39;Crypto.Cipher._DES3&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -Isrc/libtom/ -I/usr/include/python2.7 -c src/DES3.c -o build/temp.linux-armv7l-2.7/src/DES3.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/DES3.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_DES3.so
+    building &#39;Crypto.Cipher._ARC4&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/ARC4.c -o build/temp.linux-armv7l-2.7/src/ARC4.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/ARC4.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_ARC4.so
+    building &#39;Crypto.Cipher._XOR&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/XOR.c -o build/temp.linux-armv7l-2.7/src/XOR.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/XOR.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_XOR.so
+    building &#39;Crypto.Util.strxor&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/strxor.c -o build/temp.linux-armv7l-2.7/src/strxor.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/strxor.o -o build/lib.linux-armv7l-2.7/Crypto/Util/strxor.so
+    building &#39;Crypto.Util._counter&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/_counter.c -o build/temp.linux-armv7l-2.7/src/_counter.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/_counter.o -o build/lib.linux-armv7l-2.7/Crypto/Util/_counter.so
+    
+  Running setup.py install for tftpy
+    changing mode of build/scripts-2.7/tftpy_client.py from 644 to 755
+    changing mode of build/scripts-2.7/tftpy_server.py from 644 to 755
+    
+    changing mode of /home/cowrie/cowrie/cowrie-env/bin/tftpy_client.py to 755
+    changing mode of /home/cowrie/cowrie/cowrie-env/bin/tftpy_server.py to 755
+  Running setup.py install for zope.interface
+    
+    warning: no previously-included files matching &#39;*.dll&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.pyc&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.pyo&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;*.so&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;coverage.xml&#39; found anywhere in distribution
+    warning: no previously-included files matching &#39;appveyor.yml&#39; found anywhere in distribution
+    no previously-included directories found matching &#39;docs/_build&#39;
+    building &#39;zope.interface._zope_interface_coptimizations&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/zope/interface/_zope_interface_coptimizations.c -o build/temp.linux-armv7l-2.7/src/zope/interface/_zope_interface_coptimizations.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/zope/interface/_zope_interface_coptimizations.o -o build/lib.linux-armv7l-2.7/zope/interface/_zope_interface_coptimizations.so
+    Skipping installation of /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/zope/__init__.py (namespace package)
+    Installing /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/zope.interface-4.3.3-py2.7-nspkg.pth
+  Found existing installation: setuptools 5.5.1
+    Uninstalling setuptools:
+      Successfully uninstalled setuptools
+  Running setup.py install for cffi
+    building &#39;_cffi_backend&#39; extension
+    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -DUSE__THREAD -I/usr/include/python2.7 -c c/_cffi_backend.c -o build/temp.linux-armv7l-2.7/c/_cffi_backend.o
+    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/c/_cffi_backend.o -lffi -o build/lib.linux-armv7l-2.7/_cffi_backend.so
+  Could not find .egg-info directory in install record for cffi&amp;gt;=1.4.1 (from cryptography-&amp;gt;-r requirements.txt (line 2))
+  Running setup.py install for pycparser
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;tests&#39;
+    warning: no previously-included files matching &#39;yacctab.*&#39; found under directory &#39;examples&#39;
+    warning: no previously-included files matching &#39;lextab.*&#39; found under directory &#39;examples&#39;
+    Build the lexing/parsing tables
+  Could not find .egg-info directory in install record for pycparser (from cffi&amp;gt;=1.4.1-&amp;gt;cryptography-&amp;gt;-r requirements.txt (line 2))
+Successfully installed twisted cryptography configparser pyopenssl gmpy2 service-identity pycrypto python-dateutil tftpy zope.interface constantly incremental idna pyasn1 six setuptools enum34 ipaddress cffi pyasn1-modules attrs pycparser
+Cleaning up...
+(cowrie-env) $
+(cowrie-env) $ deactivate
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieの設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieの設定&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cp -p cowrie.cfg.dist cowrie.cfg
+$ ls -l cowrie.cfg*
+-rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg
+-rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg.dist
+$
+$ vi cowrie.cfg
+#sensor_name=myhostname
+sensor_name=homepot1
+
+#hostname = svr04
+hostname = cowrie01
+$
+$ diff cowrie.cfg.dist cowrie.cfg
+17a18
+&amp;gt; sensor_name=homepot1
+23c24,25
+&amp;lt; hostname = svr04
+---
+&amp;gt; #hostname = svr04
+&amp;gt; hostname = cowrie01
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieの起動と終了:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieの起動と終了&lt;/h3&gt;
+
+&lt;p&gt;起動するときは以下のコマンドを実行する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./start.sh cowrie-env/
+Activating virtualenv &amp;quot;cowrie-env/&amp;quot;
+Starting cowrie with extra arguments [ ] ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;終了するときは以下のコマンドを実行する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./stop.sh
+Stopping cowrie...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieポートのポートフォワード:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieポートのポートフォワード&lt;/h3&gt;
+
+&lt;p&gt;Cowrieでは&lt;code&gt;2222/tcp&lt;/code&gt;でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+$ sudo iptables -t nat -n -L
+Chain PREROUTING (policy ACCEPT)
+target     prot opt source               destination         
+REDIRECT   tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:22 redir ports 2222
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;iptables設定の保存:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;iptables設定の保存&lt;/h3&gt;
+
+&lt;p&gt;再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install iptables-persistent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  netfilter-persistent
+以下のパッケージが新たにインストールされます:
+  iptables-persistent netfilter-persistent
+アップグレード: 0 個、新規インストール: 2 個、削除: 0 個、保留: 0 個。
+19.5 kB のアーカイブを取得する必要があります。
+この操作後に追加で 148 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main netfilter-persistent all 1.0.3+deb8u1 [8,494 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main iptables-persistent all 1.0.3+deb8u1 [11.0 kB]
+19.5 kB を 2秒 で取得しました (7,989 B/s)      
+パッケージを事前設定しています ...
+
+↓&amp;lt;はい&amp;gt;を選択してEnter
+ ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
+ │                                                                           │ 
+ │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v4 に保存で  │ 
+ │ きます。このルールは、システムの起動時に自動的に読み込まれるようになりま  │ 
+ │ す。                                                                      │ 
+ │                                                                           │ 
+ │ ルールは、パッケージのインストール時にのみ自動的に保存されます。ルールの  │ 
+ │ ファイルを最新に保つには、iptables-save(8) のマニュアルページを参照して   │ 
+ │ ください。                                                                │ 
+ │                                                                           │ 
+ │ 現在の IPv4 ルールを保存しますか?                                         │ 
+ │                                                                           │ 
+ │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓&amp;lt;いいえ&amp;gt;を選択してEnter
+ ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
+ │                                                                           │ 
+ │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v6 に保存で  │ 
+ │ きます。このルールは、システムの起動時に自動的に読み込まれるようになりま  │ 
+ │ す。                                                                      │ 
+ │                                                                           │ 
+ │ ルールは、パッケージのインストール時にのみ自動的に保存されます。ルールの  │ 
+ │ ファイルを最新に保つには、ip6tables-save(8) のマニュアルページを参照して  │ 
+ │ ください。                                                                │ 
+ │                                                                           │ 
+ │ 現在の IPv6 ルールを保存しますか?                                         │ 
+ │                                                                           │ 
+ │                    &amp;lt;はい&amp;gt;                      &amp;lt;いいえ&amp;gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+以前に未選択のパッケージ netfilter-persistent を選択しています。
+(データベースを読み込んでいます ... 現在 34741 個のファイルとディレクトリがインストールされています。)
+.../netfilter-persistent_1.0.3+deb8u1_all.deb を展開する準備をしています ...
+netfilter-persistent (1.0.3+deb8u1) を展開しています...
+以前に未選択のパッケージ iptables-persistent を選択しています。
+.../iptables-persistent_1.0.3+deb8u1_all.deb を展開する準備をしています ...
+iptables-persistent (1.0.3+deb8u1) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+netfilter-persistent (1.0.3+deb8u1) を設定しています ...
+update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
+iptables-persistent (1.0.3+deb8u1) を設定しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+$ sudo systemctl start netfilter-persistent
+$ sudo systemctl enable netfilter-persistent
+Synchronizing state for netfilter-persistent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d netfilter-persistent defaults
+Executing /usr/sbin/update-rc.d netfilter-persistent enable
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;今後iptablesの設定変更を保存するには以下のコマンドを実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo netfilter-persistent save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cowrieの自動起動設定:638054c4f24019ce8e35d2f1d32a3666&#34;&gt;Cowrieの自動起動設定&lt;/h3&gt;
+
+&lt;p&gt;supervisorを使用してcowrieをデーモン化する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install supervisor
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  python-meld3 python-pkg-resources
+提案パッケージ:
+  python-distribute python-distribute-doc
+以下のパッケージが新たにインストールされます:
+  python-meld3 python-pkg-resources supervisor
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 0 個。
+369 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,670 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-pkg-resources all 5.5.1-1 [64.4 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-meld3 armhf 1.0.0-1 [37.0 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main supervisor all 3.0r1-1 [267 kB]
+369 kB を 1秒 で取得しました (195 kB/s)
+以前に未選択のパッケージ python-pkg-resources を選択しています。
+(データベースを読み込んでいます ... 現在 34759 個のファイルとディレクトリがインストールされています。)
+.../python-pkg-resources_5.5.1-1_all.deb を展開する準備をしています ...
+python-pkg-resources (5.5.1-1) を展開しています...
+以前に未選択のパッケージ python-meld3 を選択しています。
+.../python-meld3_1.0.0-1_armhf.deb を展開する準備をしています ...
+python-meld3 (1.0.0-1) を展開しています...
+以前に未選択のパッケージ supervisor を選択しています。
+.../supervisor_3.0r1-1_all.deb を展開する準備をしています ...
+supervisor (3.0r1-1) を展開しています...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+python-pkg-resources (5.5.1-1) を設定しています ...
+python-meld3 (1.0.0-1) を設定しています ...
+supervisor (3.0r1-1) を設定しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+$ sudo systemctl restart supervisor
+$ sudo systemctl enable supervisor
+Synchronizing state for supervisor.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d supervisor defaults
+Executing /usr/sbin/update-rc.d supervisor enable
+$
+$ sudo vi /etc/supervisor/conf.d/cowrie.conf
+[program:cowrie]
+command=/home/cowrie/cowrie/start.sh cowrie-env
+directory=/home/cowrie/cowrie/
+user=cowrie
+autorestart=true
+redirect_stderr=true
+$
+$ sudo su - cowrie
+$ cd cowrie/
+$ vi start.sh
+#DAEMONIZE=&amp;quot;&amp;quot;
+DAEMONIZE=&amp;quot;-n&amp;quot;
+$
+$ sudo supervisorctl reread
+cowrie: available
+$
+$ sudo supervisorctl add cowrie
+cowrie: added process group
+$
+$ sudo supervisorctl status
+cowrie                           RUNNING    pid 20292, uptime 0:00:04
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

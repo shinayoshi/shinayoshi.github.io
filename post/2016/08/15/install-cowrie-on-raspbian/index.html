@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>Raspbian(Jessie)にCowrieをインストールする</h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 15, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#raspbianの初期設定:4c0925631b42437e2f8c229197506152">Raspbianの初期設定</a>
+<ul>
+<li><a href="#パッケージの最新化:4c0925631b42437e2f8c229197506152">パッケージの最新化</a></li>
+<li><a href="#ipアドレスの固定化:4c0925631b42437e2f8c229197506152">IPアドレスの固定化</a></li>
+<li><a href="#ntp設定:4c0925631b42437e2f8c229197506152">NTP設定</a></li>
+<li><a href="#raspi-config関連:4c0925631b42437e2f8c229197506152">raspi-config関連</a></li>
+</ul></li>
+<li><a href="#公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152">公開鍵認証方式の設定</a></li>
+<li><a href="#sshサーバの設定:4c0925631b42437e2f8c229197506152">SSHサーバの設定</a></li>
+<li><a href="#ユーザ設定:4c0925631b42437e2f8c229197506152">ユーザ設定</a></li>
+<li><a href="#cowrieのインストール:4c0925631b42437e2f8c229197506152">Cowrieのインストール</a></li>
+<li><a href="#cowrieの設定:4c0925631b42437e2f8c229197506152">Cowrieの設定</a></li>
+<li><a href="#cowrieの起動と終了:4c0925631b42437e2f8c229197506152">Cowrieの起動と終了</a></li>
+<li><a href="#cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152">Cowrieポートのポートフォワード</a></li>
+<li><a href="#iptables設定の保存:4c0925631b42437e2f8c229197506152">iptables設定の保存</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
+はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。</p>
+
+<p>個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。</p>
+
+<h2 id="raspbianの初期設定:4c0925631b42437e2f8c229197506152">Raspbianの初期設定</h2>
+
+<p>Raspbianの初期設定として以下を行いました。</p>
+
+<h3 id="パッケージの最新化:4c0925631b42437e2f8c229197506152">パッケージの最新化</h3>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h3 id="ipアドレスの固定化:4c0925631b42437e2f8c229197506152">IPアドレスの固定化</h3>
+
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.10.10/24
+static routers=192.168.10.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre>
+
+<h3 id="ntp設定:4c0925631b42437e2f8c229197506152">NTP設定</h3>
+
+<p>NTP同期先を設定する。</p>
+
+<pre><code>$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre>
+
+<p>NTPサーバを再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>時刻同期の状態を確認する。</p>
+
+<pre><code>$ ntpq -p
+</code></pre>
+
+<h3 id="raspi-config関連:4c0925631b42437e2f8c229197506152">raspi-config関連</h3>
+
+<pre><code>$ sudo raspi-config
+</code></pre>
+
+<ul>
+<li>ディスク拡張</li>
+<li>文字コード設定</li>
+<li>タイムゾーン設定</li>
+<li>Wifiの国設定</li>
+<li>ホスト名変更</li>
+</ul>
+
+<h2 id="公開鍵認証方式の設定:4c0925631b42437e2f8c229197506152">公開鍵認証方式の設定</h2>
+
+<pre><code>$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
+Created directory '/home/pi/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/pi/.ssh/id_rsa.
+Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
+
+$ cd ~/.ssh/
+$ cat id_rsa.pub &gt;&gt; authorized_keys
+$ chmod 600 authorized_keys
+</code></pre>
+
+<p>Raspbianで作成した秘密鍵をローカルPCにコピーする。</p>
+
+<pre><code>$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
+</code></pre>
+
+<p>公開鍵認証方式でsshログインできることを確認する。</p>
+
+<pre><code>$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
+</code></pre>
+
+<h2 id="sshサーバの設定:4c0925631b42437e2f8c229197506152">SSHサーバの設定</h2>
+
+<p>Cowrieで<code>22/tcp</code>を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。</p>
+
+<pre><code>$ sudo vi /etc/ssh/sshd_config
+#Port 22
+Port 20022
+
+#PermitRootLogin without-password
+PermitRootLogin no
+
+ChallengeResponseAuthentication no
+
+#PasswordAuthentication yes
+PasswordAuthentication no
+</code></pre>
+
+<p>SSHサーバの設定を再起動する。</p>
+
+<pre><code>$ sudo systemctl restart ssh
+</code></pre>
+
+<p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
+
+<pre><code>$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
+</code></pre>
+
+<h2 id="ユーザ設定:4c0925631b42437e2f8c229197506152">ユーザ設定</h2>
+
+<p>rootユーザが無効化されていることを確認する(2列目が<code>L</code>であることを確認)。</p>
+
+<pre><code>$ sudo passwd -S root
+root L 05/27/2016 0 99999 7 -1
+</code></pre>
+
+<p>Cowrieユーザを作成する。</p>
+
+<pre><code>$ sudo adduser --disabled-password cowrie
+ユーザ `cowrie' を追加しています...
+新しいグループ `cowrie' (1001) を追加しています...
+新しいユーザ `cowrie' (1001) をグループ `cowrie' として追加しています...
+ホームディレクトリ `/home/cowrie' を作成しています...
+`/etc/skel' からファイルをコピーしています...
+cowrie のユーザ情報を変更中
+新しい値を入力してください。標準設定値を使うならリターンを押してください
+	フルネーム []: 
+	部屋番号 []: 
+	職場電話番号 []: 
+	自宅電話番号 []: 
+	その他 []: 
+以上で正しいですか? [Y/n] y
+</code></pre>
+
+<h2 id="cowrieのインストール:4c0925631b42437e2f8c229197506152">Cowrieのインストール</h2>
+
+<p>Cowrienの公式サイトの<a href="https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md">INSTALL.md</a>を参考にインストールを行う。</p>
+
+<pre><code>$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
+
+$ sudo su - cowrie
+$ git clone http://github.com/micheloosterhof/cowrie
+$ cd cowrie/
+$ cp cowrie.cfg.dist cowrie.cfg
+</code></pre>
+
+<h2 id="cowrieの設定:4c0925631b42437e2f8c229197506152">Cowrieの設定</h2>
+
+<pre><code>$ vi cowrie.cfg
+#sensor_name=myhostname
+sensor_name=rpicowrie
+
+#hostname = svr04
+hostname = cowrie01
+</code></pre>
+
+<h2 id="cowrieの起動と終了:4c0925631b42437e2f8c229197506152">Cowrieの起動と終了</h2>
+
+<p>起動するときは以下のコマンドを実行する。</p>
+
+<pre><code>$ ./start.sh
+</code></pre>
+
+<p>終了するときは以下のコマンドを実行する。</p>
+
+<pre><code>$ ./stop.sh
+</code></pre>
+
+<h2 id="cowrieポートのポートフォワード:4c0925631b42437e2f8c229197506152">Cowrieポートのポートフォワード</h2>
+
+<p>Cowrieでは<code>2222/tcp</code>でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。</p>
+
+<pre><code>$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+$ sudo iptables -t nat -n -L
+</code></pre>
+
+<h2 id="iptables設定の保存:4c0925631b42437e2f8c229197506152">iptables設定の保存</h2>
+
+<p>再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。</p>
+
+<pre><code>$ sudo apt-get install iptables-persistent
+$ sudo systemctl enable netfilter-persistent
+</code></pre>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></li>
+                  
+                  
+                  <li class="previous"><a href="http://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">家庭内インターネット接続環境を構築する その16 [ 2017-01-12 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">家庭内インターネット接続環境を構築する その14 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">家庭内インターネット接続環境を構築する その13 [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">家庭内インターネット接続環境を構築する その12 [ 2017-01-08 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">家庭内インターネット接続環境を構築する その11 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">家庭内インターネット接続環境を構築する その10 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">家庭内インターネット接続環境を構築する その9 [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">家庭内インターネット接続環境を構築する その8 [ 2017-01-05 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">家庭内インターネット接続環境を構築する その7 [ 2017-01-04 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">家庭内インターネット接続環境を構築する その6 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">家庭内インターネット接続環境を構築する その5 [ 2017-01-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">家庭内インターネット接続環境を構築する その4 [ 2017-01-02 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">35</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (16)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (5)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (31)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2017 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+
