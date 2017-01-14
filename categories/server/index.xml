@@ -7,8 +7,161 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2017 shinayoshi</copyright>
-    <lastBuildDate>Thu, 12 Jan 2017 17:52:47 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/categories/server/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>家庭内インターネット接続環境を構築する その17</title>
+      <link>http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</link>
+      <pubDate>Sun, 15 Jan 2017 00:51:03 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</guid>
+      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;のバックアップを行います。&lt;/p&gt;
+
+&lt;p&gt;##&lt;/p&gt;
+
+&lt;p&gt;gitのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install git
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  git-man liberror-perl
+提案パッケージ:
+  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn
+以下のパッケージが新たにインストールされます:
+  git git-man liberror-perl
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+4,015 kB のアーカイブを取得する必要があります。
+この操作後に追加で 20.4 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
+4,015 kB を 6秒 で取得しました (630 kB/s)                                      
+以前に未選択のパッケージ liberror-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33218 個のファイルとディレクトリがインストールされています。)
+.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
+liberror-perl (0.17-1.1) を展開しています...
+以前に未選択のパッケージ git-man を選択しています。
+.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
+git-man (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ git を選択しています。
+.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
+git (1:2.1.4-2.1+deb8u2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+liberror-perl (0.17-1.1) を設定しています ...
+git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
+git (1:2.1.4-2.1+deb8u2) を設定しています ...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rpi-cloneのインストール&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/billw2/rpi-clone.git
+Cloning into &#39;rpi-clone&#39;...
+remote: Counting objects: 58, done.
+remote: Total 58 (delta 0), reused 0 (delta 0), pack-reused 58
+Unpacking objects: 100% (58/58), done.
+Checking connectivity... done.
+$
+$ ls -l rpi-clone/
+合計 20
+-rw-r--r-- 1 pi pi  4026  1月 15 00:57 README.md
+-rwxr-xr-x 1 pi pi 13933  1月 15 00:57 rpi-clone
+$
+$ sudo cp -p rpi-clone/rpi-clone /usr/local/sbin/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;rpi-cloneでのバックアップ&lt;/p&gt;
+
+&lt;p&gt;今回、バックアップ先のmicroSDカードのデバイスは&lt;code&gt;sdd&lt;/code&gt;でしたので、&lt;code&gt;rpi-clone&lt;/code&gt;コマンドの引数には&lt;code&gt;sdd&lt;/code&gt;を指定しています。32GBのmicroSDカードのバックアップには5分程度かかりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo rpi-clone sdd -f
+
+Forcing a partition initialization of destination disk sdd
+The existing destination disk &#39;sdd&#39; partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+*** All data on destination disk sdd will be overwritten! ***
+
+Do you want to initialize the destination disk /dev/sdd? (yes/no): yes
+
+Imaging the partition structure, copying 78 megabytes...
+78+0 レコード入力
+78+0 レコード出力
+81788928 バイト (82 MB) コピーされました、 25.7102 秒、 3.2 MB/秒
+Running fsck on /dev/sdd1...
+Sizing partition 2 (root partition) to use all SD card space...
+mke2fs 1.42.12 (29-Aug-2014)
+/dev/sdd2 contains a ext4 file system
+	last mounted on / on Sun Jan  1 18:13:44 2017
+Creating filesystem with 7728128 4k blocks and 1933312 inodes
+Filesystem UUID: bffb6652-49b7-45ce-a9c6-46e745372a7c
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information:        
+done
+
+
+/dev/sdd is initialized and resized.  Its partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+
+Your booted /dev/mmcblk0p2 rootfs existing label: 
+You may enter a label for the destination rootfs /dev/sdd2: 
+======== Clone Summary ========
+Clone mode               :  rsync all files to sdd root file system
+Clone destination disk   :  sdd
+Clone destination rootfs :  /dev/sdd2 (no label) on /mnt/clone
+Clone destination bootfs :  /dev/sdd1 on /mnt/clone/boot
+Verbose mode             :  off
+===============================
+Final check, is it Ok to proceed with the clone (yes/no)?: yes
+=&amp;gt; Mounting /dev/sdd2 (no label) on /mnt/clone
+=&amp;gt; Mounting /dev/sdd1 on /mnt/clone/boot
+===============================
+Starting the filesystem rsync to sdd
+(This may take several minutes)...
+*** Done with clone to /dev/sdd ***
+    Started: 01:07:27    Finished: 01:10:05
+
+Hit Enter when ready to unmount the /dev/sdd partitions...
+unmounting /mnt/clone/boot
+unmounting /mnt/clone
+===============================
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;バックアップmicroSDカードからのリストア&lt;/p&gt;
+
+&lt;p&gt;バックアップmicroSDカードをRaspberry Piにセットして起動するだけです。特にリストアという作業は必要ありません。&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>家庭内インターネット接続環境を構築する その16</title>
@@ -6230,163 +6383,6 @@ $
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://projpi.com/diy-home-projects-with-a-raspberry-pi/raspberry-pi-raid-array-with-usb-hdds/&#34;&gt;Raspberry Pi raid array with USB HDDs&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>家庭内インターネット接続環境を構築する その2</title>
-      <link>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</link>
-      <pubDate>Sat, 22 Oct 2016 22:43:46 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</guid>
-      <description>
-
-&lt;h2 id=&#34;raspberry-pi-2共通初期設定:4734a81b60315110a1536277d531cee2&#34;&gt;Raspberry Pi 2共通初期設定&lt;/h2&gt;
-
-&lt;p&gt;家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。&lt;/p&gt;
-
-&lt;h2 id=&#34;前提:4734a81b60315110a1536277d531cee2&#34;&gt;前提&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。
-セキュリティ関連の設定は個別に行いますので、ここでは省略します。&lt;/p&gt;
-
-&lt;h2 id=&#34;パッケージ更新:4734a81b60315110a1536277d531cee2&#34;&gt;パッケージ更新&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get update
-$ sudo apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.raspberrypi.org/documentation/raspbian/updating.md&#34;&gt;Updating and Upgrading Raspbian - Raspberry Pi Documentation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ipアドレス固定化:4734a81b60315110a1536277d531cee2&#34;&gt;IPアドレス固定化&lt;/h2&gt;
-
-&lt;p&gt;Raspberry Pi 2のIPアドレスを固定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org
-$ sudo vi /etc/dhcpcd.conf
-#Add the following line
-interface eth0
-static ip_address=192.168.40.10/24
-static routers=192.168.40.254
-static domain_name_servers=192.168.100.1
-#static domain_name=
-#static domain_search=
-
-interface eth1
-static ip_address=172.31.10.110/24
-static routers=
-static domain_name_servers=
-#static domain_name=
-#static domain_search=
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;man dhcpcd.conf&amp;rdquo;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;usbポートの電流供給増加:4734a81b60315110a1536277d531cee2&#34;&gt;USBポートの電流供給増加&lt;/h2&gt;
-
-&lt;p&gt;USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /boot/config.txt /boot/config.txt.org
-$ sudo vi /boot/config.txt
-#Add the following line
-max_usb_current=1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://elinux.org/RPiconfig&#34;&gt;RPiconfig - eLinux.org&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ntp設定:4734a81b60315110a1536277d531cee2&#34;&gt;NTP設定&lt;/h2&gt;
-
-&lt;p&gt;NTP同期先を設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/ntp.conf /etc/ntp.conf.org
-$ sudo vi /etc/ntp.conf
-#Add the line
-server ntp.nict.jp iburst
-server ntp.jst.mfeed.ad.jp iburst
-# comment out
-#server 0.debian.pool.ntp.org iburst
-#server 1.debian.pool.ntp.org iburst
-#server 2.debian.pool.ntp.org iburst
-#server 3.debian.pool.ntp.org iburst
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NTPサーバを再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart ntp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;時刻同期の状態を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ntpq -p
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://vogel.at.webry.info/201501/article_5.html&#34;&gt;NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;raspi-config関連:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config関連&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo raspi-config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;文字コード設定:4734a81b60315110a1536277d531cee2&#34;&gt;文字コード設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I1 Change Locale」を選択する。&lt;/li&gt;
-&lt;li&gt;「en_GB.UTF-8 UTF-8」の選択を外す。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8 UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;「ja_JP.UTF-8」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;タイムゾーン設定:4734a81b60315110a1536277d531cee2&#34;&gt;タイムゾーン設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I2 Change Timezone」を選択する。&lt;/li&gt;
-&lt;li&gt;「Asia」を選択する。&lt;/li&gt;
-&lt;li&gt;「Tokyo」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;wifiの国設定:4734a81b60315110a1536277d531cee2&#34;&gt;Wifiの国設定&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「4 Internationalisation Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「I4 Change Wi-fi Country」を選択する。&lt;/li&gt;
-&lt;li&gt;「JP Japan」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;ホスト名変更:4734a81b60315110a1536277d531cee2&#34;&gt;ホスト名変更&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「7 Advanced Options」を選択する。&lt;/li&gt;
-&lt;li&gt;「A2 Hostname」を選択する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;ホスト名を設定する。&lt;/li&gt;
-&lt;li&gt;「Ok」を選択する。&lt;/li&gt;
-&lt;li&gt;raspi-configの初期画面に戻る。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;raspi-config終了:4734a81b60315110a1536277d531cee2&#34;&gt;raspi-config終了&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;「Finish」を選択する。&lt;/li&gt;
-&lt;li&gt;リブートの確認が求められるため、「Yes」を選択する。&lt;/li&gt;
-&lt;/ol&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

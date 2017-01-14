@@ -74,6 +74,176 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/">家庭内インターネット接続環境を構築する その17</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Jan 15, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>今回は<code>homenas1</code>のバックアップを行います。</p>
+
+<p>##</p>
+
+<p>gitのインストール</p>
+
+<pre><code>$ sudo -E apt-get install git
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  git-man liberror-perl
+提案パッケージ:
+  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn
+以下のパッケージが新たにインストールされます:
+  git git-man liberror-perl
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+4,015 kB のアーカイブを取得する必要があります。
+この操作後に追加で 20.4 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
+4,015 kB を 6秒 で取得しました (630 kB/s)                                      
+以前に未選択のパッケージ liberror-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33218 個のファイルとディレクトリがインストールされています。)
+.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
+liberror-perl (0.17-1.1) を展開しています...
+以前に未選択のパッケージ git-man を選択しています。
+.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
+git-man (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ git を選択しています。
+.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
+git (1:2.1.4-2.1+deb8u2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+liberror-perl (0.17-1.1) を設定しています ...
+git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
+git (1:2.1.4-2.1+deb8u2) を設定しています ...
+$
+</code></pre>
+
+<p>rpi-cloneのインストール</p>
+
+<pre><code>$ git clone https://github.com/billw2/rpi-clone.git
+Cloning into 'rpi-clone'...
+remote: Counting objects: 58, done.
+remote: Total 58 (delta 0), reused 0 (delta 0), pack-reused 58
+Unpacking objects: 100% (58/58), done.
+Checking connectivity... done.
+$
+$ ls -l rpi-clone/
+合計 20
+-rw-r--r-- 1 pi pi  4026  1月 15 00:57 README.md
+-rwxr-xr-x 1 pi pi 13933  1月 15 00:57 rpi-clone
+$
+$ sudo cp -p rpi-clone/rpi-clone /usr/local/sbin/
+</code></pre>
+
+<p>rpi-cloneでのバックアップ</p>
+
+<p>今回、バックアップ先のmicroSDカードのデバイスは<code>sdd</code>でしたので、<code>rpi-clone</code>コマンドの引数には<code>sdd</code>を指定しています。32GBのmicroSDカードのバックアップには5分程度かかりました。</p>
+
+<pre><code>$ sudo rpi-clone sdd -f
+
+Forcing a partition initialization of destination disk sdd
+The existing destination disk 'sdd' partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+*** All data on destination disk sdd will be overwritten! ***
+
+Do you want to initialize the destination disk /dev/sdd? (yes/no): yes
+
+Imaging the partition structure, copying 78 megabytes...
+78+0 レコード入力
+78+0 レコード出力
+81788928 バイト (82 MB) コピーされました、 25.7102 秒、 3.2 MB/秒
+Running fsck on /dev/sdd1...
+Sizing partition 2 (root partition) to use all SD card space...
+mke2fs 1.42.12 (29-Aug-2014)
+/dev/sdd2 contains a ext4 file system
+	last mounted on / on Sun Jan  1 18:13:44 2017
+Creating filesystem with 7728128 4k blocks and 1933312 inodes
+Filesystem UUID: bffb6652-49b7-45ce-a9c6-46e745372a7c
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information:        
+done
+
+
+/dev/sdd is initialized and resized.  Its partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+
+Your booted /dev/mmcblk0p2 rootfs existing label: 
+You may enter a label for the destination rootfs /dev/sdd2: 
+======== Clone Summary ========
+Clone mode               :  rsync all files to sdd root file system
+Clone destination disk   :  sdd
+Clone destination rootfs :  /dev/sdd2 (no label) on /mnt/clone
+Clone destination bootfs :  /dev/sdd1 on /mnt/clone/boot
+Verbose mode             :  off
+===============================
+Final check, is it Ok to proceed with the clone (yes/no)?: yes
+=&gt; Mounting /dev/sdd2 (no label) on /mnt/clone
+=&gt; Mounting /dev/sdd1 on /mnt/clone/boot
+===============================
+Starting the filesystem rsync to sdd
+(This may take several minutes)...
+*** Done with clone to /dev/sdd ***
+    Started: 01:07:27    Finished: 01:10:05
+
+Hit Enter when ready to unmount the /dev/sdd partitions...
+unmounting /mnt/clone/boot
+unmounting /mnt/clone
+===============================
+$
+</code></pre>
+
+<p>バックアップmicroSDカードからのリストア</p>
+
+<p>バックアップmicroSDカードをRaspberry Piにセットして起動するだけです。特にリストアという作業は必要ありません。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/">家庭内インターネット接続環境を構築する その16</a></h1>
                   <p>
                     <span class="label label-primary">Thu Jan 12, 2017</span> in
@@ -3766,971 +3936,6 @@ $
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/">家庭内インターネット接続環境を構築する その7</a></h1>
-                  <p>
-                    <span class="label label-primary">Wed Jan 4, 2017</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/homepot1">homepot1</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。</p>
-
-<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
-
-<p>今回は<code>homepot1</code>を構築していきます。</p>
-
-<h2 id="raspberry-pi-2でsshハニーポット-cowrie-構築:638054c4f24019ce8e35d2f1d32a3666">Raspberry Pi 2でSSHハニーポット(Cowrie)構築</h2>
-
-<p>インターネットの怖さを知るためにSSHハニーポットを構築します。</p>
-
-<h3 id="公開鍵認証方式の設定:638054c4f24019ce8e35d2f1d32a3666">公開鍵認証方式の設定</h3>
-
-<p>公開鍵・秘密鍵の作成</p>
-
-<pre><code>$ ssh-keygen -t rsa
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
-Created directory '/home/pi/.ssh'.
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /home/pi/.ssh/id_rsa.
-Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
-The key fingerprint is:
-XX:XX:XX:39:e2:be:63:99:e1:a2:a5:32:f4:XX:XX:XX pi@homepot1
-The key's randomart image is:
-+---[RSA 2048]----+
-|                 |
-|                 |
-|                 |
-|                 |
-|    . . S        |
-|.o E.. .         |
-|= +. +.          |
-|++..B .o         |
-|+o.***+.         |
-+-----------------+
-$
-$ cd ~/.ssh/
-$ cat id_rsa.pub &gt;&gt; authorized_keys
-$ chmod 600 authorized_keys
-$ ls -l authorized_keys 
--rw------- 1 pi pi 393  1月  4 18:04 authorized_keys
-$
-</code></pre>
-
-<p>homepot1で作成した秘密鍵をローカルPCにコピー</p>
-
-<pre><code>$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/pi@homepot1
-</code></pre>
-
-<p>公開鍵認証方式でsshログインできることを確認</p>
-
-<pre><code>$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
-</code></pre>
-
-<h3 id="sshサーバの設定:638054c4f24019ce8e35d2f1d32a3666">SSHサーバの設定</h3>
-
-<p>Cowrieで<code>22/tcp</code>を使用するため、SSHサーバのポートを変更します。またパスワード認証を無効化します。</p>
-
-<pre><code>$ sudo cp -p /etc/ssh/sshd_config{,.org}
-$ sudo ls -l /etc/ssh/sshd_config*
--rw-r--r-- 1 root root 2541 11月 26 02:28 /etc/ssh/sshd_config
--rw-r--r-- 1 root root 2541 11月 26 02:28 /etc/ssh/sshd_config.org
-$
-$ sudo vi /etc/ssh/sshd_config
-#Port 22
-Port 20022
-
-#RSAAuthentication yes
-RSAAuthentication no
-
-#PermitRootLogin without-password
-PermitRootLogin no
-
-ChallengeResponseAuthentication no
-
-#PasswordAuthentication yes
-PasswordAuthentication no
-$
-$ diff /etc/ssh/sshd_config.org /etc/ssh/sshd_config
-5c5,6
-&lt; Port 22
----
-&gt; #Port 22
-&gt; Port 10122
-28c29,30
-&lt; PermitRootLogin without-password
----
-&gt; #PermitRootLogin without-password
-&gt; PermitRootLogin no
-31c33,34
-&lt; RSAAuthentication yes
----
-&gt; #RSAAuthentication yes
-&gt; RSAAuthentication no
-52a56
-&gt; PasswordAuthentication no
-$
-</code></pre>
-
-<p>SSHサーバの設定を再起動する。</p>
-
-<pre><code>$ sudo systemctl restart ssh
-</code></pre>
-
-<p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
-
-<pre><code>$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
-</code></pre>
-
-<h3 id="ユーザ設定:638054c4f24019ce8e35d2f1d32a3666">ユーザ設定</h3>
-
-<p>rootユーザが無効化されていることを確認する(2列目が<code>L</code>であることを確認)。</p>
-
-<pre><code>$ sudo passwd -S root
-root L 11/25/2016 0 99999 7 -1
-</code></pre>
-
-<p>Cowrieユーザを作成する。</p>
-
-<pre><code>$ sudo adduser --disabled-password cowrie
-ユーザ `cowrie' を追加しています...
-新しいグループ `cowrie' (1001) を追加しています...
-新しいユーザ `cowrie' (1001) をグループ `cowrie' として追加しています...
-ホームディレクトリ `/home/cowrie' を作成しています...
-`/etc/skel' からファイルをコピーしています...
-cowrie のユーザ情報を変更中
-新しい値を入力してください。標準設定値を使うならリターンを押してください
-	フルネーム []: 
-	部屋番号 []: 
-	職場電話番号 []: 
-	自宅電話番号 []: 
-	その他 []: 
-以上で正しいですか? [Y/n] y
-$
-$ sudo passwd -S cowrie
-cowrie L 01/04/2017 0 99999 7 -1
-$
-</code></pre>
-
-<h3 id="cowrieのインストール:638054c4f24019ce8e35d2f1d32a3666">Cowrieのインストール</h3>
-
-<p>Cowrienの公式サイトの<a href="https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md">INSTALL.md</a>を参考にインストールを行う。</p>
-
-<pre><code>$ sudo -E apt-get install git virtualenv libmpfr-dev libssl-dev libmpc-dev libffi-dev build-essential libpython-dev python2.7-minimal
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-build-essential はすでに最新版です。
-python2.7-minimal はすでに最新版です。
-python2.7-minimal は手動でインストールしたと設定されました。
-以下の追加パッケージがインストールされます:
-  dh-python git-man libcurl3-gnutls liberror-perl libexpat1-dev libgmp-dev
-  libgmpxx4ldbl libmpdec2 libpython2.7-dev libpython3-stdlib
-  libpython3.4-minimal libpython3.4-stdlib libssl-doc python-chardet-whl
-  python-colorama-whl python-distlib-whl python-html5lib-whl python-pip-whl
-  python-requests-whl python-setuptools-whl python-six-whl python-urllib3-whl
-  python3 python3-minimal python3-pkg-resources python3-virtualenv python3.4
-  python3.4-minimal rsync
-提案パッケージ:
-  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
-  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn libgmp10-doc
-  libmpfr-doc python3-doc python3-tk python3-venv python3-setuptools
-  python3.4-venv python3.4-doc binfmt-support
-以下のパッケージが新たにインストールされます:
-  dh-python git git-man libcurl3-gnutls liberror-perl libexpat1-dev libffi-dev
-  libgmp-dev libgmpxx4ldbl libmpc-dev libmpdec2 libmpfr-dev libpython-dev
-  libpython2.7-dev libpython3-stdlib libpython3.4-minimal libpython3.4-stdlib
-  libssl-dev libssl-doc python-chardet-whl python-colorama-whl
-  python-distlib-whl python-html5lib-whl python-pip-whl python-requests-whl
-  python-setuptools-whl python-six-whl python-urllib3-whl python3
-  python3-minimal python3-pkg-resources python3-virtualenv python3.4
-  python3.4-minimal rsync virtualenv
-アップグレード: 0 個、新規インストール: 36 個、削除: 0 個、保留: 0 個。
-31.7 MB のアーカイブを取得する必要があります。
-この操作後に追加で 76.3 MB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgmpxx4ldbl armhf 2:6.0.0+dfsg-6+rpi1 [21.6 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpdec2 armhf 2.4.1-1 [65.8 kB]
-取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libexpat1-dev armhf 2.1.0-6+deb8u3 [115 kB]
-取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython2.7-dev armhf 2.7.9-2+deb8u1 [17.9 MB]
-取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3.4-minimal armhf 3.4.2-1 [483 kB]
-取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3.4-stdlib armhf 3.4.2-1 [2,011 kB]
-取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3.4-minimal armhf 3.4.2-1 [1,355 kB]
-取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3.4 armhf 3.4.2-1 [204 kB]
-取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-minimal armhf 3.4.2-2 [34.7 kB]
-取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython3-stdlib armhf 3.4.2-2 [18.1 kB]
-取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3 armhf 3.4.2-2 [21.2 kB]
-取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main dh-python all 1.20141111-2 [66.4 kB]
-取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
-取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
-取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
-取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main libffi-dev armhf 3.1-2 [152 kB]
-取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgmp-dev armhf 2:6.0.0+dfsg-6+rpi1 [552 kB]
-取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpfr-dev armhf 3.1.2-2 [540 kB]
-取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpython-dev armhf 2.7.9-1 [19.6 kB]
-取得:21 http://mirrordirector.raspbian.org/raspbian/ jessie/main libssl-dev armhf 1.0.1t-1+deb8u5 [1,094 kB]
-取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main libssl-doc all 1.0.1t-1+deb8u5 [1,167 kB]
-取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-pkg-resources all 5.5.1-1 [34.2 kB]
-取得:24 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-chardet-whl all 2.3.0-1 [170 kB]
-取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-colorama-whl all 0.3.2-1 [20.2 kB]
-取得:26 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-distlib-whl all 0.1.9-1 [141 kB]
-取得:27 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-html5lib-whl all 0.999-3 [112 kB]
-取得:28 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-six-whl all 1.8.0-1 [14.8 kB]
-取得:29 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-urllib3-whl all 1.9.1-3 [76.8 kB]
-取得:30 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-requests-whl all 2.4.3-6 [241 kB]
-取得:31 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-setuptools-whl all 5.5.1-1 [233 kB]
-取得:32 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-pip-whl all 1.5.6-5 [126 kB]
-取得:33 http://mirrordirector.raspbian.org/raspbian/ jessie/main python3-virtualenv all 1.11.6+ds-1 [60.5 kB]
-取得:34 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.1.1-3 [373 kB]
-取得:35 http://mirrordirector.raspbian.org/raspbian/ jessie/main virtualenv all 1.11.6+ds-1 [17.2 kB]
-取得:36 http://mirrordirector.raspbian.org/raspbian/ jessie/main libmpc-dev armhf 1.0.2-1 [39.1 kB]
-31.7 MB を 1分 8秒 で取得しました (463 kB/s)                                   
-パッケージからテンプレートを展開しています: 100%
-以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
-(データベースを読み込んでいます ... 現在 31276 個のファイルとディレクトリがインストールされています。)
-.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
-libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
-以前に未選択のパッケージ libgmpxx4ldbl:armhf を選択しています。
-.../libgmpxx4ldbl_2%3a6.0.0+dfsg-6+rpi1_armhf.deb を展開する準備をしています ...
-libgmpxx4ldbl:armhf (2:6.0.0+dfsg-6+rpi1) を展開しています...
-以前に未選択のパッケージ libmpdec2:armhf を選択しています。
-.../libmpdec2_2.4.1-1_armhf.deb を展開する準備をしています ...
-libmpdec2:armhf (2.4.1-1) を展開しています...
-以前に未選択のパッケージ libexpat1-dev:armhf を選択しています。
-.../libexpat1-dev_2.1.0-6+deb8u3_armhf.deb を展開する準備をしています ...
-libexpat1-dev:armhf (2.1.0-6+deb8u3) を展開しています...
-以前に未選択のパッケージ libpython2.7-dev:armhf を選択しています。
-.../libpython2.7-dev_2.7.9-2+deb8u1_armhf.deb を展開する準備をしています ...
-libpython2.7-dev:armhf (2.7.9-2+deb8u1) を展開しています...
-以前に未選択のパッケージ libpython3.4-minimal:armhf を選択しています。
-.../libpython3.4-minimal_3.4.2-1_armhf.deb を展開する準備をしています ...
-libpython3.4-minimal:armhf (3.4.2-1) を展開しています...
-以前に未選択のパッケージ libpython3.4-stdlib:armhf を選択しています。
-.../libpython3.4-stdlib_3.4.2-1_armhf.deb を展開する準備をしています ...
-libpython3.4-stdlib:armhf (3.4.2-1) を展開しています...
-以前に未選択のパッケージ python3.4-minimal を選択しています。
-.../python3.4-minimal_3.4.2-1_armhf.deb を展開する準備をしています ...
-python3.4-minimal (3.4.2-1) を展開しています...
-以前に未選択のパッケージ python3.4 を選択しています。
-.../python3.4_3.4.2-1_armhf.deb を展開する準備をしています ...
-python3.4 (3.4.2-1) を展開しています...
-以前に未選択のパッケージ python3-minimal を選択しています。
-.../python3-minimal_3.4.2-2_armhf.deb を展開する準備をしています ...
-python3-minimal (3.4.2-2) を展開しています...
-以前に未選択のパッケージ libpython3-stdlib:armhf を選択しています。
-.../libpython3-stdlib_3.4.2-2_armhf.deb を展開する準備をしています ...
-libpython3-stdlib:armhf (3.4.2-2) を展開しています...
-以前に未選択のパッケージ python3 を選択しています。
-.../python3_3.4.2-2_armhf.deb を展開する準備をしています ...
-python3 (3.4.2-2) を展開しています...
-以前に未選択のパッケージ dh-python を選択しています。
-.../dh-python_1.20141111-2_all.deb を展開する準備をしています ...
-dh-python (1.20141111-2) を展開しています...
-以前に未選択のパッケージ liberror-perl を選択しています。
-.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
-liberror-perl (0.17-1.1) を展開しています...
-以前に未選択のパッケージ git-man を選択しています。
-.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
-git-man (1:2.1.4-2.1+deb8u2) を展開しています...
-以前に未選択のパッケージ git を選択しています。
-.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
-git (1:2.1.4-2.1+deb8u2) を展開しています...
-以前に未選択のパッケージ libffi-dev:armhf を選択しています。
-.../libffi-dev_3.1-2_armhf.deb を展開する準備をしています ...
-libffi-dev:armhf (3.1-2) を展開しています...
-以前に未選択のパッケージ libgmp-dev:armhf を選択しています。
-.../libgmp-dev_2%3a6.0.0+dfsg-6+rpi1_armhf.deb を展開する準備をしています ...
-libgmp-dev:armhf (2:6.0.0+dfsg-6+rpi1) を展開しています...
-以前に未選択のパッケージ libmpfr-dev:armhf を選択しています。
-.../libmpfr-dev_3.1.2-2_armhf.deb を展開する準備をしています ...
-libmpfr-dev:armhf (3.1.2-2) を展開しています...
-以前に未選択のパッケージ libpython-dev:armhf を選択しています。
-.../libpython-dev_2.7.9-1_armhf.deb を展開する準備をしています ...
-libpython-dev:armhf (2.7.9-1) を展開しています...
-以前に未選択のパッケージ libssl-dev:armhf を選択しています。
-.../libssl-dev_1.0.1t-1+deb8u5_armhf.deb を展開する準備をしています ...
-libssl-dev:armhf (1.0.1t-1+deb8u5) を展開しています...
-以前に未選択のパッケージ libssl-doc を選択しています。
-.../libssl-doc_1.0.1t-1+deb8u5_all.deb を展開する準備をしています ...
-libssl-doc (1.0.1t-1+deb8u5) を展開しています...
-以前に未選択のパッケージ python3-pkg-resources を選択しています。
-.../python3-pkg-resources_5.5.1-1_all.deb を展開する準備をしています ...
-python3-pkg-resources (5.5.1-1) を展開しています...
-以前に未選択のパッケージ python-chardet-whl を選択しています。
-.../python-chardet-whl_2.3.0-1_all.deb を展開する準備をしています ...
-python-chardet-whl (2.3.0-1) を展開しています...
-以前に未選択のパッケージ python-colorama-whl を選択しています。
-.../python-colorama-whl_0.3.2-1_all.deb を展開する準備をしています ...
-python-colorama-whl (0.3.2-1) を展開しています...
-以前に未選択のパッケージ python-distlib-whl を選択しています。
-.../python-distlib-whl_0.1.9-1_all.deb を展開する準備をしています ...
-python-distlib-whl (0.1.9-1) を展開しています...
-以前に未選択のパッケージ python-html5lib-whl を選択しています。
-.../python-html5lib-whl_0.999-3_all.deb を展開する準備をしています ...
-python-html5lib-whl (0.999-3) を展開しています...
-以前に未選択のパッケージ python-six-whl を選択しています。
-.../python-six-whl_1.8.0-1_all.deb を展開する準備をしています ...
-python-six-whl (1.8.0-1) を展開しています...
-以前に未選択のパッケージ python-urllib3-whl を選択しています。
-.../python-urllib3-whl_1.9.1-3_all.deb を展開する準備をしています ...
-python-urllib3-whl (1.9.1-3) を展開しています...
-以前に未選択のパッケージ python-requests-whl を選択しています。
-.../python-requests-whl_2.4.3-6_all.deb を展開する準備をしています ...
-python-requests-whl (2.4.3-6) を展開しています...
-以前に未選択のパッケージ python-setuptools-whl を選択しています。
-.../python-setuptools-whl_5.5.1-1_all.deb を展開する準備をしています ...
-python-setuptools-whl (5.5.1-1) を展開しています...
-以前に未選択のパッケージ python-pip-whl を選択しています。
-.../python-pip-whl_1.5.6-5_all.deb を展開する準備をしています ...
-python-pip-whl (1.5.6-5) を展開しています...
-以前に未選択のパッケージ python3-virtualenv を選択しています。
-.../python3-virtualenv_1.11.6+ds-1_all.deb を展開する準備をしています ...
-python3-virtualenv (1.11.6+ds-1) を展開しています...
-以前に未選択のパッケージ rsync を選択しています。
-.../rsync_3.1.1-3_armhf.deb を展開する準備をしています ...
-rsync (3.1.1-3) を展開しています...
-以前に未選択のパッケージ virtualenv を選択しています。
-.../virtualenv_1.11.6+ds-1_all.deb を展開する準備をしています ...
-virtualenv (1.11.6+ds-1) を展開しています...
-以前に未選択のパッケージ libmpc-dev:armhf を選択しています。
-.../libmpc-dev_1.0.2-1_armhf.deb を展開する準備をしています ...
-libmpc-dev:armhf (1.0.2-1) を展開しています...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-mime-support (3.58) のトリガを処理しています ...
-install-info (5.2.0.dfsg.1-6) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
-libgmpxx4ldbl:armhf (2:6.0.0+dfsg-6+rpi1) を設定しています ...
-libmpdec2:armhf (2.4.1-1) を設定しています ...
-libexpat1-dev:armhf (2.1.0-6+deb8u3) を設定しています ...
-libpython2.7-dev:armhf (2.7.9-2+deb8u1) を設定しています ...
-libpython3.4-minimal:armhf (3.4.2-1) を設定しています ...
-libpython3.4-stdlib:armhf (3.4.2-1) を設定しています ...
-python3.4-minimal (3.4.2-1) を設定しています ...
-python3.4 (3.4.2-1) を設定しています ...
-python3-minimal (3.4.2-2) を設定しています ...
-libpython3-stdlib:armhf (3.4.2-2) を設定しています ...
-liberror-perl (0.17-1.1) を設定しています ...
-git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
-git (1:2.1.4-2.1+deb8u2) を設定しています ...
-libffi-dev:armhf (3.1-2) を設定しています ...
-libgmp-dev:armhf (2:6.0.0+dfsg-6+rpi1) を設定しています ...
-libmpfr-dev:armhf (3.1.2-2) を設定しています ...
-libpython-dev:armhf (2.7.9-1) を設定しています ...
-libssl-dev:armhf (1.0.1t-1+deb8u5) を設定しています ...
-libssl-doc (1.0.1t-1+deb8u5) を設定しています ...
-python-colorama-whl (0.3.2-1) を設定しています ...
-python-distlib-whl (0.1.9-1) を設定しています ...
-python-html5lib-whl (0.999-3) を設定しています ...
-python-six-whl (1.8.0-1) を設定しています ...
-python-urllib3-whl (1.9.1-3) を設定しています ...
-python-requests-whl (2.4.3-6) を設定しています ...
-python-setuptools-whl (5.5.1-1) を設定しています ...
-rsync (3.1.1-3) を設定しています ...
-libmpc-dev:armhf (1.0.2-1) を設定しています ...
-dh-python (1.20141111-2) を設定しています ...
-python3 (3.4.2-2) を設定しています ...
-running python rtupdate hooks for python3.4...
-running python post-rtupdate hooks for python3.4...
-python3-pkg-resources (5.5.1-1) を設定しています ...
-python-chardet-whl (2.3.0-1) を設定しています ...
-python-pip-whl (1.5.6-5) を設定しています ...
-python3-virtualenv (1.11.6+ds-1) を設定しています ...
-virtualenv (1.11.6+ds-1) を設定しています ...
-libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-$ sudo su - cowrie
-$
-$ git clone http://github.com/micheloosterhof/cowrie
-Cloning into 'cowrie'...
-remote: Counting objects: 7457, done.
-remote: Total 7457 (delta 0), reused 0 (delta 0), pack-reused 7457
-Receiving objects: 100% (7457/7457), 6.43 MiB | 202.00 KiB/s, done.
-Resolving deltas: 100% (5060/5060), done.
-Checking connectivity... done.
-$
-$ cd cowrie/
-$
-$ pwd
-/home/cowrie/cowrie
-$
-$ virtualenv cowrie-env
-Running virtualenv with interpreter /usr/bin/python2
-New python executable in cowrie-env/bin/python2
-Also creating executable in cowrie-env/bin/python
-Installing setuptools, pip...done.
-$
-$ source cowrie-env/bin/activate
-(cowrie-env) $ pip install -r requirements.txt 
-Downloading/unpacking twisted&gt;=15.2.1 (from -r requirements.txt (line 1))
-  Downloading Twisted-16.6.0.tar.bz2 (3.0MB): 3.0MB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/twisted/setup.py) egg_info for package twisted
-    no previously-included directories found matching '.travis'
-    no previously-included directories found matching 'tests'
-    warning: no previously-included files found matching 'examplesetup.py'
-    no previously-included directories found matching 'src/exampleproj'
-    no previously-included directories found matching 'src/incremental/newsfragments'
-    
-    Installed /tmp/pip-build-BjW0UZ/twisted/incremental-16.10.1-py2.7.egg
-    
-    warning: no previously-included files matching '*.misc' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.bugfix' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.doc' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.feature' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.removal' found under directory 'src/twisted'
-    warning: no previously-included files matching 'NEWS' found under directory 'src/twisted'
-    warning: no previously-included files matching 'README' found under directory 'src/twisted'
-    warning: no previously-included files matching 'topfiles' found under directory 'src/twisted'
-    warning: no previously-included files found matching 'src/twisted/topfiles/CREDITS'
-    warning: no previously-included files found matching 'src/twisted/topfiles/ChangeLog.Old'
-    warning: no previously-included files found matching 'codecov.yml'
-    warning: no previously-included files found matching 'appveyor.yml'
-    no previously-included directories found matching 'bin'
-    no previously-included directories found matching 'admin'
-    no previously-included directories found matching '.travis'
-    warning: no previously-included files found matching 'docs/historic/2003'
-    warning: no previously-included files matching '*' found under directory 'docs/historic/2003'
-Downloading/unpacking cryptography (from -r requirements.txt (line 2))
-  Downloading cryptography-1.7.1.tar.gz (420kB): 420kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/cryptography/setup.py) egg_info for package cryptography
-    
-    no previously-included directories found matching 'docs/_build'
-    warning: no previously-included files matching '*' found under directory 'vectors'
-Downloading/unpacking configparser (from -r requirements.txt (line 3))
-  Downloading configparser-3.5.0.tar.gz
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/configparser/setup.py) egg_info for package configparser
-    
-Downloading/unpacking pyopenssl (from -r requirements.txt (line 4))
-  Downloading pyOpenSSL-16.2.0-py2.py3-none-any.whl (43kB): 43kB downloaded
-Downloading/unpacking gmpy2 (from -r requirements.txt (line 5))
-  Downloading gmpy2-2.0.8.zip (280kB): 280kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/gmpy2/setup.py) egg_info for package gmpy2
-    
-Downloading/unpacking service-identity (from -r requirements.txt (line 6))
-  Downloading service_identity-16.0.0-py2.py3-none-any.whl
-Downloading/unpacking pycrypto (from -r requirements.txt (line 7))
-  Downloading pycrypto-2.6.1.tar.gz (446kB): 446kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/pycrypto/setup.py) egg_info for package pycrypto
-    
-Downloading/unpacking python-dateutil (from -r requirements.txt (line 8))
-  Downloading python_dateutil-2.6.0-py2.py3-none-any.whl (194kB): 194kB downloaded
-Downloading/unpacking tftpy (from -r requirements.txt (line 9))
-  Downloading tftpy-0.6.2.tar.gz
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/tftpy/setup.py) egg_info for package tftpy
-    
-Downloading/unpacking zope.interface&gt;=3.6.0 (from twisted&gt;=15.2.1-&gt;-r requirements.txt (line 1))
-  Downloading zope.interface-4.3.3.tar.gz (150kB): 150kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/zope.interface/setup.py) egg_info for package zope.interface
-    
-    warning: no previously-included files matching '*.dll' found anywhere in distribution
-    warning: no previously-included files matching '*.pyc' found anywhere in distribution
-    warning: no previously-included files matching '*.pyo' found anywhere in distribution
-    warning: no previously-included files matching '*.so' found anywhere in distribution
-    warning: no previously-included files matching 'coverage.xml' found anywhere in distribution
-    warning: no previously-included files matching 'appveyor.yml' found anywhere in distribution
-    no previously-included directories found matching 'docs/_build'
-Downloading/unpacking constantly&gt;=15.1 (from twisted&gt;=15.2.1-&gt;-r requirements.txt (line 1))
-  Downloading constantly-15.1.0-py2.py3-none-any.whl
-Downloading/unpacking incremental&gt;=16.10.1 (from twisted&gt;=15.2.1-&gt;-r requirements.txt (line 1))
-  Downloading incremental-16.10.1-py2.py3-none-any.whl
-Downloading/unpacking idna&gt;=2.0 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading idna-2.2-py2.py3-none-any.whl (55kB): 55kB downloaded
-Downloading/unpacking pyasn1&gt;=0.1.8 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading pyasn1-0.1.9-py2.py3-none-any.whl
-Downloading/unpacking six&gt;=1.4.1 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading six-1.10.0-py2.py3-none-any.whl
-Downloading/unpacking setuptools&gt;=11.3 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading setuptools-32.3.1-py2.py3-none-any.whl (479kB): 479kB downloaded
-Downloading/unpacking enum34 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading enum34-1.1.6-py2-none-any.whl
-Downloading/unpacking ipaddress (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading ipaddress-1.0.17-py2-none-any.whl
-Downloading/unpacking cffi&gt;=1.4.1 (from cryptography-&gt;-r requirements.txt (line 2))
-  Downloading cffi-1.9.1.tar.gz (407kB): 407kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/cffi/setup.py) egg_info for package cffi
-    
-Downloading/unpacking pyasn1-modules (from service-identity-&gt;-r requirements.txt (line 6))
-  Downloading pyasn1_modules-0.0.8-py2.py3-none-any.whl
-Downloading/unpacking attrs (from service-identity-&gt;-r requirements.txt (line 6))
-  Downloading attrs-16.3.0-py2.py3-none-any.whl
-Downloading/unpacking pycparser (from cffi&gt;=1.4.1-&gt;cryptography-&gt;-r requirements.txt (line 2))
-  Downloading pycparser-2.17.tar.gz (231kB): 231kB downloaded
-  Running setup.py (path:/tmp/pip-build-BjW0UZ/pycparser/setup.py) egg_info for package pycparser
-    
-    warning: no previously-included files matching 'yacctab.*' found under directory 'tests'
-    warning: no previously-included files matching 'lextab.*' found under directory 'tests'
-    warning: no previously-included files matching 'yacctab.*' found under directory 'examples'
-    warning: no previously-included files matching 'lextab.*' found under directory 'examples'
-Installing collected packages: twisted, cryptography, configparser, pyopenssl, gmpy2, service-identity, pycrypto, python-dateutil, tftpy, zope.interface, constantly, incremental, idna, pyasn1, six, setuptools, enum34, ipaddress, cffi, pyasn1-modules, attrs, pycparser
-  Running setup.py install for twisted
-    
-    warning: no previously-included files matching '*.misc' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.bugfix' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.doc' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.feature' found under directory 'src/twisted'
-    warning: no previously-included files matching '*.removal' found under directory 'src/twisted'
-    warning: no previously-included files matching 'NEWS' found under directory 'src/twisted'
-    warning: no previously-included files matching 'README' found under directory 'src/twisted'
-    warning: no previously-included files matching 'topfiles' found under directory 'src/twisted'
-    warning: no previously-included files found matching 'src/twisted/topfiles/CREDITS'
-    warning: no previously-included files found matching 'src/twisted/topfiles/ChangeLog.Old'
-    warning: no previously-included files found matching 'codecov.yml'
-    warning: no previously-included files found matching 'appveyor.yml'
-    no previously-included directories found matching 'bin'
-    no previously-included directories found matching 'admin'
-    no previously-included directories found matching '.travis'
-    warning: no previously-included files found matching 'docs/historic/2003'
-    warning: no previously-included files matching '*' found under directory 'docs/historic/2003'
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c conftest.c -o conftest.o
-    building 'twisted.test.raiser' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/test/raiser.c -o build/temp.linux-armv7l-2.7/src/twisted/test/raiser.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/test/raiser.o -o build/lib.linux-armv7l-2.7/twisted/test/raiser.so
-    building 'twisted.python._sendmsg' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/python/_sendmsg.c -o build/temp.linux-armv7l-2.7/src/twisted/python/_sendmsg.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/python/_sendmsg.o -o build/lib.linux-armv7l-2.7/twisted/python/_sendmsg.so
-    building 'twisted.runner.portmap' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/twisted/runner/portmap.c -o build/temp.linux-armv7l-2.7/src/twisted/runner/portmap.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/twisted/runner/portmap.o -o build/lib.linux-armv7l-2.7/twisted/runner/portmap.so
-    Installing trial script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing conch script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing ckeygen script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing twist script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing pyhtmlizer script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing mailmail script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing tkconch script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing twistd script to /home/cowrie/cowrie/cowrie-env/bin
-    Installing cftp script to /home/cowrie/cowrie/cowrie-env/bin
-  Running setup.py install for cryptography
-    
-    Installed /tmp/pip-build-BjW0UZ/cryptography/cffi-1.9.1-py2.7-linux-armv7l.egg
-    Searching for pycparser
-    Reading https://pypi.python.org/simple/pycparser/
-    Best match: pycparser 2.17
-    Downloading https://pypi.python.org/packages/be/64/1bb257ffb17d01f4a38d7ce686809a736837ad4371bcc5c42ba7a715c3ac/pycparser-2.17.tar.gz#md5=ca98dcb50bc1276f230118f6af5a40c7
-    Processing pycparser-2.17.tar.gz
-    Writing /tmp/easy_install-fNPifv/pycparser-2.17/setup.cfg
-    Running pycparser-2.17/setup.py -q bdist_egg --dist-dir /tmp/easy_install-fNPifv/pycparser-2.17/egg-dist-tmp-rWDLWz
-    warning: no previously-included files matching 'yacctab.*' found under directory 'tests'
-    warning: no previously-included files matching 'lextab.*' found under directory 'tests'
-    warning: no previously-included files matching 'yacctab.*' found under directory 'examples'
-    warning: no previously-included files matching 'lextab.*' found under directory 'examples'
-    zip_safe flag not set; analyzing archive contents...
-    pycparser.ply.ygen: module references __file__
-    pycparser.ply.yacc: module references __file__
-    pycparser.ply.yacc: module MAY be using inspect.getsourcefile
-    pycparser.ply.yacc: module MAY be using inspect.stack
-    pycparser.ply.lex: module references __file__
-    pycparser.ply.lex: module MAY be using inspect.getsourcefile
-    
-    Installed /tmp/pip-build-BjW0UZ/cryptography/pycparser-2.17-py2.7.egg
-    
-    no previously-included directories found matching 'docs/_build'
-    warning: no previously-included files matching '*' found under directory 'vectors'
-    generating cffi module 'build/temp.linux-armv7l-2.7/_padding.c'
-    generating cffi module 'build/temp.linux-armv7l-2.7/_constant_time.c'
-    generating cffi module 'build/temp.linux-armv7l-2.7/_openssl.c'
-    building '_openssl' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_openssl.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_openssl.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_openssl.o -lssl -lcrypto -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_openssl.so
-    building '_constant_time' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_constant_time.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_constant_time.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_constant_time.o -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_constant_time.so
-    building '_padding' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c build/temp.linux-armv7l-2.7/_padding.c -o build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_padding.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/build/temp.linux-armv7l-2.7/_padding.o -o build/lib.linux-armv7l-2.7/cryptography/hazmat/bindings/_padding.so
-  Running setup.py install for configparser
-    
-    Skipping installation of /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/backports/__init__.py (namespace package)
-    Installing /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/configparser-3.5.0-py2.7-nspkg.pth
-  Running setup.py install for gmpy2
-    building 'gmpy2' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -DWITHMPFR -DWITHMPC -I/usr/include/python2.7 -c src/gmpy2.c -o build/temp.linux-armv7l-2.7/src/gmpy2.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/gmpy2.o -lgmp -lmpfr -lmpc -o build/lib.linux-armv7l-2.7/gmpy2.so
-    
-  Running setup.py install for pycrypto
-    checking for gcc... gcc
-    checking whether the C compiler works... yes
-    checking for C compiler default output file name... a.out
-    checking for suffix of executables...
-    checking whether we are cross compiling... no
-    checking for suffix of object files... o
-    checking whether we are using the GNU C compiler... yes
-    checking whether gcc accepts -g... yes
-    checking for gcc option to accept ISO C89... none needed
-    checking for __gmpz_init in -lgmp... yes
-    checking for __gmpz_init in -lmpir... no
-    checking whether mpz_powm is declared... yes
-    checking whether mpz_powm_sec is declared... yes
-    checking how to run the C preprocessor... gcc -E
-    checking for grep that handles long lines and -e... /bin/grep
-    checking for egrep... /bin/grep -E
-    checking for ANSI C header files... yes
-    checking for sys/types.h... yes
-    checking for sys/stat.h... yes
-    checking for stdlib.h... yes
-    checking for string.h... yes
-    checking for memory.h... yes
-    checking for strings.h... yes
-    checking for inttypes.h... yes
-    checking for stdint.h... yes
-    checking for unistd.h... yes
-    checking for inttypes.h... (cached) yes
-    checking limits.h usability... yes
-    checking limits.h presence... yes
-    checking for limits.h... yes
-    checking stddef.h usability... yes
-    checking stddef.h presence... yes
-    checking for stddef.h... yes
-    checking for stdint.h... (cached) yes
-    checking for stdlib.h... (cached) yes
-    checking for string.h... (cached) yes
-    checking wchar.h usability... yes
-    checking wchar.h presence... yes
-    checking for wchar.h... yes
-    checking for inline... inline
-    checking for int16_t... yes
-    checking for int32_t... yes
-    checking for int64_t... yes
-    checking for int8_t... yes
-    checking for size_t... yes
-    checking for uint16_t... yes
-    checking for uint32_t... yes
-    checking for uint64_t... yes
-    checking for uint8_t... yes
-    checking for stdlib.h... (cached) yes
-    checking for GNU libc compatible malloc... yes
-    checking for memmove... yes
-    checking for memset... yes
-    configure: creating ./config.status
-    config.status: creating src/config.h
-    building 'Crypto.PublicKey._fastmath' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/ -I/usr/include/python2.7 -c src/_fastmath.c -o build/temp.linux-armv7l-2.7/src/_fastmath.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/_fastmath.o -lgmp -o build/lib.linux-armv7l-2.7/Crypto/PublicKey/_fastmath.so
-    building 'Crypto.Hash._MD2' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/MD2.c -o build/temp.linux-armv7l-2.7/src/MD2.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/MD2.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_MD2.so
-    building 'Crypto.Hash._MD4' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/MD4.c -o build/temp.linux-armv7l-2.7/src/MD4.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/MD4.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_MD4.so
-    building 'Crypto.Hash._SHA256' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA256.c -o build/temp.linux-armv7l-2.7/src/SHA256.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA256.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA256.so
-    building 'Crypto.Hash._SHA224' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA224.c -o build/temp.linux-armv7l-2.7/src/SHA224.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA224.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA224.so
-    building 'Crypto.Hash._SHA384' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA384.c -o build/temp.linux-armv7l-2.7/src/SHA384.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA384.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA384.so
-    building 'Crypto.Hash._SHA512' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/SHA512.c -o build/temp.linux-armv7l-2.7/src/SHA512.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/SHA512.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_SHA512.so
-    building 'Crypto.Hash._RIPEMD160' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -DPCT_LITTLE_ENDIAN=1 -Isrc/ -I/usr/include/python2.7 -c src/RIPEMD160.c -o build/temp.linux-armv7l-2.7/src/RIPEMD160.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/RIPEMD160.o -o build/lib.linux-armv7l-2.7/Crypto/Hash/_RIPEMD160.so
-    building 'Crypto.Cipher._AES' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/AES.c -o build/temp.linux-armv7l-2.7/src/AES.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/AES.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_AES.so
-    building 'Crypto.Cipher._ARC2' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/ARC2.c -o build/temp.linux-armv7l-2.7/src/ARC2.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/ARC2.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_ARC2.so
-    building 'Crypto.Cipher._Blowfish' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/Blowfish.c -o build/temp.linux-armv7l-2.7/src/Blowfish.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/Blowfish.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_Blowfish.so
-    building 'Crypto.Cipher._CAST' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/CAST.c -o build/temp.linux-armv7l-2.7/src/CAST.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/CAST.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_CAST.so
-    building 'Crypto.Cipher._DES' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -Isrc/libtom/ -I/usr/include/python2.7 -c src/DES.c -o build/temp.linux-armv7l-2.7/src/DES.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/DES.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_DES.so
-    building 'Crypto.Cipher._DES3' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -Isrc/libtom/ -I/usr/include/python2.7 -c src/DES3.c -o build/temp.linux-armv7l-2.7/src/DES3.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/DES3.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_DES3.so
-    building 'Crypto.Cipher._ARC4' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/ARC4.c -o build/temp.linux-armv7l-2.7/src/ARC4.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/ARC4.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_ARC4.so
-    building 'Crypto.Cipher._XOR' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/XOR.c -o build/temp.linux-armv7l-2.7/src/XOR.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/XOR.o -o build/lib.linux-armv7l-2.7/Crypto/Cipher/_XOR.so
-    building 'Crypto.Util.strxor' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/strxor.c -o build/temp.linux-armv7l-2.7/src/strxor.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/strxor.o -o build/lib.linux-armv7l-2.7/Crypto/Util/strxor.so
-    building 'Crypto.Util._counter' extension
-    arm-linux-gnueabihf-gcc -pthread -fwrapv -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Werror=format-security -fPIC -std=c99 -O3 -fomit-frame-pointer -Isrc/ -I/usr/include/python2.7 -c src/_counter.c -o build/temp.linux-armv7l-2.7/src/_counter.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/_counter.o -o build/lib.linux-armv7l-2.7/Crypto/Util/_counter.so
-    
-  Running setup.py install for tftpy
-    changing mode of build/scripts-2.7/tftpy_client.py from 644 to 755
-    changing mode of build/scripts-2.7/tftpy_server.py from 644 to 755
-    
-    changing mode of /home/cowrie/cowrie/cowrie-env/bin/tftpy_client.py to 755
-    changing mode of /home/cowrie/cowrie/cowrie-env/bin/tftpy_server.py to 755
-  Running setup.py install for zope.interface
-    
-    warning: no previously-included files matching '*.dll' found anywhere in distribution
-    warning: no previously-included files matching '*.pyc' found anywhere in distribution
-    warning: no previously-included files matching '*.pyo' found anywhere in distribution
-    warning: no previously-included files matching '*.so' found anywhere in distribution
-    warning: no previously-included files matching 'coverage.xml' found anywhere in distribution
-    warning: no previously-included files matching 'appveyor.yml' found anywhere in distribution
-    no previously-included directories found matching 'docs/_build'
-    building 'zope.interface._zope_interface_coptimizations' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -I/usr/include/python2.7 -c src/zope/interface/_zope_interface_coptimizations.c -o build/temp.linux-armv7l-2.7/src/zope/interface/_zope_interface_coptimizations.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/src/zope/interface/_zope_interface_coptimizations.o -o build/lib.linux-armv7l-2.7/zope/interface/_zope_interface_coptimizations.so
-    Skipping installation of /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/zope/__init__.py (namespace package)
-    Installing /home/cowrie/cowrie/cowrie-env/lib/python2.7/site-packages/zope.interface-4.3.3-py2.7-nspkg.pth
-  Found existing installation: setuptools 5.5.1
-    Uninstalling setuptools:
-      Successfully uninstalled setuptools
-  Running setup.py install for cffi
-    building '_cffi_backend' extension
-    arm-linux-gnueabihf-gcc -pthread -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -fPIC -DUSE__THREAD -I/usr/include/python2.7 -c c/_cffi_backend.c -o build/temp.linux-armv7l-2.7/c/_cffi_backend.o
-    arm-linux-gnueabihf-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-z,relro -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security -Wl,-z,relro -D_FORTIFY_SOURCE=2 -g -fstack-protector-strong -Wformat -Werror=format-security build/temp.linux-armv7l-2.7/c/_cffi_backend.o -lffi -o build/lib.linux-armv7l-2.7/_cffi_backend.so
-  Could not find .egg-info directory in install record for cffi&gt;=1.4.1 (from cryptography-&gt;-r requirements.txt (line 2))
-  Running setup.py install for pycparser
-    warning: no previously-included files matching 'yacctab.*' found under directory 'tests'
-    warning: no previously-included files matching 'lextab.*' found under directory 'tests'
-    warning: no previously-included files matching 'yacctab.*' found under directory 'examples'
-    warning: no previously-included files matching 'lextab.*' found under directory 'examples'
-    Build the lexing/parsing tables
-  Could not find .egg-info directory in install record for pycparser (from cffi&gt;=1.4.1-&gt;cryptography-&gt;-r requirements.txt (line 2))
-Successfully installed twisted cryptography configparser pyopenssl gmpy2 service-identity pycrypto python-dateutil tftpy zope.interface constantly incremental idna pyasn1 six setuptools enum34 ipaddress cffi pyasn1-modules attrs pycparser
-Cleaning up...
-(cowrie-env) $
-(cowrie-env) $ deactivate
-$
-</code></pre>
-
-<h3 id="cowrieの設定:638054c4f24019ce8e35d2f1d32a3666">Cowrieの設定</h3>
-
-<pre><code>$ cp -p cowrie.cfg.dist cowrie.cfg
-$ ls -l cowrie.cfg*
--rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg
--rw-r--r-- 1 cowrie cowrie 11555  1月  4 19:05 cowrie.cfg.dist
-$
-$ vi cowrie.cfg
-#sensor_name=myhostname
-sensor_name=homepot1
-
-#hostname = svr04
-hostname = cowrie01
-$
-$ diff cowrie.cfg.dist cowrie.cfg
-17a18
-&gt; sensor_name=homepot1
-23c24,25
-&lt; hostname = svr04
----
-&gt; #hostname = svr04
-&gt; hostname = cowrie01
-$
-</code></pre>
-
-<h3 id="cowrieの起動と終了:638054c4f24019ce8e35d2f1d32a3666">Cowrieの起動と終了</h3>
-
-<p>起動するときは以下のコマンドを実行する。</p>
-
-<pre><code>$ ./start.sh cowrie-env/
-Activating virtualenv &quot;cowrie-env/&quot;
-Starting cowrie with extra arguments [ ] ...
-$
-</code></pre>
-
-<p>終了するときは以下のコマンドを実行する。</p>
-
-<pre><code>$ ./stop.sh
-Stopping cowrie...
-$
-</code></pre>
-
-<h3 id="cowrieポートのポートフォワード:638054c4f24019ce8e35d2f1d32a3666">Cowrieポートのポートフォワード</h3>
-
-<p>Cowrieでは<code>2222/tcp</code>でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。</p>
-
-<pre><code>$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-$ sudo iptables -t nat -n -L
-Chain PREROUTING (policy ACCEPT)
-target     prot opt source               destination         
-REDIRECT   tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:22 redir ports 2222
-$
-</code></pre>
-
-<h3 id="iptables設定の保存:638054c4f24019ce8e35d2f1d32a3666">iptables設定の保存</h3>
-
-<p>再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。</p>
-
-<pre><code>$ sudo -E apt-get install iptables-persistent
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  netfilter-persistent
-以下のパッケージが新たにインストールされます:
-  iptables-persistent netfilter-persistent
-アップグレード: 0 個、新規インストール: 2 個、削除: 0 個、保留: 0 個。
-19.5 kB のアーカイブを取得する必要があります。
-この操作後に追加で 148 kB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main netfilter-persistent all 1.0.3+deb8u1 [8,494 B]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main iptables-persistent all 1.0.3+deb8u1 [11.0 kB]
-19.5 kB を 2秒 で取得しました (7,989 B/s)      
-パッケージを事前設定しています ...
-
-↓&lt;はい&gt;を選択してEnter
- ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
- │                                                                           │ 
- │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v4 に保存で  │ 
- │ きます。このルールは、システムの起動時に自動的に読み込まれるようになりま  │ 
- │ す。                                                                      │ 
- │                                                                           │ 
- │ ルールは、パッケージのインストール時にのみ自動的に保存されます。ルールの  │ 
- │ ファイルを最新に保つには、iptables-save(8) のマニュアルページを参照して   │ 
- │ ください。                                                                │ 
- │                                                                           │ 
- │ 現在の IPv4 ルールを保存しますか?                                         │ 
- │                                                                           │ 
- │                    &lt;はい&gt;                      &lt;いいえ&gt;                   │ 
- │                                                                           │ 
- └───────────────────────────────────────────────────────────────────────────┘ 
-
-↓&lt;いいえ&gt;を選択してEnter
- ┌─────────────────┤ iptables-persistent を設定しています ├──────────────────┐
- │                                                                           │ 
- │ 現在の iptables のルールは、設定ファイル /etc/iptables/rules.v6 に保存で  │ 
- │ きます。このルールは、システムの起動時に自動的に読み込まれるようになりま  │ 
- │ す。                                                                      │ 
- │                                                                           │ 
- │ ルールは、パッケージのインストール時にのみ自動的に保存されます。ルールの  │ 
- │ ファイルを最新に保つには、ip6tables-save(8) のマニュアルページを参照して  │ 
- │ ください。                                                                │ 
- │                                                                           │ 
- │ 現在の IPv6 ルールを保存しますか?                                         │ 
- │                                                                           │ 
- │                    &lt;はい&gt;                      &lt;いいえ&gt;                   │ 
- │                                                                           │ 
- └───────────────────────────────────────────────────────────────────────────┘ 
-
-以前に未選択のパッケージ netfilter-persistent を選択しています。
-(データベースを読み込んでいます ... 現在 34741 個のファイルとディレクトリがインストールされています。)
-.../netfilter-persistent_1.0.3+deb8u1_all.deb を展開する準備をしています ...
-netfilter-persistent (1.0.3+deb8u1) を展開しています...
-以前に未選択のパッケージ iptables-persistent を選択しています。
-.../iptables-persistent_1.0.3+deb8u1_all.deb を展開する準備をしています ...
-iptables-persistent (1.0.3+deb8u1) を展開しています...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-netfilter-persistent (1.0.3+deb8u1) を設定しています ...
-update-rc.d: warning: start and stop actions are no longer supported; falling back to defaults
-iptables-persistent (1.0.3+deb8u1) を設定しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-$ sudo systemctl start netfilter-persistent
-$ sudo systemctl enable netfilter-persistent
-Synchronizing state for netfilter-persistent.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d netfilter-persistent defaults
-Executing /usr/sbin/update-rc.d netfilter-persistent enable
-$
-</code></pre>
-
-<p>今後iptablesの設定変更を保存するには以下のコマンドを実行します。</p>
-
-<pre><code>$ sudo netfilter-persistent save
-</code></pre>
-
-<h3 id="cowrieの自動起動設定:638054c4f24019ce8e35d2f1d32a3666">Cowrieの自動起動設定</h3>
-
-<p>supervisorを使用してcowrieをデーモン化する。</p>
-
-<pre><code>$ sudo -E apt-get install supervisor
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  python-meld3 python-pkg-resources
-提案パッケージ:
-  python-distribute python-distribute-doc
-以下のパッケージが新たにインストールされます:
-  python-meld3 python-pkg-resources supervisor
-アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 0 個。
-369 kB のアーカイブを取得する必要があります。
-この操作後に追加で 1,670 kB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-pkg-resources all 5.5.1-1 [64.4 kB]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-meld3 armhf 1.0.0-1 [37.0 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main supervisor all 3.0r1-1 [267 kB]
-369 kB を 1秒 で取得しました (195 kB/s)
-以前に未選択のパッケージ python-pkg-resources を選択しています。
-(データベースを読み込んでいます ... 現在 34759 個のファイルとディレクトリがインストールされています。)
-.../python-pkg-resources_5.5.1-1_all.deb を展開する準備をしています ...
-python-pkg-resources (5.5.1-1) を展開しています...
-以前に未選択のパッケージ python-meld3 を選択しています。
-.../python-meld3_1.0.0-1_armhf.deb を展開する準備をしています ...
-python-meld3 (1.0.0-1) を展開しています...
-以前に未選択のパッケージ supervisor を選択しています。
-.../supervisor_3.0r1-1_all.deb を展開する準備をしています ...
-supervisor (3.0r1-1) を展開しています...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-python-pkg-resources (5.5.1-1) を設定しています ...
-python-meld3 (1.0.0-1) を設定しています ...
-supervisor (3.0r1-1) を設定しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-$ sudo systemctl restart supervisor
-$ sudo systemctl enable supervisor
-Synchronizing state for supervisor.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d supervisor defaults
-Executing /usr/sbin/update-rc.d supervisor enable
-$
-$ sudo vi /etc/supervisor/conf.d/cowrie.conf
-[program:cowrie]
-command=/home/cowrie/cowrie/start.sh cowrie-env
-directory=/home/cowrie/cowrie/
-user=cowrie
-autorestart=true
-redirect_stderr=true
-$
-$ sudo su - cowrie
-$ cd cowrie/
-$ vi start.sh
-#DAEMONIZE=&quot;&quot;
-DAEMONIZE=&quot;-n&quot;
-$
-$ sudo supervisorctl reread
-cowrie: available
-$
-$ sudo supervisorctl add cowrie
-cowrie: added process group
-$
-$ sudo supervisorctl status
-cowrie                           RUNNING    pid 20292, uptime 0:00:04
-$
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -4802,6 +4007,8 @@ $
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">家庭内インターネット接続環境を構築する その17 [ 2017-01-15 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">家庭内インターネット接続環境を構築する その16 [ 2017-01-12 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">家庭内インターネット接続環境を構築する その15 [ 2017-01-09 ]</a>
@@ -4830,8 +4037,6 @@ $
       
       <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">家庭内インターネット接続環境を構築する その3 [ 2017-01-01 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/" class="list-group-item">家庭内インターネット接続環境を構築する その2 [ 2016-10-22 ]</a>
-      
     
   </div>
 </section>
@@ -4845,7 +4050,7 @@ $
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">35</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">36</span>server</a>
     
   </div>
 </section>
@@ -4890,7 +4095,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (16)</a>
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
     
     
     
@@ -4906,7 +4111,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (5)</a>
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
     
     
     
@@ -4934,7 +4139,7 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (31)</a>
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
     
