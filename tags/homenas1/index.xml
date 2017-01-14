@@ -25,10 +25,10 @@
 
 &lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;にrsnapshotを導入してファイルバックアップを行う設定を行います。&lt;/p&gt;
 
-&lt;p&gt;なおバックアップ元は&lt;code&gt;/mnt/nas/&lt;/code&gt;、バックアップ先は&lt;code&gt;/backup/&lt;/code&gt;を想定しています。&lt;/p&gt;
+&lt;p&gt;なおバックアップ元は&lt;code&gt;/mnt/nas/&lt;/code&gt;、バックアップ先は&lt;code&gt;/mnt/backup/&lt;/code&gt;を想定しています。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ df -h
-/dev/sdc1        917G   72M  871G    1% /backup
+/dev/sdc1        917G   72M  871G    1% /mnt/backup
 /dev/md0         394G   71M  374G    1% /mnt/nas
 $
 &lt;/code&gt;&lt;/pre&gt;
@@ -79,8 +79,9 @@ $ ls -l /etc/rsnapshot.conf*
 -rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf
 -rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf.org
 $
+$ sudo vi /etc/rsnapshot
 #snapshot_root  /var/cache/rsnapshot/
-snapshot_root   /backup/
+snapshot_root   /mnt/backup/
 
 #retain         hourly  6
 retain          daily   7
@@ -97,7 +98,7 @@ $ diff /etc/rsnapshot.conf.org /etc/rsnapshot.conf
 &amp;lt; snapshot_root	/var/cache/rsnapshot/
 ---
 &amp;gt; #snapshot_root	/var/cache/rsnapshot/
-&amp;gt; snapshot_root	/backup/
+&amp;gt; snapshot_root	/mnt/backup/
 97c98
 &amp;lt; retain		hourly	6
 ---
@@ -146,9 +147,9 @@ $
 
 &lt;h2 id=&#34;restoreについて:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;Restoreについて&lt;/h2&gt;
 
-&lt;pre&gt;&lt;code&gt;$ rsync -a /backup/localhost/monthly.0/localhost/. /mnt/nas/
-$ rsync -a /backup/localhost/weekly.0/localhost/. /mnt/nas/
-$ rsync -a /backup/localhost/daily.0/localhost/. /mnt/nas/
+&lt;pre&gt;&lt;code&gt;$ rsync -a /mnt/backup/localhost/monthly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/weekly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/daily.0/localhost/. /mnt/nas/
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;参考:3d6ec9515f60bc1021728b9e428098dd&#34;&gt;参考&lt;/h2&gt;

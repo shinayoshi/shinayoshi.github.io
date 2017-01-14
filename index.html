@@ -103,10 +103,10 @@
 
 <p>今回は<code>homenas1</code>にrsnapshotを導入してファイルバックアップを行う設定を行います。</p>
 
-<p>なおバックアップ元は<code>/mnt/nas/</code>、バックアップ先は<code>/backup/</code>を想定しています。</p>
+<p>なおバックアップ元は<code>/mnt/nas/</code>、バックアップ先は<code>/mnt/backup/</code>を想定しています。</p>
 
 <pre><code>$ df -h
-/dev/sdc1        917G   72M  871G    1% /backup
+/dev/sdc1        917G   72M  871G    1% /mnt/backup
 /dev/md0         394G   71M  374G    1% /mnt/nas
 $
 </code></pre>
@@ -157,8 +157,9 @@ $ ls -l /etc/rsnapshot.conf*
 -rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf
 -rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf.org
 $
+$ sudo vi /etc/rsnapshot
 #snapshot_root  /var/cache/rsnapshot/
-snapshot_root   /backup/
+snapshot_root   /mnt/backup/
 
 #retain         hourly  6
 retain          daily   7
@@ -175,7 +176,7 @@ $ diff /etc/rsnapshot.conf.org /etc/rsnapshot.conf
 &lt; snapshot_root	/var/cache/rsnapshot/
 ---
 &gt; #snapshot_root	/var/cache/rsnapshot/
-&gt; snapshot_root	/backup/
+&gt; snapshot_root	/mnt/backup/
 97c98
 &lt; retain		hourly	6
 ---
@@ -224,9 +225,9 @@ $
 
 <h2 id="restoreについて:3d6ec9515f60bc1021728b9e428098dd">Restoreについて</h2>
 
-<pre><code>$ rsync -a /backup/localhost/monthly.0/localhost/. /mnt/nas/
-$ rsync -a /backup/localhost/weekly.0/localhost/. /mnt/nas/
-$ rsync -a /backup/localhost/daily.0/localhost/. /mnt/nas/
+<pre><code>$ rsync -a /mnt/backup/localhost/monthly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/weekly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/daily.0/localhost/. /mnt/nas/
 </code></pre>
 
 <h2 id="参考:3d6ec9515f60bc1021728b9e428098dd">参考</h2>
