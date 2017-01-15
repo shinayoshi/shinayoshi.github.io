@@ -1793,6 +1793,7 @@ $
 $ sudo vi /etc/rsyslog.d/network-device.conf
 $template NetworkDeviceFileName,&amp;quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&amp;quot;
 if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
+&amp;amp; ~
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;rsyslogの再起動&lt;/p&gt;
@@ -1812,16 +1813,13 @@ if $fromhost-ip != &#39;127.0.0.1&#39; then ?NetworkDeviceFileName
 /var/log/network-device/*/*.log
 {
 	daily
-	rotate 0
+	rotate 1
 	maxage 92
 	nocreate
 	missingok
 	ifempty
 	compress
 	sharedscripts
-	postrotate
-		invoke-rc.d rsyslog rotate &amp;gt; /dev/null
-	endscript
 }
 &lt;/code&gt;&lt;/pre&gt;
 
