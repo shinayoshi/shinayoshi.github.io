@@ -11,21 +11,21 @@
     <atom:link href="http://www.shinayoshi.net/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その17</title>
+      <title>Raspberry Pi 2のイメージバックアップを行う</title>
       <link>http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</link>
       <pubDate>Sun, 15 Jan 2017 00:51:03 +0900</pubDate>
       
       <guid>http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</guid>
-      <description>&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+      <description>
+
+&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
 最終的には以下のような構成を想定しています。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;今回は&lt;code&gt;homenas1&lt;/code&gt;のバックアップを行います。&lt;/p&gt;
 
-&lt;p&gt;##&lt;/p&gt;
-
-&lt;p&gt;gitのインストール&lt;/p&gt;
+&lt;h2 id=&#34;gitのインストール:5e7a3f0a88a3c296765e72c5a062b6da&#34;&gt;gitのインストール&lt;/h2&gt;
 
 &lt;pre&gt;&lt;code&gt;$ sudo -E apt-get install git
 パッケージリストを読み込んでいます... 完了
@@ -164,7 +164,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その16</title>
+      <title>Raspberry Pi 2でファイルバックアップを行う</title>
       <link>http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/</link>
       <pubDate>Thu, 12 Jan 2017 17:52:47 +0900</pubDate>
       
@@ -318,7 +318,7 @@ $ rsync -a /mnt/backup/localhost/daily.0/localhost/. /mnt/nas/
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その15</title>
+      <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
       <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
       
@@ -564,7 +564,7 @@ $ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 -
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その14</title>
+      <title>Raspberry Pi 2でCactiを導入する</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-cacti/</link>
       <pubDate>Mon, 09 Jan 2017 14:45:15 +0900</pubDate>
       
@@ -957,7 +957,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その13</title>
+      <title>Raspberry Pi 2でZabbixサーバを構築する(Agent導入)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
       <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
       
@@ -1123,7 +1123,7 @@ Agent interfaces: 192.168.20.10
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その12</title>
+      <title>Raspberry Pi 2でZabbixサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</link>
       <pubDate>Sun, 08 Jan 2017 20:40:44 +0900</pubDate>
       
@@ -2041,7 +2041,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その11</title>
+      <title>Raspberry Pi 2でSyslogサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</link>
       <pubDate>Sat, 07 Jan 2017 16:09:11 +0900</pubDate>
       
@@ -2187,7 +2187,7 @@ end
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その10</title>
+      <title>Raspberry Pi 2でNTPサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</link>
       <pubDate>Sat, 07 Jan 2017 13:05:24 +0900</pubDate>
       
@@ -2238,7 +2238,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その9</title>
+      <title>Raspberry Pi 2のセキュリティ設定を強化する</title>
       <link>http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/</link>
       <pubDate>Sat, 07 Jan 2017 01:02:37 +0900</pubDate>
       
@@ -2562,7 +2562,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その8</title>
+      <title>Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する</title>
       <link>http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/</link>
       <pubDate>Thu, 05 Jan 2017 03:34:58 +0900</pubDate>
       
@@ -3664,7 +3664,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その7</title>
+      <title>Raspberry Pi 2でHoney Pot(Cowrie)を構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/</link>
       <pubDate>Wed, 04 Jan 2017 17:53:55 +0900</pubDate>
       
@@ -4612,7 +4612,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その6</title>
+      <title>Raspberry Pi 2でSquidサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</link>
       <pubDate>Tue, 03 Jan 2017 23:25:23 +0900</pubDate>
       
@@ -4803,7 +4803,7 @@ $ sudo -E apt-get upgrade
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その5</title>
+      <title>Raspberry Pi 2でCache DNSを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</link>
       <pubDate>Tue, 03 Jan 2017 22:22:47 +0900</pubDate>
       
@@ -5081,7 +5081,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その4</title>
+      <title>Raspberry Pi 2でファイルサーバを構築する(NFS/Samba)</title>
       <link>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</link>
       <pubDate>Mon, 02 Jan 2017 20:30:05 +0900</pubDate>
       
@@ -5606,7 +5606,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その3</title>
+      <title>Raspberry Pi 2でファイルサーバを構築する(mdadm)</title>
       <link>http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/</link>
       <pubDate>Sun, 01 Jan 2017 18:28:38 +0900</pubDate>
       

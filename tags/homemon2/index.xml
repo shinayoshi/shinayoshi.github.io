@@ -11,7 +11,7 @@
     <atom:link href="http://www.shinayoshi.net/tags/homemon2/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その15</title>
+      <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
       <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
       
@@ -257,7 +257,7 @@ $ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 -
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その14</title>
+      <title>Raspberry Pi 2でCactiを導入する</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-cacti/</link>
       <pubDate>Mon, 09 Jan 2017 14:45:15 +0900</pubDate>
       
@@ -650,7 +650,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その13</title>
+      <title>Raspberry Pi 2でZabbixサーバを構築する(Agent導入)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
       <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
       
@@ -816,7 +816,7 @@ Agent interfaces: 192.168.20.10
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その12</title>
+      <title>Raspberry Pi 2でZabbixサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</link>
       <pubDate>Sun, 08 Jan 2017 20:40:44 +0900</pubDate>
       
@@ -1734,7 +1734,7 @@ $
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その11</title>
+      <title>Raspberry Pi 2でSyslogサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/</link>
       <pubDate>Sat, 07 Jan 2017 16:09:11 +0900</pubDate>
       
@@ -1880,7 +1880,7 @@ end
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その10</title>
+      <title>Raspberry Pi 2でNTPサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</link>
       <pubDate>Sat, 07 Jan 2017 13:05:24 +0900</pubDate>
       

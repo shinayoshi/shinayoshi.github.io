@@ -11,7 +11,7 @@
     <atom:link href="http://www.shinayoshi.net/tags/homepxy1/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その15</title>
+      <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
       <pubDate>Mon, 09 Jan 2017 17:30:57 +0900</pubDate>
       
@@ -257,7 +257,7 @@ $ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 -
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その13</title>
+      <title>Raspberry Pi 2でZabbixサーバを構築する(Agent導入)</title>
       <link>http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/</link>
       <pubDate>Mon, 09 Jan 2017 12:04:12 +0900</pubDate>
       
@@ -423,7 +423,7 @@ Agent interfaces: 192.168.20.10
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その6</title>
+      <title>Raspberry Pi 2でSquidサーバを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</link>
       <pubDate>Tue, 03 Jan 2017 23:25:23 +0900</pubDate>
       
@@ -614,7 +614,7 @@ $ sudo -E apt-get upgrade
     </item>
     
     <item>
-      <title>家庭内インターネット接続環境を構築する その5</title>
+      <title>Raspberry Pi 2でCache DNSを構築する</title>
       <link>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</link>
       <pubDate>Tue, 03 Jan 2017 22:22:47 +0900</pubDate>
       
