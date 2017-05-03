@@ -74,6 +74,196 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/">Cactiにデバイスを登録する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Aug 21, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/cacti">cacti</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Cactiに新規デバイスを登録するメモです。
+SNMPv3を使用してSNMPの値を取得します。</p>
+
+<h2 id="snmpdのインストール:96919d4705cb30bdfea22f7f270ecaaf">snmpdのインストール</h2>
+
+<p>追加するデバイス(Server)にsnmpdをインストールする。</p>
+
+<pre><code>$ sudo apt-get install snmpd snmp
+</code></pre>
+
+<p>snmpconfツールを使用してsnmpd.confを作成する。
+SNMPv3を使用する前提で質問に回答していきます。</p>
+
+<pre><code>$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent's access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent's ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I'll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I'll copy them there automatically for you.
+</code></pre>
+
+<p>snmpd.confを設置する。</p>
+
+<pre><code>$ sudo cp -p /etc/snmp/snmpd.conf{,.org}
+$ sudo cp snmpd.conf /etc/snmp/snmpd.conf
+</code></pre>
+
+<p>SNMPv3ユーザを作成する。</p>
+
+<pre><code>$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+</code></pre>
+
+<p>SNMPv3で値を取得できることを確認する。</p>
+
+<pre><code>$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+</code></pre>
+
+<ul>
+<li><a href="http://www.infraexpert.com/study/tcpip21.html">TCP/IP - SNMPとは</a></li>
+</ul>
+
+<h2 id="iptablesの通信許可:96919d4705cb30bdfea22f7f270ecaaf">iptablesの通信許可</h2>
+
+<p>CactiからのSNMP通信を許可する。</p>
+
+<pre><code>##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+</code></pre>
+
+<p>iptablesの設定を保存する。</p>
+
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre>
+
+<h2 id="cactiにデバイス-server-を登録:96919d4705cb30bdfea22f7f270ecaaf">Cactiにデバイス(Server)を登録</h2>
+
+<p>↓Cactiにログイン。<code>User Name</code>と<code>Password</code>を入力して<code>Login</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_01.png" alt="cacti_register_01" width="320px" /></p>
+
+<p>↓Cactiログイン後の画面。<code>Devices</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_02.png" alt="cacti_register_02" width="320px" /></p>
+
+<p>↓デバイスの管理画面。<code>Add</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_03.png" alt="cacti_register_03" width="320px" /></p>
+
+<p>↓デバイスの登録画面。必要事項を入力して<code>Create</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_04.png" alt="cacti_register_04" width="320px" /></p>
+
+<p>↓デバイスの登録完了画面。<code>SNMP Information</code>にデバイスの情報が表示されていることを確認する。<code>Create Graphs for this Host</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_05.png" alt="cacti_register_05" width="320px" /></p>
+
+<p>↓作成したいグラフを選択して<code>Create</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_06.png" alt="cacti_register_06" width="320px" /></p>
+
+<p>↓グラフが作成されたことを確認する。</p>
+
+<p><img src="/img/20160821_01/cacti_register_07.png" alt="cacti_register_07" width="320px" /></p>
+
+<p>↓左のメニューから<code>Graph Trees</code>をクリックし、<code>Default Tree</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_08.png" alt="cacti_register_08" width="320px" /></p>
+
+<p>↓ツリーの管理画面。<code>Add</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_09.png" alt="cacti_register_09" width="320px" /></p>
+
+<p>↓ツリーへのデバイス登録画面。必要事項を入力して<code>Create</code>をクリックする。</p>
+
+<p><img src="/img/20160821_01/cacti_register_10.png" alt="cacti_register_10" width="320px" /></p>
+
+<p>↓ツリーの管理画面。デバイスが登録されたことを確認する。</p>
+
+<p><img src="/img/20160821_01/cacti_register_11.png" alt="cacti_register_11" width="320px" /></p>
+
+<p>↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。</p>
+
+<p><img src="/img/20160821_01/cacti_register_12.png" alt="cacti_register_12" width="320px" /></p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/">Raspbian(Jessie)にCactiをインストールする</a></h1>
                   <p>
                     <span class="label label-primary">Sat Aug 20, 2016</span> in
@@ -1596,104 +1786,6 @@ Disk /dev/disk1 ejected
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/">RaspbianにKivyをセットアップ</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Jul 16, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/kivy">kivy</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。</p>
-
-<h2 id="kivyのインストール:7e54fa4db923fa1d790b8a2df258af41">Kivyのインストール</h2>
-
-<p>Kivyに必要なパッケージをインストールする。</p>
-
-<pre><code>$ sudo apt-get update
-$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
-
-$ sudo reboot
-</code></pre>
-
-<p>Kivyをインストールする。</p>
-
-<pre><code>$ git clone https://github.com/kivy/kivy
-$ cd kivy
-$ make
-$ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile
-$ source ~/.profile
-</code></pre>
-
-<ul>
-<li><a href="https://kivy.org/docs/installation/installation-rpi.html">Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation</a></li>
-</ul>
-
-<h2 id="raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定</h2>
-
-<pre><code>$ vi ~/.kivy/config.ini
-[input]
-mouse = mouse
-mtdev\_%(name)s = probesysfs,provider=mtdev
-hid\_%(name)s = probesysfs,provider=hidinput
-</code></pre>
-
-<h2 id="kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41">Kivyデモを実行</h2>
-
-<p>デモ実行に必要なパッケージをインストールする。</p>
-
-<pre><code>$ sudo apt-get install xclip xsel
-$ sudo pip install pygments docutils
-</code></pre>
-
-<h3 id="デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</h3>
-
-<pre><code>$ cd ~/kivy/examples/demo/showcase
-$ python main.py
-</code></pre>
-
-<h3 id="デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</h3>
-
-<pre><code>$ cd ~/kivy/examples/3Drendering
-$ python main.py
-</code></pre>
-
-<h2 id="kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</h2>
-
-<p><a href="http://a-zumi.net/python-kivy-simple-paint/">【Python】Kivyを使ってシンプルなペイントツールを作成する方法</a>を参考に、自前でペイントツールを作成し、実行する。</p>
-
-<p>ソースコードを作成する。</p>
-
-<pre><code>$ vi paint.py
-</code></pre>
-
-<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script>
-
-<p>実行する。</p>
-
-<pre><code>$ python paint.py  
-</code></pre>
-
-<p>Raspberry Pi 7&rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。</p>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1767,6 +1859,8 @@ $ python main.py
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
@@ -1795,8 +1889,6 @@ $ python main.py
       
       <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(NFS/Samba) [ 2017-01-02 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(mdadm) [ 2017-01-01 ]</a>
-      
     
   </div>
 </section>
@@ -1807,6 +1899,8 @@ $ python main.py
     <h1 class="panel-title">Categories</h1>
   </div>
   <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/centos" class="list-group-item"><span class="badge">1</span>centos</a>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
@@ -1839,7 +1933,7 @@ $ python main.py
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
     
     
     
@@ -1896,6 +1990,10 @@ $ python main.py
     
     
     <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
     
     
     

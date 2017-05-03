@@ -74,6 +74,104 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/">RaspbianにKivyをセットアップ</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/kivy">kivy</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspberry Pi 7&rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。</p>
+
+<h2 id="kivyのインストール:7e54fa4db923fa1d790b8a2df258af41">Kivyのインストール</h2>
+
+<p>Kivyに必要なパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython
+
+$ sudo reboot
+</code></pre>
+
+<p>Kivyをインストールする。</p>
+
+<pre><code>$ git clone https://github.com/kivy/kivy
+$ cd kivy
+$ make
+$ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile
+$ source ~/.profile
+</code></pre>
+
+<ul>
+<li><a href="https://kivy.org/docs/installation/installation-rpi.html">Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation</a></li>
+</ul>
+
+<h2 id="raspberry-pi-7-touch-screen-lcdの利用設定:7e54fa4db923fa1d790b8a2df258af41">Raspberry Pi 7&rdquo; Touch Screen LCDの利用設定</h2>
+
+<pre><code>$ vi ~/.kivy/config.ini
+[input]
+mouse = mouse
+mtdev\_%(name)s = probesysfs,provider=mtdev
+hid\_%(name)s = probesysfs,provider=hidinput
+</code></pre>
+
+<h2 id="kivyデモを実行:7e54fa4db923fa1d790b8a2df258af41">Kivyデモを実行</h2>
+
+<p>デモ実行に必要なパッケージをインストールする。</p>
+
+<pre><code>$ sudo apt-get install xclip xsel
+$ sudo pip install pygments docutils
+</code></pre>
+
+<h3 id="デモ１-showcase:7e54fa4db923fa1d790b8a2df258af41">デモ１(showcase)</h3>
+
+<pre><code>$ cd ~/kivy/examples/demo/showcase
+$ python main.py
+</code></pre>
+
+<h3 id="デモ２-3drendering:7e54fa4db923fa1d790b8a2df258af41">デモ２(3Drendering)</h3>
+
+<pre><code>$ cd ~/kivy/examples/3Drendering
+$ python main.py
+</code></pre>
+
+<h2 id="kivyのプログラムを作成-実行:7e54fa4db923fa1d790b8a2df258af41">Kivyのプログラムを作成・実行</h2>
+
+<p><a href="http://a-zumi.net/python-kivy-simple-paint/">【Python】Kivyを使ってシンプルなペイントツールを作成する方法</a>を参考に、自前でペイントツールを作成し、実行する。</p>
+
+<p>ソースコードを作成する。</p>
+
+<pre><code>$ vi paint.py
+</code></pre>
+
+<script src="https://gist.github.com/kurozumi/31f250c38662a102afa5.js"></script>
+
+<p>実行する。</p>
+
+<pre><code>$ python paint.py  
+</code></pre>
+
+<p>Raspberry Pi 7&rdquo; Touch Screen LCDをタッチすることで線が引けることを確認する。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</a></h1>
                   <p>
                     <span class="label label-primary">Tue Jul 12, 2016</span> in
@@ -602,9 +700,9 @@ $ sudo systemctl enable httpd
 
 <p>FirewallでWeb通信を許可します。</p>
 
-<pre><code>$ sudo firewall-cmd \-\-permanent \-\-zone=public \-\-add-service=http
-$ sudo firewall-cmd \-\-reload
-$ sudo firewall-cmd \-\-list-all-zones
+<pre><code>$ sudo firewall-cmd --permanent --zone=public --add-service=http
+$ sudo firewall-cmd --reload
+$ sudo firewall-cmd --list-all-zones
 </code></pre>
 
 <h2 id="動作確認:cb5d764d8c08bb095f7a6ed7bff2ff04">動作確認</h2>
@@ -667,7 +765,7 @@ Password:
 
 <p>ログインに成功すると以下のようなプロンプトが表示されます。</p>
 
-<pre><code>[root@&lt;ホスト名&gt; ~\]#
+<pre><code>[root@&lt;ホスト名&gt; ~]#
 </code></pre>
 
 <p>以降の手順では、rootアカウントのプロンプトを<code>#</code>で表現します。</p>
@@ -680,7 +778,7 @@ Password:
 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot;
 ↓変更
 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot;
-# grub2-mkconfig \-o /boot/grub2/grub.cfg
+# grub2-mkconfig -o /boot/grub2/grub.cfg
 # reboot
 </code></pre>
 
@@ -708,7 +806,7 @@ GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet 
 
 <p>パッケージを最新の状態に更新します。</p>
 
-<pre><code># yum \-y update
+<pre><code># yum -y update
 </code></pre>
 
 <p>kernelのバージョンアップがあった場合にはサーバの再起動を実施します。</p>
@@ -726,14 +824,14 @@ Changing password for user centos.
 New password: &lt;パスワード入力&gt;
 Retype new password: &lt;パスワード再入力&gt;
 passwd: all authentication tokens updated successfully.
-# gpasswd \-a centos wheel
+# gpasswd -a centos wheel
 </code></pre>
 
 <h2 id="sudo権限の付与:130a6ce433fd353093f8e4a56dec5622">sudo権限の付与</h2>
 
 <p>管理者アカウントにsudo権限を付与します。以下ではcentosにROOT関連のコマンドとSHUTDOWN関連のコマンド以外のすべてのコマンドの実行権限を付与しています。</p>
 
-<pre><code># visudo \-f /etc/sudoers.d/wheel
+<pre><code># visudo -f /etc/sudoers.d/wheel
 Cmnd_Alias ROOT = /bin/su, /usr/bin/sudo
 Cmnd_Alias SHUTDOWN = /sbin/halt, /sbin/shutdown, /sbin/poweroff, /sbin/reboot, /sbin/fastboot, /sbin/init
 %wheel  ALL=(ALL)       ALL,!ROOT,!SHUTDOWN
@@ -778,7 +876,7 @@ $ sudo newaliases
 
 <h3 id="firewalldのインストール:130a6ce433fd353093f8e4a56dec5622">Firewalldのインストール</h3>
 
-<pre><code>$ sudo yum \-y install firewalld
+<pre><code>$ sudo yum -y install firewalld
 $ sudo systemctl start firewalld
 $ sudo systemctl enable firewalld
 </code></pre>
@@ -1045,6 +1143,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
@@ -1073,8 +1173,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(NFS/Samba) [ 2017-01-02 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(mdadm) [ 2017-01-01 ]</a>
-      
     
   </div>
 </section>
@@ -1085,6 +1183,8 @@ $ sudo systemctl disable sshd
     <h1 class="panel-title">Categories</h1>
   </div>
   <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/centos" class="list-group-item"><span class="badge">1</span>centos</a>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
@@ -1117,7 +1217,7 @@ $ sudo systemctl disable sshd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
     
     
     
@@ -1174,6 +1274,10 @@ $ sudo systemctl disable sshd
     
     
     <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
     
     
     

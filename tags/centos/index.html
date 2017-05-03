@@ -74,6 +74,27 @@
               <h1>Centos</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">
+                  <h2 class="list-group-item-heading">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed May 3, 2017</span> in
+                    
+                    
+                    centos
+                     using tags
+                    
+                    
+                    centos
+                    
+                     , 
+                    Let&#39;s Encrypt
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    前提 OS CentOS Linux release 7.3.1611 (Core) Web Server Apache 2.4.6 firewalld enabled SELinux disabled firewalldでhttpsを有効化 インターネットからhttpsアクセスを許可する。 $ sudo firewall-cmd --permanent --zone=public --add-service=https success $ sudo firewall-cmd --reload success $ sudo firewall-cmd --zone=public --list-all public (active) target: default icmp-block-inversion: no interfaces: eth0 sources: services: http https ports: protocols: masquerade: no forward-ports: sourceports: icmp-blocks: rich rules: EPELリポジトリのインストール EPELリポジトリをインストールする。 $ sudo yum install epel-release [sudo] password for ryota: 読み込んだプラグイン:fastestmirror Loading mirror speeds from cached hostfile * base: ftp.iij.ad.jp * extras: ftp.iij.ad.jp * updates: ftp.iij.ad.jp 依存性の解決をしています --&gt; トランザクションの確認を実行しています。 ---&gt; パッケージ epel-release.noarch 0:7-9 を インストール --&gt; 依存性解決を終了しました。 依存性を解決しました ================================================================================ Package アーキテクチャー バージョン リポジトリー 容量 ================================================================================ インストール中: epel-release noarch 7-9 extras 14 k トランザクションの要約 ================================================================================ インストール 1 パッケージ 総ダウンロード容量: 14 k インストール容量: 24 k Is this ok [y/d/N]: y Downloading packages: epel-release-7-9.noarch.rpm | 14 kB 00:00 Running transaction check Running transaction test Transaction test succeeded Running transaction インストール中 : epel-release-7-9.noarch 1/1 検証中 : epel-release-7-9.noarch 1/1 インストール: epel-release.noarch 0:7-9 完了しました!
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
                   <p class="list-group-item-text">
@@ -106,7 +127,7 @@
                     
                   </p>
                   <p class="list-group-item-text">
-                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~\]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig \-o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum \-y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
+                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。 rootでログイン お名前.comのコンソール画面でログインを行います。 login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。 [root@&lt;ホスト名&gt; ~]# 以降の手順では、rootアカウントのプロンプトを#で表現します。 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。 # vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig -o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド ホスト名変更 ホスト名の変更を行います。 # hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。 # reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。 パッケージの更新 パッケージを最新の状態に更新します。 # yum -y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。 # reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。 # useradd centos # passwd centos Changing password for user centos.
                   </p>
                 </a>
                 
@@ -180,6 +201,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
@@ -208,8 +231,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(NFS/Samba) [ 2017-01-02 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/01/setting-usb-storage/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(mdadm) [ 2017-01-01 ]</a>
-      
     
   </div>
 </section>
@@ -220,6 +241,8 @@
     <h1 class="panel-title">Categories</h1>
   </div>
   <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/centos" class="list-group-item"><span class="badge">1</span>centos</a>
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
@@ -252,7 +275,7 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/centos" >centos (2)</a>
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
     
     
     
@@ -309,6 +332,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
     
     
     

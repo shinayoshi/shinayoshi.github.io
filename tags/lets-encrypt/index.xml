@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lets Encrypt on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/lets-encrypt/</link>
+    <description>Recent content in Lets Encrypt on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <lastBuildDate>Wed, 03 May 2017 15:50:26 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/lets-encrypt/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>CentOS 7.3にLet&#39;s Encryptの証明書を導入する</title>
+      <link>http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/</link>
+      <pubDate>Wed, 03 May 2017 15:50:26 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/</guid>
+      <description>
+
+&lt;h2 id=&#34;前提:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;前提&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OS
+
+&lt;ul&gt;
+&lt;li&gt;CentOS Linux release 7.3.1611 (Core)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Web Server
+
+&lt;ul&gt;
+&lt;li&gt;Apache 2.4.6&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;firewalld
+
+&lt;ul&gt;
+&lt;li&gt;enabled&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;SELinux
+
+&lt;ul&gt;
+&lt;li&gt;disabled&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;firewalldでhttpsを有効化:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;firewalldでhttpsを有効化&lt;/h2&gt;
+
+&lt;p&gt;インターネットからhttpsアクセスを許可する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo firewall-cmd --permanent --zone=public --add-service=https
+success
+$ sudo firewall-cmd --reload
+success
+$ sudo firewall-cmd --zone=public --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: eth0
+  sources: 
+  services: http https
+  ports: 
+  protocols: 
+  masquerade: no
+  forward-ports: 
+  sourceports: 
+  icmp-blocks: 
+  rich rules: 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;epelリポジトリのインストール:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;EPELリポジトリのインストール&lt;/h2&gt;
+
+&lt;p&gt;EPELリポジトリをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo yum install epel-release
+[sudo] password for ryota:
+読み込んだプラグイン:fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: ftp.iij.ad.jp
+ * extras: ftp.iij.ad.jp
+ * updates: ftp.iij.ad.jp
+依存性の解決をしています
+--&amp;gt; トランザクションの確認を実行しています。
+---&amp;gt; パッケージ epel-release.noarch 0:7-9 を インストール
+--&amp;gt; 依存性解決を終了しました。
+
+依存性を解決しました
+
+================================================================================
+ Package                アーキテクチャー バージョン      リポジトリー      容量
+================================================================================
+インストール中:
+ epel-release           noarch           7-9             extras            14 k
+
+トランザクションの要約
+================================================================================
+インストール  1 パッケージ
+
+総ダウンロード容量: 14 k
+インストール容量: 24 k
+Is this ok [y/d/N]: y
+Downloading packages:
+epel-release-7-9.noarch.rpm                                |  14 kB   00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  インストール中          : epel-release-7-9.noarch                         1/1
+  検証中                  : epel-release-7-9.noarch                         1/1
+
+インストール:
+  epel-release.noarch 0:7-9
+
+完了しました!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;通常時EPELリポジトリを無効化する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/yum.repos.d/epel.repo{,.org}
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+$
+$ sudo sed -i -e &amp;quot;s/^enabled=1/enabled=0/g&amp;quot; /etc/yum.repos.d/epel.repo
+$
+$ diff /etc/yum.repos.d/epel.repo{.org,}
+6c6
+&amp;lt; enabled=1
+---
+&amp;gt; enabled=0
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957  5月  3 16:17 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;certbotのインストール:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;Certbotのインストール&lt;/h2&gt;
+
+&lt;p&gt;EPELリポジトリからCertbotをインストールする。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo yum --enablerepo=epel install certbot python-certbot-apache
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;let-s-encryptで証明書を取得:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;Let&amp;rsquo;s Encryptで証明書を取得&lt;/h2&gt;
+
+&lt;p&gt;以下のコマンドを実行してLet&amp;rsquo;s Encryptの証明書を取得する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo certbot --apache
+[sudo] password for ryota: 
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Enter email address (used for urgent renewal and security notices) (Enter &#39;c&#39; to
+cancel):&amp;lt;メールアドレス&amp;gt;
+Starting new HTTPS connection (1): acme-v01.api.letsencrypt.org
+
+-------------------------------------------------------------------------------
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf. You must agree
+in order to register with the ACME server at
+https://acme-v01.api.letsencrypt.org/directory
+-------------------------------------------------------------------------------
+(A)gree/(C)ancel: A
+
+-------------------------------------------------------------------------------
+Would you be willing to share your email address with the Electronic Frontier
+Foundation, a founding partner of the Let&#39;s Encrypt project and the non-profit
+organization that develops Certbot? We&#39;d like to send you email about EFF and
+our work to encrypt the web, protect its users and defend digital rights.
+-------------------------------------------------------------------------------
+(Y)es/(N)o: N
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter &#39;c&#39; to cancel):www.shinayoshi.net
+Obtaining a new certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press &#39;c&#39; to cancel): 1
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0000_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0000_csr-certbot.pem
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press &#39;c&#39; to cancel): 1
+Deploying Certificate to VirtualHost /etc/httpd/conf.d/ssl.conf
+
+Please choose whether HTTPS access is required or optional.
+-------------------------------------------------------------------------------
+1: Easy - Allow both HTTP and HTTPS access to these sites
+2: Secure - Make all requests redirect to secure HTTPS access
+-------------------------------------------------------------------------------
+Select the appropriate number [1-2] then [enter] (press &#39;c&#39; to cancel): 2
+Created redirect file: le-redirect-www.shinayoshi.net.conf
+Rollback checkpoint is empty (no changes made?)
+
+-------------------------------------------------------------------------------
+Congratulations! You have successfully enabled https://www.shinayoshi.net
+
+You should test your configuration at:
+https://www.ssllabs.com/ssltest/analyze.html?d=www.shinayoshi.net
+-------------------------------------------------------------------------------
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at
+   /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem. Your
+   cert will expire on 2017-08-01. To obtain a new or tweaked version
+   of this certificate in the future, simply run certbot again with
+   the &amp;quot;certonly&amp;quot; option. To non-interactively renew *all* of your
+   certificates, run &amp;quot;certbot renew&amp;quot;
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let&#39;s Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;let-s-encryptの証明書確認:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;Let&amp;rsquo;s Encryptの証明書確認&lt;/h2&gt;
+
+&lt;p&gt;ブラウザから証明書を作成したWebサイトにアクセスし、Let&amp;rsquo;s Encryptの証明書が使用されていることを確認する。&lt;/p&gt;
+
+&lt;h2 id=&#34;systemdで証明書の自動更新:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;systemdで証明書の自動更新&lt;/h2&gt;
+
+&lt;p&gt;以下のコマンドを実行して自動更新が正常に完了することを確認する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo certbot renew --dry-run
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+-------------------------------------------------------------------------------
+Processing /etc/letsencrypt/renewal/www.shinayoshi.net.conf
+-------------------------------------------------------------------------------
+Cert not due for renewal, but simulating renewal for dry run
+Starting new HTTPS connection (1): acme-staging.api.letsencrypt.org
+Renewing an existing certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0003_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0003_csr-certbot.pem
+
+-------------------------------------------------------------------------------
+new certificate deployed with reload of apache server; fullchain is
+/etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem
+-------------------------------------------------------------------------------
+** DRY RUN: simulating &#39;certbot renew&#39; close to cert expiry
+**          (The test certificates below have not been saved.)
+
+Congratulations, all renewals succeeded. The following certs have been renewed:
+  /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem (success)
+** DRY RUN: simulating &#39;certbot renew&#39; close to cert expiry
+**          (The test certificates above have not been saved.)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;certbot renew --dry-run&lt;/code&gt;の実行結果に問題がないことを確認し、以下のコマンドを実行して自動更新を有効化する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo systemctl enable certbot-renew.timer
+Created symlink from /etc/systemd/system/timer.target.wants/certbot-renew.timer to /usr/lib/systemd/system/certbot-renew.timer.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;参考:796da8d9138d6d5ff4391beb8d50ce4e&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://letsencrypt.org/&#34;&gt;Let&amp;rsquo;s Encrypt&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://certbot.eff.org/#centosrhel7-apache&#34;&gt;Certbot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://letsencrypt.jp/&#34;&gt;Let&amp;rsquo;s Encrypt 総合ポータル&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://hyper-text.org/archives/2016/10/lets_encrypt_ssl_quick_start.shtml&#34;&gt;Let&amp;rsquo;s Encrypt （無料 SSL サーバ証明書） の設定が超簡単になったと聞いて試してみた件 | WWW WATCH&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
