@@ -74,13 +74,34 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Java SE 8 Silverを取得しました</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat May 6, 2017</span> in
+                    
+                    
+                    program
+                     using tags
+                    
+                    
+                    java
+                    
+                     , 
+                    certification
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。 資格取得までに勉強したことをメモしておきます。 Java経験 私のJava経験は以下ととおりです。 2010年にSun認定JavaプログラマSE6(SJC-P)を取得 Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません) 勉強方法 試験まで以下の参考書を使用して勉強しました。 オラクル認定資格教科書 Javaプログラマ Silver SE 8 SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。 参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。 Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。 新しく勉強した内容 過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。 2進数表記 0bを先頭につけることで2進数を表現できるようになりました。 ex) 0b1010 // 10進数で10 0b1111 // 10進数で15 数値リテラルのアンダーバー 数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。 ex) 1_234 5_6 インタフェースのdefaultメソッドとstaticメソッド インタフェースにメソッドの実装を記載できるようになりました。 結果、多重継承が実現可能となりました。 インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。 ex) interface MyInterface { void method1(); default void method2() { System.out.println(&quot;method2&quot;); } static void method3() { System.out.println(&quot;method3&quot;); } } ラムダ式 ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。 ラムダ式を使用するにあたり、Java
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">
                   <h2 class="list-group-item-heading">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</h2>
                   <p class="list-group-item-text">
                     <span class="label label-primary">Wed May 3, 2017</span> in
                     
                     
-                    centos
+                    server
                      using tags
                     
                     
@@ -326,30 +347,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 2のセキュリティ設定を強化する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    home-network
-                    
-                     , 
-                    homepot1
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &quot;net.ipv6.conf.all.stable_secret&quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.default.stable_secret&quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth0.stable_secret&quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth1.stable_secret&quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.lo.stable_secret&quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定します。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 ##INPUTチェーン #IPスプーフィング対策 $ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset #セッションハイジャック対策 $ sudo iptables -A INPUT -p tcp !
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -422,6 +419,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">Java SE 8 Silverを取得しました [ 2017-05-06 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
@@ -450,8 +449,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(NFS/Samba) [ 2017-01-02 ]</a>
-      
     
   </div>
 </section>
@@ -463,11 +460,11 @@
   </div>
   <div id="categories" class="list-group">
     
-    <a href="http://www.shinayoshi.net//categories/centos" class="list-group-item"><span class="badge">1</span>centos</a>
-    
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">36</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
     
   </div>
 </section>
@@ -497,6 +494,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certification" >certification (1)</a>
     
     
     
@@ -541,6 +542,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/java" >java (1)</a>
     
     
     

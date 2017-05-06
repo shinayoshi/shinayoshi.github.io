@@ -74,12 +74,152 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/">Java SE 8 Silverを取得しました</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat May 6, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/program">program</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/java">java</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/certification">certification</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。
+資格取得までに勉強したことをメモしておきます。</p>
+
+<h2 id="java経験:a2b7eb23385017c639e28ffb3d4d429e">Java経験</h2>
+
+<p>私のJava経験は以下ととおりです。</p>
+
+<ul>
+<li>2010年にSun認定JavaプログラマSE6(SJC-P)を取得</li>
+<li>Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません)</li>
+</ul>
+
+<h2 id="勉強方法:a2b7eb23385017c639e28ffb3d4d429e">勉強方法</h2>
+
+<p>試験まで以下の参考書を使用して勉強しました。</p>
+
+<ul>
+<li>オラクル認定資格教科書 Javaプログラマ Silver SE 8</li>
+</ul>
+
+<p>SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。</p>
+
+<p>参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。
+Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。</p>
+
+<h2 id="新しく勉強した内容:a2b7eb23385017c639e28ffb3d4d429e">新しく勉強した内容</h2>
+
+<p>過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。</p>
+
+<h3 id="2進数表記:a2b7eb23385017c639e28ffb3d4d429e">2進数表記</h3>
+
+<p>0bを先頭につけることで2進数を表現できるようになりました。</p>
+
+<pre><code>ex)
+0b1010    // 10進数で10
+0b1111    // 10進数で15
+</code></pre>
+
+<h3 id="数値リテラルのアンダーバー:a2b7eb23385017c639e28ffb3d4d429e">数値リテラルのアンダーバー</h3>
+
+<p>数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。</p>
+
+<pre><code>ex)
+1_234
+5_6
+</code></pre>
+
+<h3 id="インタフェースのdefaultメソッドとstaticメソッド:a2b7eb23385017c639e28ffb3d4d429e">インタフェースのdefaultメソッドとstaticメソッド</h3>
+
+<p>インタフェースにメソッドの実装を記載できるようになりました。
+結果、多重継承が実現可能となりました。</p>
+
+<p>インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。</p>
+
+<pre><code>ex)
+interface MyInterface {
+    void method1();
+    default void method2() { System.out.println(&quot;method2&quot;); }
+    static void method3() { System.out.println(&quot;method3&quot;); }
+}
+</code></pre>
+
+<h3 id="ラムダ式:a2b7eb23385017c639e28ffb3d4d429e">ラムダ式</h3>
+
+<p>ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。</p>
+
+<p>ラムダ式を使用するにあたり、Java SE 8のAPIに関数型インタフェースというものが追加されています。(参考：<a href="https://docs.oracle.com/javase/jp/8/docs/api/java/util/function/package-summary.html">java.util.function (Java Platform SE 8)</a>)</p>
+
+<pre><code>ex)
+import java.util.function.Predicate;
+public class LambdaSample {
+    public static void main(String[] args) {
+        // ラムダ式(省略あり)
+        Predicate&lt;String&gt; pre = str -&gt; str.isEmpty();
+
+        /*
+        // ラムダ式(省略なし)
+        Predicate&lt;String&gt; pre = (String str) -&gt; { return str.isEmpty(); }
+        */
+
+        /*
+        // 匿名クラスの実装
+        Predicate&lt;String&gt; pre = new Predicate&lt;String&gt;() {
+            public boolean test(String str) {
+                return str.isEmpty();
+            }
+        }
+        */
+
+        System.out.println(pre.test(&quot;&quot;));
+        System.out.println(pre.test(&quot;LambdaSample&quot;));
+    }
+}
+</code></pre>
+
+<h3 id="date-and-time-api:a2b7eb23385017c639e28ffb3d4d429e">Date and Time API</h3>
+
+<p>Dateクラスの代わりとなる新しいDate/Time APIが追加されました。
+例えば、LocalDateクラスやLocalTimeクラス、LocalDateTimeクラス等が追加されています。</p>
+
+<pre><code>ex)
+LocalDate date = LocalDate.now();
+LocalTime time = LocalTime.parse(&quot;18:23:11&quot;);
+LocalDateTime dateTime = LocalDateTime.of(2017, 5, 6, 18, 23, 11);
+</code></pre>
+
+<h2 id="今後:a2b7eb23385017c639e28ffb3d4d429e">今後</h2>
+
+<p>Oracle Certified Java Programmer, Gold SE 8 (1Z0-809)の取得に向けて勉強をしています。</p>
+
+<p>勉強を始めたばかりなのですが、Gold SE 8ではSilver SE 8以上に深い言語仕様の理解と標準APIの理解が必要なことがわかります。</p>
+
+<p>仕事でJavaを書くことはないのですが、趣味に生かしていければと考えています。</p>
+
+<p>以上です。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</a></h1>
                   <p>
                     <span class="label label-primary">Wed May 3, 2017</span> in
                     
                     
-                    <a href="http://www.shinayoshi.net//categories/centos">centos</a>
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
                      using tags
                     
                     
@@ -2759,347 +2899,6 @@ $
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/">Raspberry Pi 2のセキュリティ設定を強化する</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/homepot1">homepot1</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。</p>
-
-<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
-
-<p>前回に引き続き<code>homepot1</code>を構築していきます。
-Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。</p>
-
-<h2 id="ipv6の無効化:cb5f0701b8057bc3422a1cfa2b48de88">IPv6の無効化</h2>
-
-<p>IPv6は使用しないため、IPv6を無効化します。</p>
-
-<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.all.disable_ipv6 = 1
-$
-$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6 = 1
-$
-$ sudo sysctl -a | grep disable_ipv6
-sysctl: reading key &quot;net.ipv6.conf.all.stable_secret&quot;
-net.ipv6.conf.all.disable_ipv6 = 1
-sysctl: reading key &quot;net.ipv6.conf.default.stable_secret&quot;
-net.ipv6.conf.default.disable_ipv6 = 1
-sysctl: reading key &quot;net.ipv6.conf.eth0.stable_secret&quot;
-net.ipv6.conf.eth0.disable_ipv6 = 1
-sysctl: reading key &quot;net.ipv6.conf.eth1.stable_secret&quot;
-net.ipv6.conf.eth1.disable_ipv6 = 1
-sysctl: reading key &quot;net.ipv6.conf.lo.stable_secret&quot;
-net.ipv6.conf.lo.disable_ipv6 = 1
-$
-</code></pre>
-
-<p>再起動後もIPv6が無効化するように設定します。</p>
-
-<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
-net.ipv6.conf.all.disable_ipv6=1
-net.ipv6.conf.default.disable_ipv6=1
-</code></pre>
-
-<h2 id="selinuxの無効化:cb5f0701b8057bc3422a1cfa2b48de88">SELinuxの無効化</h2>
-
-<p>Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。</p>
-
-<h2 id="iptablesの設定:cb5f0701b8057bc3422a1cfa2b48de88">iptablesの設定</h2>
-
-<p>iptablesでfirewallを設定します。</p>
-
-<pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
-#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-
-##INPUTチェーン
-#IPスプーフィング対策
-$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
-
-#セッションハイジャック対策
-$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
-
-#不正なパケット拒否
-$ sudo iptables -A INPUT -m state --state INVALID -j DROP
-
-#内部からの通信を始めた場合のパケットは許可
-$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#ループバックからの通信は通す
-$ sudo iptables -A INPUT -i lo -j ACCEPT
-
-#ICMPパケットは許可
-$ sudo iptables -A INPUT -p icmp -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
-
-#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
-
-#HTTPは許可(ローカルネットワークからの接続のみ許可)
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
-
-#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
-$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
-
-#Zabbix-Agentへの通信は許可
-#$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
-
-##OUTPUTチェーン
-#ループバックへの通信は通す
-$ sudo iptables -A OUTPUT -o lo -j ACCEPT
-
-#ICMP応答のパケットは通す
-$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#外部からの通信を始めた場合のパケットを許可
-$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#tcp-resetの通信は通す
-$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-#DHCPクライアントとしてDHCPに必要な通信は通す
-#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
-
-#ユーザrootが発したパケットは許可
-$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
-
-#NTPは許可
-$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
-
-#Zabbix-Serverへの通信は許可
-#$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
-
-#外部からの通信は拒否。外部への通信も拒否。
-$ sudo iptables -P INPUT DROP
-$ sudo iptables -P FORWARD DROP
-$ sudo iptables -P OUTPUT DROP
-</code></pre>
-
-<p>iptablesの設定を保存します。</p>
-
-<pre><code>$ sudo netfilter-persistent save
-run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
-run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
-$
-</code></pre>
-
-<ul>
-<li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
-<li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
-<li><a href="http://kassyjp.ninja-web.net/ras/jessie/iptables.htm">2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋</a></li>
-</ul>
-
-<h2 id="ログ出力先をsyslogに変更:cb5f0701b8057bc3422a1cfa2b48de88">ログ出力先をsyslogに変更</h2>
-
-<p>twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更します。</p>
-
-<p>ログ保管用のディレクトリ作成</p>
-
-<pre><code>$ sudo mkdir /var/log/cowrie
-$ sudo chown cowrie:adm /var/log/cowrie/
-</code></pre>
-
-<p>rsyslogの設定</p>
-
-<pre><code>$ sudo vi /etc/rsyslog.d/cowrie.conf
-if $programname == 'cowrie' then /var/log/cowrie/cowrie.log
-&amp; ~
-</code></pre>
-
-<p>rsyslogの再起動</p>
-
-<pre><code>$ sudo systemctl restart rsyslog
-</code></pre>
-
-<p>Cowrieのログ出力先変更</p>
-
-<pre><code>$ sudo su - cowrie
-$ cd cowrie
-$ cp -p start.sh{,.backup20170107}
-$ ls -l start.sh*
--rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh
--rwxr-xr-x 1 cowrie cowrie 922  1月  4 21:10 start.sh.backup20170105
--rwxr-xr-x 1 cowrie cowrie 922  1月  5 05:21 start.sh.backup20170107
--rwxr-xr-x 1 cowrie cowrie 920  1月  4 19:05 start.sh.org
-$
-$ vi start.sh
-$ diff start.sh.backup20170107 start.sh
-35c35
-&lt;     twistd $XARGS $DAEMONIZE -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
----
-&gt;     twistd $XARGS $DAEMONIZE --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
-37c37
-&lt;     authbind --deep twistd $DAEMONIZE $XARGS -l log/cowrie.log --umask 0027 --pidfile ${PIDFILE} cowrie
----
-&gt;     authbind --deep twistd $DAEMONIZE $XARGS --syslog --prefix cowrie --umask 0027 --pidfile ${PIDFILE} cowrie
-$
-</code></pre>
-
-<h2 id="logrotateの設定:cb5f0701b8057bc3422a1cfa2b48de88">logrotateの設定</h2>
-
-<p>logrotateをインストールします(通常はインストール済みのはずです)。</p>
-
-<pre><code>$ sudo -E apt-get install logrotate
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-logrotate はすでに最新版です。
-アップグレード: 0 個、新規インストール: 0 個、削除: 0 個、保留: 0 個。
-$
-</code></pre>
-
-<p>Cowrie用のlogrotate設定を作成</p>
-
-<pre><code>$ sudo vi /etc/logrotate.d/cowrie
-/var/log/cowrie/cowrie.log
-{
-        daily
-        rotate 92
-        dateext
-        create 0640 cowrie adm
-        missingok
-        ifempty
-        compress
-        postrotate
-                invoke-rc.d rsyslog rotate &gt; /dev/null
-        endscript
-}
-</code></pre>
-
-<p>logrotateをテスト実行し、エラーがないことを確認</p>
-
-<pre><code>$ sudo logrotate -d /etc/logrotate.d/cowrie
-reading config file /etc/logrotate.d/cowrie
-
-Handling 1 logs
-
-rotating pattern: /var/log/cowrie/cowrie.log
- after 1 days (92 rotations)
-empty log files are rotated, old logs are removed
-considering log /var/log/cowrie/cowrie.log
-  log /var/log/cowrie/cowrie.log does not exist -- skipping
-$
-</code></pre>
-
-<ul>
-<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
-<li><a href="https://open-groove.net/linux/logrotate-test/">logrotate（ログローテート）の動作確認 | OpenGroove</a></li>
-</ul>
-
-<h2 id="logwatchのインストール:cb5f0701b8057bc3422a1cfa2b48de88">logwatchのインストール</h2>
-
-<p>logwatchをインストール</p>
-
-<pre><code>$ sudo -E apt-get install logwatch
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
-  liblockfile-bin liblockfile1 libsys-cpu-perl
-提案パッケージ:
-  mail-reader eximon4 exim4-doc-html exim4-doc-info spf-tools-perl swaks
-  fortune-mod
-推奨パッケージ:
-  mailx
-以下のパッケージが新たにインストールされます:
-  bsd-mailx exim4-base exim4-config exim4-daemon-light libdate-manip-perl
-  liblockfile-bin liblockfile1 libsys-cpu-perl logwatch
-アップグレード: 0 個、新規インストール: 9 個、削除: 0 個、保留: 0 個。
-3,532 kB のアーカイブを取得する必要があります。
-この操作後に追加で 17.1 MB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile-bin armhf 1.09-6 [18.2 kB]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblockfile1 armhf 1.09-6 [14.7 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-config all 4.84.2-2+deb8u2 [503 kB]
-取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-base armhf 4.84.2-2+deb8u2 [1,046 kB]
-取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main exim4-daemon-light armhf 4.84.2-2+deb8u2 [578 kB]
-取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main bsd-mailx armhf 8.1.2-0.20141216cvs-2 [74.3 kB]
-取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdate-manip-perl all 6.47-1 [923 kB]
-取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsys-cpu-perl armhf 0.61-1+b1 [9,800 B]
-取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main logwatch all 7.4.1-2 [365 kB]
-3,532 kB を 48秒 で取得しました (72.9 kB/s)                                    
-パッケージを事前設定しています ...
-以前に未選択のパッケージ liblockfile-bin を選択しています。
-(データベースを読み込んでいます ... 現在 36617 個のファイルとディレクトリがインストールされています。)
-.../liblockfile-bin_1.09-6_armhf.deb を展開する準備をしています ...
-liblockfile-bin (1.09-6) を展開しています...
-以前に未選択のパッケージ liblockfile1:armhf を選択しています。
-.../liblockfile1_1.09-6_armhf.deb を展開する準備をしています ...
-liblockfile1:armhf (1.09-6) を展開しています...
-以前に未選択のパッケージ exim4-config を選択しています。
-.../exim4-config_4.84.2-2+deb8u2_all.deb を展開する準備をしています ...
-exim4-config (4.84.2-2+deb8u2) を展開しています...
-以前に未選択のパッケージ exim4-base を選択しています。
-.../exim4-base_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
-exim4-base (4.84.2-2+deb8u2) を展開しています...
-以前に未選択のパッケージ exim4-daemon-light を選択しています。
-.../exim4-daemon-light_4.84.2-2+deb8u2_armhf.deb を展開する準備をしています ...
-exim4-daemon-light (4.84.2-2+deb8u2) を展開しています...
-以前に未選択のパッケージ bsd-mailx を選択しています。
-.../bsd-mailx_8.1.2-0.20141216cvs-2_armhf.deb を展開する準備をしています ...
-bsd-mailx (8.1.2-0.20141216cvs-2) を展開しています...
-以前に未選択のパッケージ libdate-manip-perl を選択しています。
-.../libdate-manip-perl_6.47-1_all.deb を展開する準備をしています ...
-libdate-manip-perl (6.47-1) を展開しています...
-以前に未選択のパッケージ libsys-cpu-perl を選択しています。
-.../libsys-cpu-perl_0.61-1+b1_armhf.deb を展開する準備をしています ...
-libsys-cpu-perl (0.61-1+b1) を展開しています...
-以前に未選択のパッケージ logwatch を選択しています。
-.../logwatch_7.4.1-2_all.deb を展開する準備をしています ...
-logwatch (7.4.1-2) を展開しています...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-liblockfile-bin (1.09-6) を設定しています ...
-liblockfile1:armhf (1.09-6) を設定しています ...
-exim4-config (4.84.2-2+deb8u2) を設定しています ...
-Adding system-user for exim (v4)
-exim4-base (4.84.2-2+deb8u2) を設定しています ...
-exim: DB upgrade, deleting hints-db
-exim4-daemon-light (4.84.2-2+deb8u2) を設定しています ...
-bsd-mailx (8.1.2-0.20141216cvs-2) を設定しています ...
-update-alternatives: /usr/bin/mailx (mailx) を提供するために自動モードで /usr/bin/bsd-mailx を使います
-libdate-manip-perl (6.47-1) を設定しています ...
-libsys-cpu-perl (0.61-1+b1) を設定しています ...
-logwatch (7.4.1-2) を設定しています ...
-libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-</code></pre>
-
-<p>logwatchの実行結果を確認</p>
-
-<pre><code>$ sudo logwatch --output stdout
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -3171,6 +2970,8 @@ $
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">Java SE 8 Silverを取得しました [ 2017-05-06 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
@@ -3199,8 +3000,6 @@ $
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/" class="list-group-item">Raspberry Pi 2でファイルサーバを構築する(NFS/Samba) [ 2017-01-02 ]</a>
-      
     
   </div>
 </section>
@@ -3212,11 +3011,11 @@ $
   </div>
   <div id="categories" class="list-group">
     
-    <a href="http://www.shinayoshi.net//categories/centos" class="list-group-item"><span class="badge">1</span>centos</a>
-    
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">36</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
     
   </div>
 </section>
@@ -3246,6 +3045,10 @@ $
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certification" >certification (1)</a>
     
     
     
@@ -3290,6 +3093,10 @@ $
     
     
     <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/java" >java (1)</a>
     
     
     

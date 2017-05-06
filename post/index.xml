@@ -7,8 +7,134 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2017 shinayoshi</copyright>
-    <lastBuildDate>Wed, 03 May 2017 15:50:26 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 06 May 2017 15:56:59 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Java SE 8 Silverを取得しました</title>
+      <link>http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/</link>
+      <pubDate>Sat, 06 May 2017 15:56:59 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/</guid>
+      <description>
+
+&lt;p&gt;2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。
+資格取得までに勉強したことをメモしておきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;java経験:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;Java経験&lt;/h2&gt;
+
+&lt;p&gt;私のJava経験は以下ととおりです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;2010年にSun認定JavaプログラマSE6(SJC-P)を取得&lt;/li&gt;
+&lt;li&gt;Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;勉強方法:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;勉強方法&lt;/h2&gt;
+
+&lt;p&gt;試験まで以下の参考書を使用して勉強しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;オラクル認定資格教科書 Javaプログラマ Silver SE 8&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。&lt;/p&gt;
+
+&lt;p&gt;参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。
+Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。&lt;/p&gt;
+
+&lt;h2 id=&#34;新しく勉強した内容:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;新しく勉強した内容&lt;/h2&gt;
+
+&lt;p&gt;過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。&lt;/p&gt;
+
+&lt;h3 id=&#34;2進数表記:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;2進数表記&lt;/h3&gt;
+
+&lt;p&gt;0bを先頭につけることで2進数を表現できるようになりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ex)
+0b1010    // 10進数で10
+0b1111    // 10進数で15
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;数値リテラルのアンダーバー:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;数値リテラルのアンダーバー&lt;/h3&gt;
+
+&lt;p&gt;数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ex)
+1_234
+5_6
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;インタフェースのdefaultメソッドとstaticメソッド:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;インタフェースのdefaultメソッドとstaticメソッド&lt;/h3&gt;
+
+&lt;p&gt;インタフェースにメソッドの実装を記載できるようになりました。
+結果、多重継承が実現可能となりました。&lt;/p&gt;
+
+&lt;p&gt;インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ex)
+interface MyInterface {
+    void method1();
+    default void method2() { System.out.println(&amp;quot;method2&amp;quot;); }
+    static void method3() { System.out.println(&amp;quot;method3&amp;quot;); }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;ラムダ式:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;ラムダ式&lt;/h3&gt;
+
+&lt;p&gt;ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。&lt;/p&gt;
+
+&lt;p&gt;ラムダ式を使用するにあたり、Java SE 8のAPIに関数型インタフェースというものが追加されています。(参考：&lt;a href=&#34;https://docs.oracle.com/javase/jp/8/docs/api/java/util/function/package-summary.html&#34;&gt;java.util.function (Java Platform SE 8)&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ex)
+import java.util.function.Predicate;
+public class LambdaSample {
+    public static void main(String[] args) {
+        // ラムダ式(省略あり)
+        Predicate&amp;lt;String&amp;gt; pre = str -&amp;gt; str.isEmpty();
+
+        /*
+        // ラムダ式(省略なし)
+        Predicate&amp;lt;String&amp;gt; pre = (String str) -&amp;gt; { return str.isEmpty(); }
+        */
+
+        /*
+        // 匿名クラスの実装
+        Predicate&amp;lt;String&amp;gt; pre = new Predicate&amp;lt;String&amp;gt;() {
+            public boolean test(String str) {
+                return str.isEmpty();
+            }
+        }
+        */
+
+        System.out.println(pre.test(&amp;quot;&amp;quot;));
+        System.out.println(pre.test(&amp;quot;LambdaSample&amp;quot;));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;date-and-time-api:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;Date and Time API&lt;/h3&gt;
+
+&lt;p&gt;Dateクラスの代わりとなる新しいDate/Time APIが追加されました。
+例えば、LocalDateクラスやLocalTimeクラス、LocalDateTimeクラス等が追加されています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ex)
+LocalDate date = LocalDate.now();
+LocalTime time = LocalTime.parse(&amp;quot;18:23:11&amp;quot;);
+LocalDateTime dateTime = LocalDateTime.of(2017, 5, 6, 18, 23, 11);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;今後:a2b7eb23385017c639e28ffb3d4d429e&#34;&gt;今後&lt;/h2&gt;
+
+&lt;p&gt;Oracle Certified Java Programmer, Gold SE 8 (1Z0-809)の取得に向けて勉強をしています。&lt;/p&gt;
+
+&lt;p&gt;勉強を始めたばかりなのですが、Gold SE 8ではSilver SE 8以上に深い言語仕様の理解と標準APIの理解が必要なことがわかります。&lt;/p&gt;
+
+&lt;p&gt;仕事でJavaを書くことはないのですが、趣味に生かしていければと考えています。&lt;/p&gt;
+
+&lt;p&gt;以上です。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>CentOS 7.3にLet&#39;s Encryptの証明書を導入する</title>
@@ -5346,531 +5472,6 @@ $ dig -x 8.8.8.8
 
 $
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 2でファイルサーバを構築する(NFS/Samba)</title>
-      <link>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</link>
-      <pubDate>Mon, 02 Jan 2017 20:30:05 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2017/01/02/setting-fileserver/</guid>
-      <description>
-
-&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;前回に引き続き&lt;code&gt;homenas1&lt;/code&gt;を構築していきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspberry-pi-2でファイルサーバ構築-nfs-samba:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Raspberry Pi 2でファイルサーバ構築(NFS/Samba)&lt;/h2&gt;
-
-&lt;p&gt;前回はUSB Storageを使用してRAIDデバイスを設定しました。
-今回はNFSやSambaの設定を行っていきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;nfsの設定:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;NFSの設定&lt;/h2&gt;
-
-&lt;p&gt;NFSのインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install nfs-kernel-server
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下のパッケージが新たにインストールされます:
-  nfs-kernel-server
-アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。
-101 kB のアーカイブを取得する必要があります。
-この操作後に追加で 373 kB のディスク容量が消費されます。
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB]
-101 kB を 1秒 で取得しました (66.7 kB/s)  
-以前に未選択のパッケージ nfs-kernel-server を選択しています。
-(データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。)
-.../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ...
-nfs-kernel-server (1:1.2.8-9) を展開しています...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-nfs-kernel-server (1:1.2.8-9) を設定しています ...
-
-Creating config file /etc/exports with new version
-
-Creating config file /etc/default/nfs-kernel-server with new version
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NFSの設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/exports{,.org}
-$ ls -l /etc/exports*
--rw-r--r-- 1 root root 389  8月 13  2014 /etc/exports
--rw-r--r-- 1 root root 389  8月 13  2014 /etc/exports.org
-$
-$ sudo vi /etc/exports
-/mnt/rpibackup	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
-/mnt/syslog	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
-$
-$ diff /etc/exports.org /etc/exports
-10a11,12
-&amp;gt; /mnt/rpibackup	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
-&amp;gt; /mnt/syslog	172.31.10.0/24(rw,sync,insecure,all_squash,no_subtree_check)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;dl&gt;
-    &lt;dt&gt;rw&lt;/dt&gt;
-    &lt;dd&gt;ファイルシステムに対して変更(読み込み/書き込み)ができるようにする&lt;/dd&gt;
-    &lt;dt&gt;sync&lt;/dt&gt;
-    &lt;dd&gt;ディスクへの書き込みを同期する&lt;/dd&gt;
-    &lt;dt&gt;insecure&lt;/dt&gt;
-    &lt;dd&gt;クライアントからのアクセスに使用するポートを制限しない&lt;/dd&gt;
-    &lt;dt&gt;all_squash&lt;/dt&gt;
-    &lt;dd&gt;すべてのuidとgidをanonymousにマッピングする&lt;/dd&gt;
-    &lt;dt&gt;no_subtree_check&lt;/dt&gt;
-    &lt;dd&gt;サブツリーのチェックを無効にする&lt;/dd&gt;
-&lt;/dl&gt;
-
-&lt;p&gt;NFSの起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl start rpcbind
-$ sudo systemctl enable rpcbind
-Synchronizing state for rpcbind.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d rpcbind defaults
-insserv: warning: current start runlevel(s) (empty) of script `rpcbind&#39; overrides LSB defaults (S).
-insserv: warning: current stop runlevel(s) (0 1 6 S) of script `rpcbind&#39; overrides LSB defaults (0 1 6).
-Executing /usr/sbin/update-rc.d rpcbind enable
-$
-$ sudo systemctl restart nfs-kernel-server
-$ sudo systemctl enable nfs-kernel-server
-Synchronizing state for nfs-kernel-server.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d nfs-kernel-server defaults
-Executing /usr/sbin/update-rc.d nfs-kernel-server enable
-$
-$ sudo showmount -e
-Export list for homenas1:
-/mnt/syslog    172.31.10.0/24
-/mnt/rpibackup 172.31.10.0/24
-$
-$ sudo exportfs -v
-/mnt/rpibackup	172.31.10.0/24(rw,wdelay,insecure,root_squash,all_squash,no_subtree_check,sec=sys,rw,root_squash,all_squash)
-/mnt/syslog   	172.31.10.0/24(rw,wdelay,insecure,root_squash,all_squash,no_subtree_check,sec=sys,rw,root_squash,all_squash)
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;NFSクライアント側の設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install -y nfs-client
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-Note, selecting &#39;nfs-common&#39; instead of &#39;nfs-client&#39;
-nfs-common はすでに最新版です。
-アップグレード: 0 個、新規インストール: 0 個、削除: 0 個、保留: 1 個。
-$
-$ sudo mkdir /mnt/rpibackup
-$ sudo mkdir /mnt/syslog
-$
-$ sudo cp -p /etc/fstab{,.org}
-$ ls -l /etc/fstab*
--rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab
--rw-r--r-- 1 root root 302  9月 23 12:53 /etc/fstab.org
-$
-$ sudo vi /etc/fstab
-172.31.10.110:/mnt/rpibackup	/mnt/rpibackup	nfs	defaults,nofail	0	0
-172.31.10.110:/mnt/syslog	/mnt/syslog	nfs	defaults,nofail	0	0
-$
-$ sudo mount -a
-$ df -h
-ファイルシス                 サイズ  使用  残り 使用% マウント位置
-/dev/root                       29G  963M   27G    4% /
-devtmpfs                       459M     0  459M    0% /dev
-tmpfs                          463M     0  463M    0% /dev/shm
-tmpfs                          463M  6.2M  457M    2% /run
-tmpfs                          5.0M  4.0K  5.0M    1% /run/lock
-tmpfs                          463M     0  463M    0% /sys/fs/cgroup
-/dev/mmcblk0p1                  63M   21M   43M   34% /boot
-172.31.10.110:/mnt/rpibackup   325G   67M  308G    1% /mnt/rpibackup
-172.31.10.110:/mnt/syslog      197G   60M  187G    1% /mnt/syslog
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;sambaの設定:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;Sambaの設定&lt;/h2&gt;
-
-&lt;p&gt;Sambaのインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install samba
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  attr libaio1 libasn1-8-heimdal libavahi-client3 libcups2
-  libfile-copy-recursive-perl libhcrypto4-heimdal libhdb9-heimdal
-  libheimbase1-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldb1 libntdb1
-  libroken18-heimdal libtdb1 libtevent0 libwind0-heimdal python-crypto
-  python-dnspython python-ldb python-ntdb python-samba python-talloc
-  python-tdb samba-common-bin samba-dsdb-modules samba-libs samba-vfs-modules
-  tdb-tools update-inetd
-提案パッケージ:
-  cups-common python-crypto-dbg python-crypto-doc bind9 bind9utils ctdb
-  ldb-tools smbldap-tools winbind heimdal-clients
-以下のパッケージが新たにインストールされます:
-  attr libaio1 libasn1-8-heimdal libavahi-client3 libcups2
-  libfile-copy-recursive-perl libhcrypto4-heimdal libhdb9-heimdal
-  libheimbase1-heimdal libhx509-5-heimdal libkrb5-26-heimdal libldb1 libntdb1
-  libroken18-heimdal libtdb1 libtevent0 libwind0-heimdal python-crypto
-  python-dnspython python-ldb python-ntdb python-samba python-talloc
-  python-tdb samba samba-common-bin samba-dsdb-modules samba-libs
-  samba-vfs-modules tdb-tools update-inetd
-アップグレード: 0 個、新規インストール: 31 個、削除: 0 個、保留: 1 個。
-8,999 kB のアーカイブを取得する必要があります。
-この操作後に追加で 44.6 MB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libaio1 armhf 0.3.110-1 [9,228 B]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libroken18-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [56.6 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libasn1-8-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [161 kB]
-取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libavahi-client3 armhf 0.6.31-5 [50.6 kB]
-取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcups2 armhf 1.7.5-11+deb8u1 [253 kB]
-取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhcrypto4-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [98.3 kB]
-取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libheimbase1-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [46.4 kB]
-取得:8 http://mirrordirector.raspbian.org/raspbian/ jessie/main libwind0-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [71.0 kB]
-取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhx509-5-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [111 kB]
-取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libkrb5-26-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [188 kB]
-取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libhdb9-heimdal armhf 1.6~rc2+dfsg-9+rpi1 [73.6 kB]
-取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtdb1 armhf 1.3.6-0+deb8u1 [37.1 kB]
-取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main libtevent0 armhf 0.9.28-0+deb8u1 [23.5 kB]
-取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main libldb1 armhf 2:1.1.20-0+deb8u1 [90.9 kB]
-取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main libntdb1 armhf 1.0-5 [37.8 kB]
-取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-ldb armhf 2:1.1.20-0+deb8u1 [26.0 kB]
-取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-talloc armhf 2.1.2-0+deb8u1 [9,912 B]
-取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-dnspython all 1.12.0-1 [101 kB]
-取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-ntdb armhf 1.0-5 [8,372 B]
-取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-tdb armhf 1.3.6-0+deb8u1 [14.0 kB]
-取得:21 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-crypto armhf 2.6.1-5 [248 kB]
-取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-libs armhf 2:4.2.14+dfsg-0+deb8u2 [4,244 kB]
-取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main python-samba armhf 2:4.2.14+dfsg-0+deb8u2 [850 kB]
-取得:24 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-common-bin armhf 2:4.2.14+dfsg-0+deb8u2 [562 kB]
-取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-dsdb-modules armhf 2:4.2.14+dfsg-0+deb8u2 [276 kB]
-取得:26 http://mirrordirector.raspbian.org/raspbian/ jessie/main tdb-tools armhf 1.3.6-0+deb8u1 [25.5 kB]
-取得:27 http://mirrordirector.raspbian.org/raspbian/ jessie/main libfile-copy-recursive-perl all 0.38-1 [20.6 kB]
-取得:28 http://mirrordirector.raspbian.org/raspbian/ jessie/main update-inetd all 4.43 [21.8 kB]
-取得:29 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba armhf 2:4.2.14+dfsg-0+deb8u2 [939 kB]
-取得:30 http://mirrordirector.raspbian.org/raspbian/ jessie/main attr armhf 1:2.4.47-2 [41.3 kB]
-取得:31 http://mirrordirector.raspbian.org/raspbian/ jessie/main samba-vfs-modules armhf 2:4.2.14+dfsg-0+deb8u2 [303 kB]
-8,999 kB を 1分 8秒 で取得しました (131 kB/s)                                  
-パッケージからテンプレートを展開しています: 100%
-パッケージを事前設定しています ...
-以前に未選択のパッケージ libaio1:armhf を選択しています。
-(データベースを読み込んでいます ... 現在 31562 個のファイルとディレクトリがインストールされています。)
-.../libaio1_0.3.110-1_armhf.deb を展開する準備をしています ...
-libaio1:armhf (0.3.110-1) を展開しています...
-以前に未選択のパッケージ libroken18-heimdal:armhf を選択しています。
-.../libroken18-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libroken18-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libasn1-8-heimdal:armhf を選択しています。
-.../libasn1-8-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libasn1-8-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libavahi-client3:armhf を選択しています。
-.../libavahi-client3_0.6.31-5_armhf.deb を展開する準備をしています ...
-libavahi-client3:armhf (0.6.31-5) を展開しています...
-以前に未選択のパッケージ libcups2:armhf を選択しています。
-.../libcups2_1.7.5-11+deb8u1_armhf.deb を展開する準備をしています ...
-libcups2:armhf (1.7.5-11+deb8u1) を展開しています...
-以前に未選択のパッケージ libhcrypto4-heimdal:armhf を選択しています。
-.../libhcrypto4-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libhcrypto4-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libheimbase1-heimdal:armhf を選択しています。
-.../libheimbase1-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libheimbase1-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libwind0-heimdal:armhf を選択しています。
-.../libwind0-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libwind0-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libhx509-5-heimdal:armhf を選択しています。
-.../libhx509-5-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libhx509-5-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libkrb5-26-heimdal:armhf を選択しています。
-.../libkrb5-26-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libkrb5-26-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libhdb9-heimdal:armhf を選択しています。
-.../libhdb9-heimdal_1.6~rc2+dfsg-9+rpi1_armhf.deb を展開する準備をしています ...
-libhdb9-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を展開しています...
-以前に未選択のパッケージ libtdb1:armhf を選択しています。
-.../libtdb1_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
-libtdb1:armhf (1.3.6-0+deb8u1) を展開しています...
-以前に未選択のパッケージ libtevent0:armhf を選択しています。
-.../libtevent0_0.9.28-0+deb8u1_armhf.deb を展開する準備をしています ...
-libtevent0:armhf (0.9.28-0+deb8u1) を展開しています...
-以前に未選択のパッケージ libldb1:armhf を選択しています。
-.../libldb1_2%3a1.1.20-0+deb8u1_armhf.deb を展開する準備をしています ...
-libldb1:armhf (2:1.1.20-0+deb8u1) を展開しています...
-以前に未選択のパッケージ libntdb1:armhf を選択しています。
-.../libntdb1_1.0-5_armhf.deb を展開する準備をしています ...
-libntdb1:armhf (1.0-5) を展開しています...
-以前に未選択のパッケージ python-ldb を選択しています。
-.../python-ldb_2%3a1.1.20-0+deb8u1_armhf.deb を展開する準備をしています ...
-python-ldb (2:1.1.20-0+deb8u1) を展開しています...
-以前に未選択のパッケージ python-talloc を選択しています。
-.../python-talloc_2.1.2-0+deb8u1_armhf.deb を展開する準備をしています ...
-python-talloc (2.1.2-0+deb8u1) を展開しています...
-以前に未選択のパッケージ python-dnspython を選択しています。
-.../python-dnspython_1.12.0-1_all.deb を展開する準備をしています ...
-python-dnspython (1.12.0-1) を展開しています...
-以前に未選択のパッケージ python-ntdb を選択しています。
-.../python-ntdb_1.0-5_armhf.deb を展開する準備をしています ...
-python-ntdb (1.0-5) を展開しています...
-以前に未選択のパッケージ python-tdb を選択しています。
-.../python-tdb_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
-python-tdb (1.3.6-0+deb8u1) を展開しています...
-以前に未選択のパッケージ python-crypto を選択しています。
-.../python-crypto_2.6.1-5_armhf.deb を展開する準備をしています ...
-python-crypto (2.6.1-5) を展開しています...
-以前に未選択のパッケージ samba-libs:armhf を選択しています。
-.../samba-libs_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-samba-libs:armhf (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-以前に未選択のパッケージ python-samba を選択しています。
-.../python-samba_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-python-samba (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-以前に未選択のパッケージ samba-common-bin を選択しています。
-.../samba-common-bin_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-samba-common-bin (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-以前に未選択のパッケージ samba-dsdb-modules を選択しています。
-.../samba-dsdb-modules_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-samba-dsdb-modules (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-以前に未選択のパッケージ tdb-tools を選択しています。
-.../tdb-tools_1.3.6-0+deb8u1_armhf.deb を展開する準備をしています ...
-tdb-tools (1.3.6-0+deb8u1) を展開しています...
-以前に未選択のパッケージ libfile-copy-recursive-perl を選択しています。
-.../libfile-copy-recursive-perl_0.38-1_all.deb を展開する準備をしています ...
-libfile-copy-recursive-perl (0.38-1) を展開しています...
-以前に未選択のパッケージ update-inetd を選択しています。
-.../update-inetd_4.43_all.deb を展開する準備をしています ...
-update-inetd (4.43) を展開しています...
-以前に未選択のパッケージ samba を選択しています。
-.../samba_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-samba (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-以前に未選択のパッケージ attr を選択しています。
-.../attr_1%3a2.4.47-2_armhf.deb を展開する準備をしています ...
-attr (1:2.4.47-2) を展開しています...
-以前に未選択のパッケージ samba-vfs-modules を選択しています。
-.../samba-vfs-modules_2%3a4.2.14+dfsg-0+deb8u2_armhf.deb を展開する準備をしています ...
-samba-vfs-modules (2:4.2.14+dfsg-0+deb8u2) を展開しています...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-libaio1:armhf (0.3.110-1) を設定しています ...
-libroken18-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libasn1-8-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libavahi-client3:armhf (0.6.31-5) を設定しています ...
-libcups2:armhf (1.7.5-11+deb8u1) を設定しています ...
-libhcrypto4-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libheimbase1-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libwind0-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libhx509-5-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libkrb5-26-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libhdb9-heimdal:armhf (1.6~rc2+dfsg-9+rpi1) を設定しています ...
-libtdb1:armhf (1.3.6-0+deb8u1) を設定しています ...
-libtevent0:armhf (0.9.28-0+deb8u1) を設定しています ...
-libldb1:armhf (2:1.1.20-0+deb8u1) を設定しています ...
-libntdb1:armhf (1.0-5) を設定しています ...
-python-ldb (2:1.1.20-0+deb8u1) を設定しています ...
-python-talloc (2.1.2-0+deb8u1) を設定しています ...
-python-dnspython (1.12.0-1) を設定しています ...
-python-ntdb (1.0-5) を設定しています ...
-python-tdb (1.3.6-0+deb8u1) を設定しています ...
-python-crypto (2.6.1-5) を設定しています ...
-samba-libs:armhf (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-python-samba (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-samba-common-bin (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-samba-dsdb-modules (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-tdb-tools (1.3.6-0+deb8u1) を設定しています ...
-update-alternatives: /usr/bin/tdbbackup (tdbbackup) を提供するために自動モードで /usr/bin/tdbbackup.tdbtools を使います
-libfile-copy-recursive-perl (0.38-1) を設定しています ...
-update-inetd (4.43) を設定しています ...
-samba (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-グループ `sambashare&#39; (グループ ID 115) を追加しています...
-完了。
-attr (1:2.4.47-2) を設定しています ...
-samba-vfs-modules (2:4.2.14+dfsg-0+deb8u2) を設定しています ...
-libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Sambaの設定(後日見直し要素)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/samba/smb.conf{,.org}
-$ ls -l /etc/samba/smb.conf*
--rw-r--r-- 1 root root 9231 12月 31 18:33 /etc/samba/smb.conf
--rw-r--r-- 1 root root 9231 12月 31 18:33 /etc/samba/smb.conf.org
-$
-$ sudo vi /etc/samba/smb.conf
-[global]
-   dos charset = CP932
-   unix charset = UTF-8
-   unix extensions = no
-
-   load printers = no
-   printing = bsd
-   printcap name = /dev/null
-
-;   interfaces = 127.0.0.0/8 eth0
-   interfaces = 127.0.0.0/8 192.168.40.0/24 eth0
-   hosts allow = 192.168.40.0/24
-
-;   map to guest = bad user
-   map to guest = never
-
-;   usershare allow guests = yes
-   usershare allow guests = no
-
-;[homes]
-;   comment = Home Directories
-;   browseable = no
-
-;   read only = yes
-
-;   create mask = 0700
-
-;   directory mask = 0700
-
-;   valid users = %S
-
-;[printers]
-;   comment = All Printers
-;   browseable = no
-;   path = /var/spool/samba
-;   printable = yes
-;   guest ok = no
-;   read only = yes
-;   create mask = 0700
-
-;[print$]
-;   comment = Printer Drivers
-;   path = /var/lib/samba/printers
-;   browseable = yes
-;   read only = yes
-;   guest ok = no
-
-[share]
-   path = /mnt/nas
-   writable = yes
-   valid users = @sambashare
-   force user = root
-   force group = adm
-   create mask = 0664
-   directory mask = 0775
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Sambaを起動する&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ testparm /etc/samba/smb.conf
-Load smb config files from /etc/samba/smb.conf
-Processing section &amp;quot;[share]&amp;quot;
-Loaded services file OK.
-Server role: ROLE_STANDALONE
-
-Press enter to see a dump of your service definitions
-
-# Global parameters
-[global]
-	dos charset = CP932
-	interfaces = 127.0.0.0/8 192.168.40.0/24 eth0
-	server role = standalone server
-	obey pam restrictions = Yes
-	pam password change = Yes
-	passwd program = /usr/bin/passwd %u
-	passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
-	unix password sync = Yes
-	syslog = 0
-	log file = /var/log/samba/log.%m
-	max log size = 1000
-	unix extensions = No
-	load printers = No
-	printcap name = /dev/null
-	dns proxy = No
-	panic action = /usr/share/samba/panic-action %d
-	idmap config * : backend = tdb
-	hosts allow = 192.168.40.0/24
-	printing = bsd
-
-
-[share]
-	path = /mnt/nas
-	valid users = @sambashare
-	force user = root
-	force group = adm
-	read only = No
-	create mask = 0664
-	directory mask = 0775
-$
-$ sudo systemctl restart smbd
-$ sudo systemctl restart nmbd
-$
-$ sudo systemctl enable smbd
-Synchronizing state for smbd.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d smbd defaults
-Executing /usr/sbin/update-rc.d smbd enable
-$
-$ sudo systemctl enable nmbd
-Synchronizing state for nmbd.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d nmbd defaults
-Executing /usr/sbin/update-rc.d nmbd enable
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Samba接続用のユーザ作成&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo useradd samba -u 1100 -g sambashare -s /bin/false
-$ sudo passwd -l samba
-passwd: パスワード期限切れ情報を変更しました
-$
-$ sudo pdbedit -a -u samba
-new password:
-retype new password:
-Unix username:        samba
-NT username:          
-Account Flags:        [U          ]
-User SID:             S-1-5-21-4142804337-213291639-510360124-1000
-Primary Group SID:    S-1-5-21-4142804337-213291639-510360124-513
-Full Name:            
-Home Directory:       \\homenas1\samba
-HomeDir Drive:        
-Logon Script:         
-Profile Path:         \\homenas1\samba\profile
-Domain:               HOMENAS1
-Account desc:         
-Workstations:         
-Munged dial:          
-Logon time:           0
-Logoff time:          never
-Kickoff time:         never
-Password last set:    月, 02  1月 2017 23:15:52 JST
-Password can change:  月, 02  1月 2017 23:15:52 JST
-Password must change: never
-Last bad password   : 0
-Bad password count  : 0
-Logon hours         : FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-$
-$ sudo pdbedit -Lw
-samba:1100:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:016FADE2356324CBD21E6685516D4A24:[U          ]:LCT-586A6098:
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;MacからSambaに接続&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Finderを開く&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Command + K&lt;/code&gt;を入力する&lt;/li&gt;
-&lt;li&gt;サーバアドレスに&lt;code&gt;smb://192.168.40.10/share&lt;/code&gt;を入力する&lt;/li&gt;
-&lt;li&gt;ユーザの種類に&lt;code&gt;登録ユーザ&lt;/code&gt;を選択、名前に&lt;code&gt;samba&lt;/code&gt;、パスワードに&lt;code&gt;sambaユーザのパスワード&lt;/code&gt;を入力して接続をクリックする&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;参考url:7daa4bd7d9cd8ea181b8fb40ded40309&#34;&gt;参考URL&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://denshikousaku.net/raspberry-pi-file-server-part1-basic-samba&#34;&gt;Raspberry Piでファイルサーバ、Part1 Samba基本編 | ものづくりエクスペリメント&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://ossfan.net/setup/samba-03.html&#34;&gt;Samba 4.2.3をCentOS 7.2にインストールしてファイルサーバとして設定 | OSSでLinuxサーバ構築 | OSS Fan&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.virment.com/config-sambaserver/&#34;&gt;sambaサーバによるファイル共有環境の構築手順&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>
