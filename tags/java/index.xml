@@ -95,7 +95,7 @@ public class LambdaSample {
 
         /*
         // ラムダ式(省略なし)
-        Predicate&amp;lt;String&amp;gt; pre = (String str) -&amp;gt; { return str.isEmpty(); }
+        Predicate&amp;lt;String&amp;gt; pre = (String str) -&amp;gt; { return str.isEmpty(); };
         */
 
         /*
