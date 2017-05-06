@@ -104,7 +104,7 @@ public class LambdaSample {
             public boolean test(String str) {
                 return str.isEmpty();
             }
-        }
+        };
         */
 
         System.out.println(pre.test(&amp;quot;&amp;quot;));
