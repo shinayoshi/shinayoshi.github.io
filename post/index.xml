@@ -7,8 +7,45 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2017 shinayoshi</copyright>
-    <lastBuildDate>Sat, 06 May 2017 15:56:59 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 17 May 2017 22:43:05 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>LinuxでUTF-8のBOMを削除する</title>
+      <link>http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/</link>
+      <pubDate>Wed, 17 May 2017 22:43:05 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/</guid>
+      <description>
+
+&lt;p&gt;Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。&lt;/p&gt;
+
+&lt;p&gt;きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。
+Windowsのnotepadで保存するとBOM付きで保存されるようです。&lt;/p&gt;
+
+&lt;h2 id=&#34;bomの確認:680a720cfe2197bdb5afbf40b094d412&#34;&gt;BOMの確認&lt;/h2&gt;
+
+&lt;p&gt;ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。&lt;code&gt;&amp;lt;U+FEFF&amp;gt;&lt;/code&gt;がBOMです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ less bom.txt
+&amp;lt;U+FEFF&amp;gt;#!/bin/sh
+echo hoge
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;bomの削除:680a720cfe2197bdb5afbf40b094d412&#34;&gt;BOMの削除&lt;/h2&gt;
+
+&lt;p&gt;通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vim -b bom.txt
+&amp;lt;feff\&amp;gt;#!/bin/sh
+echo hoge
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あとはBOM(↑でいうところの&amp;lt;feff&amp;gt;)を削除して保存すれば、BOMなしファイルができます。&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OCJP, Silver SE 8を取得しました</title>
@@ -5194,284 +5231,6 @@ $ sudo -E apt-get upgrade
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://karaage.hatenadiary.jp/entry/2015/11/26/073000&#34;&gt;Mac/Linux/Raspberry Piでプロキシサーバを手軽に設定する方法 - karaage. [からあげ]&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 2でCache DNSを構築する</title>
-      <link>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</link>
-      <pubDate>Tue, 03 Jan 2017 22:22:47 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/</guid>
-      <description>
-
-&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;今回は&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspberry-pi-2でキャッシュdnsサーバ構築:a3b948e685fd47b3236875750b0610c7&#34;&gt;Raspberry Pi 2でキャッシュDNSサーバ構築&lt;/h2&gt;
-
-&lt;p&gt;家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
-まずはキャッシュDNSサーバを構築していきます。&lt;/p&gt;
-
-&lt;h3 id=&#34;bind9の設定:a3b948e685fd47b3236875750b0610c7&#34;&gt;bind9の設定&lt;/h3&gt;
-
-&lt;p&gt;bind9のインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install bind9 dnsutils
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  bind9utils
-提案パッケージ:
-  bind9-doc ufw rblcheck
-以下のパッケージが新たにインストールされます:
-  bind9 bind9utils dnsutils
-アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
-562 kB のアーカイブを取得する必要があります。
-この操作後に追加で 1,620 kB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.9.5.dfsg-9+deb8u8 [292 kB]
-562 kB を 2秒 で取得しました (229 kB/s)
-パッケージを事前設定しています ...
-以前に未選択のパッケージ dnsutils を選択しています。
-(データベースを読み込んでいます ... 現在 31244 個のファイルとディレクトリがインストールされています。)
-.../dnsutils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
-dnsutils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
-以前に未選択のパッケージ bind9utils を選択しています。
-.../bind9utils_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
-bind9utils (1:9.9.5.dfsg-9+deb8u8) を展開しています...
-以前に未選択のパッケージ bind9 を選択しています。
-.../bind9_1%3a9.9.5.dfsg-9+deb8u8_armhf.deb を展開する準備をしています ...
-bind9 (1:9.9.5.dfsg-9+deb8u8) を展開しています...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-dnsutils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
-bind9utils (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
-bind9 (1:9.9.5.dfsg-9+deb8u8) を設定しています ...
-グループ `bind&#39; (グループ ID 114) を追加しています...
-完了。
-システムユーザ `bind&#39; (UID 109) を追加しています...
-新しいユーザ `bind&#39; (UID 109) をグループ `bind&#39; に追加しています...
-ホームディレクトリ `/var/cache/bind&#39; は作成しません。
-wrote key file &amp;quot;/etc/bind/rndc.key&amp;quot;
-#
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9の設定&lt;/p&gt;
-
-&lt;p&gt;※変更箇所が多いため、変更箇所ではなく変更後のコンフィグを記載します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/bind/named.conf.options{,.org}
-$ ls -l /etc/bind/named.conf.options*
--rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options
--rw-r--r-- 1 root bind 890  1月  3 22:26 /etc/bind/named.conf.options.org
-$
-$ sudo vi /etc/bind/named.conf.options
-controls {
-	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
-};
-include &amp;quot;/etc/bind/rndc.key&amp;quot;;
-
-acl &amp;quot;internal-network&amp;quot; {
-	localhost;
-	127.0.0.1/32;
-	192.168.10.0/24;
-	192.168.20.0/24;
-	192.168.30.0/24;
-	192.168.40.0/24;
-};
-
-options {
-	version &amp;quot;unknown&amp;quot;;
-
-	directory &amp;quot;/var/cache/bind&amp;quot;;
-
-	listen-on {
-		internal-network;
-	};
-
-	querylog yes;
-	allow-query {
-		internal-network;
-	};
-
-	recursion yes;
-	allow-recursion {
-		internal-network;
-	};
-
-	forwarders {
-		192.168.100.1;
-	};
-
-	notify no;
-
-	max-ncache-ttl	300;
-	max-cache-ttl	3600;
-	recursive-clients	300;
-	cleaning-interval	60;
-	lame-ttl	600;
-	max-cache-size	256m;
-
-	allow-transfer {
-		none;
-	};
-
-	allow-update {
-		none;
-	};
-};
-
-logging {
-	channel &amp;quot;log_default&amp;quot; {
-		file &amp;quot;/var/log/bind/named.log&amp;quot; versions 5 size 5m;
-		print-time yes;
-		severity info;
-		print-category yes;
-	};
-	channel &amp;quot;alert&amp;quot; {
-		file &amp;quot;/var/log/bind/alert.log&amp;quot; versions 8 size 4m;
-		severity info;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-	channel &amp;quot;query&amp;quot; {
-		file &amp;quot;/var/log/bind/query.log&amp;quot; versions 8 size 50m;
-		severity debug;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-
-	category default { &amp;quot;log_default&amp;quot;; };
-	category security { &amp;quot;alert&amp;quot;; };
-	category queries { &amp;quot;query&amp;quot;; };
-	category lame-servers { null; };
-};
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9のコンフィグ不備を確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo named-checkconf /etc/bind/named.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ログ保存先のディレクトリ作成&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo mkdir -p /var/log/bind
-$ sudo chown bind:bind /var/log/bind
-$ ls -ld /var/log/bind
-drwxr-xr-x 2 bind bind 4096  1月  3 22:39 /var/log/bind
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9の起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart bind9
-$ sudo systemctl enable bind9
-Synchronizing state for bind9.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d bind9 defaults
-Executing /usr/sbin/update-rc.d bind9 enable
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;dnsクライアントの設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/dhcpcd.conf{,.backup20160103}
-$ ls -l /etc/dhcpcd.conf*
--rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf
--rw-rw-r-- 1 root netdev 1553  9月 23 13:24 /etc/dhcpcd.conf.backup20160103
--rw-rw-r-- 1 root netdev 1247 10月 17  2015 /etc/dhcpcd.conf.org
-$
-$ sudo vi /etc/dhcpcd.conf
-static domain_name_servers=127.0.0.1
-$
-$ diff /etc/dhcpcd.conf.backup20160103 /etc/dhcpcd.conf
-46c46
-&amp;lt; static domain_name_servers=192.168.100.1
----
-&amp;gt; static domain_name_servers=127.0.0.1
-$
-$ sudo systemctl restart dhcpcd
-$ cat /etc/resolv.conf 
-# Generated by resolvconf
-nameserver 127.0.0.1
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9による名前解決の確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ dig www.google.co.jp
-
-; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.9.5-9+deb8u8-Raspbian &amp;lt;&amp;lt;&amp;gt;&amp;gt; www.google.co.jp
-;; global options: +cmd
-;; Got answer:
-;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 455
-;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 4096
-;; QUESTION SECTION:
-;www.google.co.jp.		IN	A
-
-;; ANSWER SECTION:
-www.google.co.jp.	187	IN	A	172.217.26.99
-
-;; Query time: 70 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1)
-;; WHEN: Tue Jan 03 22:55:14 JST 2017
-;; MSG SIZE  rcvd: 61
-
-$ dig -x 8.8.8.8
-
-; &amp;lt;&amp;lt;&amp;gt;&amp;gt; DiG 9.9.5-9+deb8u8-Raspbian &amp;lt;&amp;lt;&amp;gt;&amp;gt; -x 8.8.8.8
-;; global options: +cmd
-;; Got answer:
-;; -&amp;gt;&amp;gt;HEADER&amp;lt;&amp;lt;- opcode: QUERY, status: NOERROR, id: 3656
-;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 13, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 4096
-;; QUESTION SECTION:
-;8.8.8.8.in-addr.arpa.		IN	PTR
-
-;; ANSWER SECTION:
-8.8.8.8.in-addr.arpa.	3600	IN	PTR	google-public-dns-a.google.com.
-
-;; AUTHORITY SECTION:
-.			3449	IN	NS	h.root-servers.net.
-.			3449	IN	NS	m.root-servers.net.
-.			3449	IN	NS	c.root-servers.net.
-.			3449	IN	NS	l.root-servers.net.
-.			3449	IN	NS	b.root-servers.net.
-.			3449	IN	NS	f.root-servers.net.
-.			3449	IN	NS	g.root-servers.net.
-.			3449	IN	NS	k.root-servers.net.
-.			3449	IN	NS	e.root-servers.net.
-.			3449	IN	NS	d.root-servers.net.
-.			3449	IN	NS	a.root-servers.net.
-.			3449	IN	NS	j.root-servers.net.
-.			3449	IN	NS	i.root-servers.net.
-
-;; Query time: 70 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1)
-;; WHEN: Tue Jan 03 22:57:45 JST 2017
-;; MSG SIZE  rcvd: 304
-
-$
-&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

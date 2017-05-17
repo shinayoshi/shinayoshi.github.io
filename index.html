@@ -74,6 +74,57 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/">LinuxでUTF-8のBOMを削除する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/vim">vim</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/utf-8">utf-8</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。</p>
+
+<p>きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。
+Windowsのnotepadで保存するとBOM付きで保存されるようです。</p>
+
+<h2 id="bomの確認:680a720cfe2197bdb5afbf40b094d412">BOMの確認</h2>
+
+<p>ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。<code>&lt;U+FEFF&gt;</code>がBOMです。</p>
+
+<pre><code>$ less bom.txt
+&lt;U+FEFF&gt;#!/bin/sh
+echo hoge
+</code></pre>
+
+<h2 id="bomの削除:680a720cfe2197bdb5afbf40b094d412">BOMの削除</h2>
+
+<p>通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。</p>
+
+<pre><code>$ vim -b bom.txt
+&lt;feff\&gt;#!/bin/sh
+echo hoge
+</code></pre>
+
+<p>あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/">OCJP, Silver SE 8を取得しました</a></h1>
                   <p>
                     <span class="label label-primary">Sat May 6, 2017</span> in
@@ -86,7 +137,7 @@
                     <a href="http://www.shinayoshi.net//tags/java">java</a>
                     
                      , 
-                    <a href="http://www.shinayoshi.net//tags/qualification">qualification</a>
+                    <a href="http://www.shinayoshi.net//tags/certificate">certificate</a>
                     
                   </p>
                 </div>
@@ -2828,81 +2879,10 @@ end
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/">Raspberry Pi 2でNTPサーバを構築する</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/homemon1">homemon1</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/homemon2">homemon2</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。</p>
-
-<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
-
-<p>今回は<code>homemon1</code>、<code>homemon2</code>を構築していきます。
-まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。</p>
-
-<h2 id="ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab">NTPサーバの構築</h2>
-
-<pre><code>$ sudo cp -p /etc/ntp.conf{,.backup20170107}
-$ ls -l /etc/ntp.conf*
--rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
--rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
--rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
-$
-$ sudo vi /etc/ntp.conf
-# Clients from this (example!) subnet have unlimited access, but only if
-# cryptographically authenticated.
-#restrict 192.168.123.0 mask 255.255.255.0 notrust
-restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
-restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
-restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
-restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
-$
-$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
-47a48,51
-&gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
-&gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
-&gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
-&gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
-$
-</code></pre>
-
-<p>NTPサーバの再起動</p>
-
-<pre><code>$ sudo systemctl restart ntp
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 4</li>
+  <li>Page 1 of 5</li>
   
   <li class="next"><a href="/page/2/">Older &rarr;</a></li>
   
@@ -2970,6 +2950,8 @@ $
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -2998,8 +2980,6 @@ $
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -3015,7 +2995,7 @@ $
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -3045,6 +3025,10 @@ $
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -3112,10 +3096,6 @@ $
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -3125,6 +3105,14 @@ $
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     

@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianをバックアップ・リストアする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Aug 7, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    backup
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    RaspbianをSDカード丸ごとバックアップ・リストアするメモです。 今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。 バックアップ SDカードデバイスを確認する。 $ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2 SDカードデバイスをアンマウントする。 $ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードのディスクイメージをバックアップする。 $ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec) SDカードデバイスを取り出す。 $ diskutil eject /dev/disk1 Disk
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">
                   <h2 class="list-group-item-heading">RaspbianにKivyをセットアップ</h2>
                   <p class="list-group-item-text">
@@ -287,6 +308,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -315,8 +338,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -332,7 +353,7 @@
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -362,6 +383,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -429,10 +454,6 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -442,6 +463,14 @@
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     

@@ -74,6 +74,27 @@
               <h1>Server</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">
+                  <h2 class="list-group-item-heading">LinuxでUTF-8のBOMを削除する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    vim
+                    
+                     , 
+                    utf-8
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。 きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。 Windowsのnotepadで保存するとBOM付きで保存されるようです。 BOMの確認 ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。&lt;U+FEFF&gt;がBOMです。 $ less bom.txt &lt;U+FEFF&gt;#!/bin/sh echo hoge BOMの削除 通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。 $ vim -b bom.txt &lt;feff\&gt;#!/bin/sh echo hoge あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。 以上
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">
                   <h2 class="list-group-item-heading">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</h2>
                   <p class="list-group-item-text">
@@ -326,30 +347,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 2のセキュリティ設定を強化する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    home-network
-                    
-                     , 
-                    homepot1
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。 $ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &quot;net.ipv6.conf.all.stable_secret&quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.default.stable_secret&quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth0.stable_secret&quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.eth1.stable_secret&quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &quot;net.ipv6.conf.lo.stable_secret&quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。 $ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。 iptablesの設定 iptablesでfirewallを設定します。 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 ##INPUTチェーン #IPスプーフィング対策 $ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset #セッションハイジャック対策 $ sudo iptables -A INPUT -p tcp !
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -422,6 +419,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -450,8 +449,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -467,7 +464,7 @@
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -497,6 +494,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -564,10 +565,6 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -577,6 +574,14 @@
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     

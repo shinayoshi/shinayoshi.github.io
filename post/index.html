@@ -74,6 +74,27 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">
+                  <h2 class="list-group-item-heading">LinuxでUTF-8のBOMを削除する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    vim
+                    
+                     , 
+                    utf-8
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。 きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。 Windowsのnotepadで保存するとBOM付きで保存されるようです。 BOMの確認 ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。&lt;U+FEFF&gt;がBOMです。 $ less bom.txt &lt;U+FEFF&gt;#!/bin/sh echo hoge BOMの削除 通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。 $ vim -b bom.txt &lt;feff\&gt;#!/bin/sh echo hoge あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。 以上
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">
                   <h2 class="list-group-item-heading">OCJP, Silver SE 8を取得しました</h2>
                   <p class="list-group-item-text">
@@ -87,7 +108,7 @@
                     java
                     
                      , 
-                    qualification
+                    certificate
                     
                   </p>
                   <p class="list-group-item-text">
@@ -320,38 +341,11 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 2でNTPサーバを構築する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    home-network
-                    
-                     , 
-                    homemon1
-                    
-                     , 
-                    homemon2
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 今回はhomemon1、homemon2を構築していきます。 まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。 NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.168.10.0
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 4</li>
+  <li>Page 1 of 5</li>
   
   <li class="next"><a href="/post/page/2/">Older &rarr;</a></li>
   
@@ -419,6 +413,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -447,8 +443,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -464,7 +458,7 @@
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -494,6 +488,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -561,10 +559,6 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -574,6 +568,14 @@
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     

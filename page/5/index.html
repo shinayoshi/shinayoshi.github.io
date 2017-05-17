@@ -12,7 +12,7 @@
     <title>shinayoshi&#39;s note</title>
     <link rel="canonical" href="http://www.shinayoshi.net/" />
     <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
-    <link href="http://www.shinayoshi.net/tags/qualification/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+    <link href="http://www.shinayoshi.net/index.xml" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
 
     
     <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +56,7 @@
                 </li>
                 
                 <li>
-                  <a class="subscribe-rss" href="http://www.shinayoshi.net/tags/qualification/index.xml" title="subscribe via RSS">
+                  <a class="subscribe-rss" href="http://www.shinayoshi.net/index.xml" title="subscribe via RSS">
                     <i class="fa fa-rss fa-lg"></i>
                   </a>
                 </li>
@@ -71,35 +71,38 @@
         <div id="content">
           <div class="row">
             <div class="page-content col-md-9">
-              <h1>Qualification</h1>
-              <div class="list-group">
-                
-                <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">
-                  <h2 class="list-group-item-heading">OCJP, Silver SE 8を取得しました</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat May 6, 2017</span> in
+              
+              <article>
+                <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2015/09/06/first-post/">hugo始めました</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Sep 6, 2015</span> in
                     
                     
-                    program
+                    <a href="http://www.shinayoshi.net//categories/diary">diary</a>
                      using tags
                     
                     
-                    java
-                    
-                     , 
-                    qualification
+                    <a href="http://www.shinayoshi.net//tags/blog">blog</a>
                     
                   </p>
-                  <p class="list-group-item-text">
-                    2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。 資格取得までに勉強したことをメモしておきます。 Java経験 私のJava経験は以下ととおりです。 2010年にSun認定JavaプログラマSE6(SJC-P)を取得 Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません) 勉強方法 試験まで以下の参考書を使用して勉強しました。 オラクル認定資格教科書 Javaプログラマ Silver SE 8 SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。 参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。 Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。 新しく勉強した内容 過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。 2進数表記 0bを先頭につけることで2進数を表現できるようになりました。 ex) 0b1010 // 10進数で10 0b1111 // 10進数で15 数値リテラルのアンダーバー 数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。 ex) 1_234 5_6 インタフェースのdefaultメソッドとstaticメソッド インタフェースにメソッドの実装を記載できるようになりました。 結果、多重継承が実現可能となりました。 インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。 ex) interface MyInterface { void method1(); default void method2() { System.out.println(&quot;method2&quot;); } static void method3() { System.out.println(&quot;method3&quot;); } } ラムダ式 ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。 ラムダ式を使用するにあたり、Java
-                  </p>
-                </a>
-                
-              </div>
+                </div>
+                <div class="contents">
+                  <p>Hugoでブログ始めました。</p>
+
+<p>本ブログでは私が得た技術的な知識・経験を投稿していく予定です。</p>
+
+<p>今後ともよろしくお願いします。</p>
+
+                </div>
+              </article>
+              
               <div class="pagination">
                 <ul class="pager">
   
-  <li>Page 1 of 1</li>
+  <li class="previous"><a href="/page/4/">&larr; Newer</a></li>
+  
+  <li>Page 5 of 5</li>
   
 </ul>
 
@@ -165,6 +168,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -193,8 +198,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -210,7 +213,7 @@
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -240,6 +243,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -307,10 +314,6 @@
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -320,6 +323,14 @@
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     

@@ -74,6 +74,77 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/">Raspberry Pi 2でNTPサーバを構築する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homemon1">homemon1</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/homemon2">homemon2</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+
+<p><img src="/img/20161022_01/home-network.png" alt="home network" width="640px" /></p>
+
+<p>今回は<code>homemon1</code>、<code>homemon2</code>を構築していきます。
+まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。</p>
+
+<h2 id="ntpサーバの構築:1f1fc8ca38bc68f6fa4bdfc515f760ab">NTPサーバの構築</h2>
+
+<pre><code>$ sudo cp -p /etc/ntp.conf{,.backup20170107}
+$ ls -l /etc/ntp.conf*
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf
+-rw-r--r-- 1 root root 2052  9月 23 13:25 /etc/ntp.conf.backup20170107
+-rw-r--r-- 1 root root 1988  7月 26 07:36 /etc/ntp.conf.org
+$
+$ sudo vi /etc/ntp.conf
+# Clients from this (example!) subnet have unlimited access, but only if
+# cryptographically authenticated.
+#restrict 192.168.123.0 mask 255.255.255.0 notrust
+restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+$ diff /etc/ntp.conf.backup20170107 /etc/ntp.conf
+47a48,51
+&gt; restrict 192.168.10.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.20.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.30.0 mask 255.255.255.0 nomodify notrap nopeer
+&gt; restrict 192.168.40.0 mask 255.255.255.0 nomodify notrap nopeer
+$
+</code></pre>
+
+<p>NTPサーバの再起動</p>
+
+<pre><code>$ sudo systemctl restart ntp
+</code></pre>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/">Raspberry Pi 2のセキュリティ設定を強化する</a></h1>
                   <p>
                     <span class="label label-primary">Sat Jan 7, 2017</span> in
@@ -4557,177 +4628,12 @@ server ntp.jst.mfeed.ad.jp iburst
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
-                  <p>
-                    <span class="label label-primary">Wed Aug 24, 2016</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/server">server</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/bind">bind</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
-Raspbianの基本的な設定は完了している前提です。</p>
-
-<h2 id="bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09">bind9のインストール</h2>
-
-<pre><code>$ sudo apt-get install bind9 dnsutils
-</code></pre>
-
-<p>bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。</p>
-
-<pre><code>$ sudo cat /etc/bind/named.conf.options
-controls {
-	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
-};
-include &quot;/etc/bind/rndc.key&quot;;
-
-acl &quot;internal-network&quot; {
-	localhost;
-	127.0.0.1/32;
-	192.168.10.0/24;
-	192.168.20.0/24;
-	192.168.30.0/24;
-	192.168.40.0/24;
-};
-
-options {
-	version &quot;unknown&quot;;
-
-	directory &quot;/var/cache/bind&quot;;
-
-	listen-on {
-		internal-network;
-	};
-
-	querylog yes;
-	allow-query {
-		internal-network;
-	};
-
-	recursion yes;
-	allow-recursion {
-		internal-network;
-	};
-
-	forwarders {
-		192.168.100.1;
-	};
-
-	notify no;
-
-	max-ncache-ttl	300;
-	max-cache-ttl	3600;
-	recursive-clients	300;
-	cleaning-interval	60;
-	lame-ttl	600;
-	max-cache-size	256m;
-
-	allow-transfer {
-		none;
-	};
-
-	allow-update {
-		none;
-	};
-};
-
-logging {
-	channel &quot;log_default&quot; {
-		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
-		print-time yes;
-		severity info;
-		print-category yes;
-	};
-	channel &quot;alert&quot; {
-		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
-		severity info;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-	channel &quot;query&quot; {
-		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
-		severity debug;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-
-	category default { &quot;log_default&quot;; };
-	category security { &quot;alert&quot;; };
-	category queries { &quot;query&quot;; };
-	category lame-servers { null; };
-};
-</code></pre>
-
-<p>コンフィグの不備を確認する。</p>
-
-<pre><code>$ sudo named-checkconf /etc/bind/named.conf
-</code></pre>
-
-<p>ログ保存先のディレクトリを作成する。</p>
-
-<pre><code>$ sudo mkdir -p /var/log/bind
-$ sudo chown bind:bind /var/log/bind
-</code></pre>
-
-<p>bind9を再起動する。</p>
-
-<pre><code>$ sudo systemctl restart bind9
-</code></pre>
-
-<h2 id="iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09">iptablesの設定</h2>
-
-<p>iptablesでfirewallを設定する。</p>
-
-<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-
-$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
-$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
-</code></pre>
-
-<p>iptablesの設定を保存する。</p>
-
-<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
-</code></pre>
-
-<h2 id="dnsの設定:de7ee9c067a99fe782c9ccc491d85d09">DNSの設定</h2>
-
-<p>キャッシュDNSを使用するように設定変更を行う。</p>
-
-<pre><code>$ sudo vi /etc/dhcpcd.conf
-static domain_name_servers=127.0.0.1
-$ sudo systemctl restart dhcpcd
-</code></pre>
-
-<p>以上</p>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
   <li class="previous"><a href="/">&larr; Newer</a></li>
   
-  <li>Page 2 of 4</li>
+  <li>Page 2 of 5</li>
   
   <li class="next"><a href="/page/3/">Older &rarr;</a></li>
   
@@ -4795,6 +4701,8 @@ $ sudo systemctl restart dhcpcd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
@@ -4823,8 +4731,6 @@ $ sudo systemctl restart dhcpcd
       
       <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-cache-dns/" class="list-group-item">Raspberry Pi 2でCache DNSを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -4840,7 +4746,7 @@ $ sudo systemctl restart dhcpcd
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
-    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">37</span>server</a>
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
     
   </div>
 </section>
@@ -4870,6 +4776,10 @@ $ sudo systemctl restart dhcpcd
     
     
     <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
     
     
     
@@ -4937,10 +4847,6 @@ $ sudo systemctl restart dhcpcd
     
     
     
-    <a href="http://www.shinayoshi.net//tags/qualification" >qualification (1)</a>
-    
-    
-    
     <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
     
     
@@ -4950,6 +4856,14 @@ $ sudo systemctl restart dhcpcd
     
     
     <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
     
     
     
