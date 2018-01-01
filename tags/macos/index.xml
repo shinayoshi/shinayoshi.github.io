@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Macos on shinayoshi&#39;s note</title>
+    <link>http://www.shinayoshi.net/tags/macos/</link>
+    <description>Recent content in Macos on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <lastBuildDate>Mon, 25 Dec 2017 21:31:09 +0900</lastBuildDate>
+    <atom:link href="http://www.shinayoshi.net/tags/macos/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>MacOS High Sierraにアプリケーションを自動インストールする</title>
+      <link>http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/</link>
+      <pubDate>Mon, 25 Dec 2017 21:31:09 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/</guid>
+      <description>
+
+&lt;h2 id=&#34;概要:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;概要&lt;/h2&gt;
+
+&lt;p&gt;MacOS HighSierraにアプリケーションをインストールします。
+1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。&lt;/p&gt;
+
+&lt;p&gt;インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。&lt;/p&gt;
+
+&lt;h2 id=&#34;homebrewでアプリケーションを自動インストールする:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;homebrewでアプリケーションを自動インストールする&lt;/h2&gt;
+
+&lt;h3 id=&#34;step1-準備-homebrewのインストール:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP1.準備(homebrewのインストール)&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してhomebrewをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ xcode-select --install
+$ sudo xcodebuild -license
+$ /usr/bin/ruby -e &amp;quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&amp;quot;
+$ brew tap caskroom/cask
+$ brew tap homebrew/bundle
+$ brew install mas
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step2-brewfile作成:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP2.Brewfile作成&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してBrewfileを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew bundle dump
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Brewfileにインストールしたいアプリケーションを追記します。
+homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew search &amp;quot;検索文字列(アプリケーション名)&amp;quot;
+$ mas search &amp;quot;検索文字列(アプリケーション名)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;私のBrewfileは以下の感じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tap &amp;quot;caskroot/cask&amp;quot;
+tap &amp;quot;homebrew/core&amp;quot;
+tap &amp;quot;homebrew/bundle&amp;quot;
+brew &amp;quot;mas&amp;quot;
+brew &amp;quot;git&amp;quot;
+brew &amp;quot;hub&amp;quot;
+brew &amp;quot;go&amp;quot;
+brew &amp;quot;hugo&amp;quot;
+cask &amp;quot;osxfuse&amp;quot;
+brew &amp;quot;encfs&amp;quot;
+brew &amp;quot;lv&amp;quot;
+brew &amp;quot;nkf&amp;quot;
+brew &amp;quot;wget&amp;quot;
+brew &amp;quot;ansible&amp;quot;
+brew &amp;quot;emacs&amp;quot;, args: [&amp;quot;with-cocoa&amp;quot;]
+brew &amp;quot;macvim&amp;quot;, args: [&amp;quot;HEAD&amp;quot;, &amp;quot;with-lua&amp;quot;]
+brew &amp;quot;markdown&amp;quot;
+brew &amp;quot;fish&amp;quot;
+cask &amp;quot;iterm2&amp;quot;
+cask &amp;quot;keepassx&amp;quot;
+cask &amp;quot;sublime-text&amp;quot;
+cask &amp;quot;atom&amp;quot;
+cask &amp;quot;google-chrome&amp;quot;
+cask &amp;quot;firefox&amp;quot;
+cask &amp;quot;flash-player&amp;quot;
+cask &amp;quot;flsah-npapi&amp;quot;
+cask &amp;quot;flsah-ppapi&amp;quot;
+cask &amp;quot;mamp&amp;quot;
+cask &amp;quot;sequel-pro&amp;quot;
+cask &amp;quot;virtualBox&amp;quot;
+cask &amp;quot;virtualBox-extension-pack&amp;quot;
+cask &amp;quot;vagrant&amp;quot;
+cask &amp;quot;xquartz&amp;quot;
+cask &amp;quot;dropbox&amp;quot;
+cask &amp;quot;wireshark&amp;quot;
+cask &amp;quot;krita&amp;quot;
+cask &amp;quot;java&amp;quot;
+cask &amp;quot;java-jdk-javadoc&amp;quot;
+cask &amp;quot;intellij-idea-ce&amp;quot;
+cask &amp;quot;alfred&amp;quot;
+cask &amp;quot;github&amp;quot;
+cask &amp;quot;hosts&amp;quot;
+cask &amp;quot;omnifocus&amp;quot;
+cask &amp;quot;atok&amp;quot;
+mas &amp;quot;Xcode&amp;quot;, id: 497799835
+mas &amp;quot;Slack&amp;quot;, id: 803453959
+mas &amp;quot;OneDrive&amp;quot;, id: 823766827
+mas &amp;quot;Marked 2&amp;quot;, id: 890031187
+mas &amp;quot;Microsoft OneNote&amp;quot;, id: 784801555
+mas &amp;quot;Twitter&amp;quot;, id: 409789998
+mas &amp;quot;The Unarchiver&amp;quot;, id: 425424353
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step3-自動インストール:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP3.自動インストール&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してアプリケーションをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew bundle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;ソフトウェアインストール時にエラーが発生した場合の対処法:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;ソフトウェアインストール時にエラーが発生した場合の対処法&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;MacVim&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;The following build commands failed:
+        StripNIB English.lproj/Preferences.nib
+(1 failure)
+make[1]: *** [macvim] Error 65
+make: *** [first] Error 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒Xcodeを実行してaddtional componentsをインストールします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;virtualbox/virtualbox-extension-pack&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;System Preferences -&amp;gt; Security &amp;amp; Privacy -&amp;gt; General
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒Oracleのソフトウェアインストールを許可します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;all packages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;curl: (56) LibreSSL SSL_read: SSL_ERROR_SYSCALL, errno 54
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒ネットワークの問題のようです。めげずに再度&lt;code&gt;$ brew bundle&lt;/code&gt;を実行します。&lt;/p&gt;
+
+&lt;h3 id=&#34;step4-アプリケーションのメンテナンス:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP4.アプリケーションのメンテナンス&lt;/h3&gt;
+
+&lt;p&gt;定期的に以下のコマンドを実行してアプリケーションを最新化します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew update
+$ brew bundle dump --force
+$ brew bundle cleanup
+$ brew bundle check
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;手動でインストールするもの:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;手動でインストールするもの&lt;/h2&gt;
+
+&lt;p&gt;homebrewでインストールできないアプリケーションは手動でインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ESET Cyber Security
+Microsoft Office 2016 for Mac
+ScanSnap
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

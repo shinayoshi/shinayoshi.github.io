@@ -74,6 +74,36 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でSyslogサーバを構築する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jan 7, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                     , 
+                    homefw01
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomemon1、homemon2を構築していきます。 FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。 rsyslogの設定 ネットワーク機器のSyslogを保存する用の設定 ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。 例）/var/log/network-device/ホスト名/ホスト名.log $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf.org $ $ sudo vi /etc/rsyslog.conf #$ModLoad imudp #$UDPServerRun 514 $ModLoad imudp $UDPServerRun 514 $WorkDirectory /var/spool/rsyslog # # Queue # $MainMsgQueueType LinkedList #$ActionQueueType Direct $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf 16,17c16,17 &lt; #$ModLoad imudp &lt; #$UDPServerRun 514 --- &gt; $ModLoad imudp &gt; $UDPServerRun 514 46a47,52 &gt; &gt; # &gt; # Queue &gt; # &gt; $MainMsgQueueType LinkedList &gt; #$ActionQueueType Direct $ $ sudo vi /etc/rsyslog.d/network-device.conf $template NetworkDeviceFileName,&quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&quot; if $fromhost-ip != '127.0.0.1' then ?NetworkDeviceFileName &amp; ~ rsyslogの再起動 $ sudo systemctl restart rsyslog 20.4.
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">
                   <h2 class="list-group-item-heading">Raspberry Pi 2でNTPサーバを構築する</h2>
                   <p class="list-group-item-text">
@@ -290,30 +320,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2016/10/22/build-home-network-01/" class="list-group-item">
-                  <h2 class="list-group-item-heading">家庭内インターネット接続環境を構築する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Oct 22, 2016</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    fortigate
-                    
-                     , 
-                    home-network
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 機材 本環境を構築するために以下の機材を用意しました。 FortiGate 60D : 1台 Raspberry Pi 2 : 5台 USB LANアダプタ : 5個 Switching HUB : 3台 WANルータ : 1台 具体的な構築内容は次回から記載します。
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -388,6 +394,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
@@ -416,8 +424,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を構築する [ 2017-01-04 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -430,6 +436,8 @@
   <div id="categories" class="list-group">
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
@@ -531,6 +539,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/macos" >macos (1)</a>
     
     
     

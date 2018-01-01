@@ -74,6 +74,73 @@
               
               <article>
                 <div class="title">
+                  <h1><a href="http://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/">Raspbian(Jessie)にZabbix Agentをインストール</a></h1>
+                  <p>
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="http://www.shinayoshi.net//tags/zabbix">zabbix</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+
+<p>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。
+Zabbix Serverのインストールは別のメモになります。</p>
+
+<h2 id="パッケージの更新:235ab9bc7c5a5e6a7bcc83bc43bc05a7">パッケージの更新</h2>
+
+<p>Raspbianのパッケージを最新する。</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre>
+
+<h2 id="zabbix-agentのインストール:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentのインストール</h2>
+
+<p>Zabbix Agentのインストール</p>
+
+<pre><code>$ sudo apt-get install zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-agentの設定:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Agentの設定</h2>
+
+<p>Zabbix Agentを設定する。</p>
+
+<pre><code>$ sudo vi /etc/zabbix/zabbix_agentd.conf
+Server=(Zabbix server IP address)
+ServerActive=(Zabbix server IP address)
+Hostname=(Hostname)
+
+$ sudo systemctl restart zabbix-agent
+</code></pre>
+
+<h2 id="zabbix-serverでの監視登録:235ab9bc7c5a5e6a7bcc83bc43bc05a7">Zabbix Serverでの監視登録</h2>
+
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインする。</p>
+
+<p>「設定」⇒「ホスト」⇒「ホストの作成」を選択する。</p>
+
+<p>ホスト名の設定やテンプレートの選択を行い、保存を選択する。</p>
+
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
                   <h1><a href="http://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/">Raspbian(Jessie)にZabbix Serverをインストール</a></h1>
                   <p>
                     <span class="label label-primary">Wed Aug 10, 2016</span> in
@@ -1330,57 +1397,6 @@ $ sudo systemctl disable sshd
                 </div>
               </article>
               
-              <article>
-                <div class="title">
-                  <h1><a href="http://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/">囲碁・将棋の思考エンジンの覚え書き</a></h1>
-                  <p>
-                    <span class="label label-primary">Sat Oct 31, 2015</span> in
-                    
-                    
-                    <a href="http://www.shinayoshi.net//categories/diary">diary</a>
-                     using tags
-                    
-                    
-                    <a href="http://www.shinayoshi.net//tags/igo">igo</a>
-                    
-                     , 
-                    <a href="http://www.shinayoshi.net//tags/shogi">shogi</a>
-                    
-                  </p>
-                </div>
-                <div class="contents">
-                  
-
-<p>囲碁・将棋の思考エンジンは以下が有名らしい。
-よく忘れるので覚え書きとして残しておく。</p>
-
-<p>実際に使用したことはないため、使用方法や強さはわかりません。あしからず。</p>
-
-<h2 id="囲碁の思考エンジン:a0d1e30c95d0ce93df0972286458f7bf">囲碁の思考エンジン</h2>
-
-<ul>
-<li><a href="http://pachi.or.cz">Pachi</a></li>
-<li><a href="http://fuego.sourceforge.net">Fuego</a></li>
-<li><a href="http://www.gnu.org/software/gnugo/download.html">GNU Go</a></li>
-</ul>
-
-<h2 id="将棋の思考エンジン:a0d1e30c95d0ce93df0972286458f7bf">将棋の思考エンジン</h2>
-
-<ul>
-<li><a href="http://www.geocities.jp/bonanza_shogi/">Bonanza</a></li>
-<li><a href="http://hiraokatakuya.github.io/apery/">Apery</a></li>
-<li><a href="http://gps.tanaka.ecc.u-tokyo.ac.jp/gpsshogi/">GPSshogi</a></li>
-</ul>
-
-<h3 id="将棋guiソフト:a0d1e30c95d0ce93df0972286458f7bf">将棋GUIソフト</h3>
-
-<ul>
-<li><a href="http://www.geocities.jp/shogidokoro/index.html">将棋所</a></li>
-</ul>
-
-                </div>
-              </article>
-              
               <div class="pagination">
                 <ul class="pager">
   
@@ -1454,6 +1470,8 @@ $ sudo systemctl disable sshd
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
@@ -1482,8 +1500,6 @@ $ sudo systemctl disable sshd
       
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を構築する [ 2017-01-04 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -1496,6 +1512,8 @@ $ sudo systemctl disable sshd
   <div id="categories" class="list-group">
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
@@ -1597,6 +1615,10 @@ $ sudo systemctl disable sshd
     
     
     <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/macos" >macos (1)</a>
     
     
     

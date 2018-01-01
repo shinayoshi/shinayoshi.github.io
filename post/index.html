@@ -74,6 +74,24 @@
               <h1>Posts</h1>
               <div class="list-group">
                 
+                <a href="http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">
+                  <h2 class="list-group-item-heading">MacOS High Sierraにアプリケーションを自動インストールする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Dec 25, 2017</span> in
+                    
+                    
+                    mac
+                     using tags
+                    
+                    
+                    macos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    概要 MacOS HighSierraにアプリケーションをインストールします。 1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。 インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。 homebrewでアプリケーションを自動インストールする STEP1.準備(homebrewのインストール) 以下のコマンドを実行してhomebrewをインストールします。 $ xcode-select --install $ sudo xcodebuild -license $ /usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot; $ brew tap caskroom/cask $ brew tap homebrew/bundle $ brew install mas STEP2.Brewfile作成 以下のコマンドを実行してBrewfileを作成します。 $ brew bundle dump Brewfileにインストールしたいアプリケーションを追記します。 homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。 $ brew search &quot;検索文字列(アプリケーション名)&quot; $ mas search &quot;検索文字列(アプリケーション名)&quot; 私のBrewfileは以下の感じです。 tap &quot;caskroot/cask&quot; tap &quot;homebrew/core&quot; tap &quot;homebrew/bundle&quot; brew &quot;mas&quot; brew &quot;git&quot; brew &quot;hub&quot; brew &quot;go&quot; brew &quot;hugo&quot; cask &quot;osxfuse&quot; brew &quot;encfs&quot;
+                  </p>
+                </a>
+                
                 <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">
                   <h2 class="list-group-item-heading">LinuxでUTF-8のBOMを削除する</h2>
                   <p class="list-group-item-text">
@@ -311,36 +329,6 @@
                   </p>
                 </a>
                 
-                <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">
-                  <h2 class="list-group-item-heading">Raspberry Pi 2でSyslogサーバを構築する</h2>
-                  <p class="list-group-item-text">
-                    <span class="label label-primary">Sat Jan 7, 2017</span> in
-                    
-                    
-                    server
-                     using tags
-                    
-                    
-                    raspberrypi
-                    
-                     , 
-                    home-network
-                    
-                     , 
-                    homemon1
-                    
-                     , 
-                    homemon2
-                    
-                     , 
-                    homefw01
-                    
-                  </p>
-                  <p class="list-group-item-text">
-                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。 前回に引き続きhomemon1、homemon2を構築していきます。 FortiGate 60Dの通過ログやセキュリティイベントログを記録するためにSyslogサーバを構築します。 rsyslogの設定 ネットワーク機器のSyslogを保存する用の設定 ネットワーク機器のIPアドレスまたはホスト名でディレクトリを作成し、IPアドレスまたはホスト名でログファイルを作成する。 例）/var/log/network-device/ホスト名/ホスト名.log $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf -rw-r--r-- 1 root root 2632 12月 14 2015 /etc/rsyslog.conf.org $ $ sudo vi /etc/rsyslog.conf #$ModLoad imudp #$UDPServerRun 514 $ModLoad imudp $UDPServerRun 514 $WorkDirectory /var/spool/rsyslog # # Queue # $MainMsgQueueType LinkedList #$ActionQueueType Direct $ diff /etc/rsyslog.conf.org /etc/rsyslog.conf 16,17c16,17 &lt; #$ModLoad imudp &lt; #$UDPServerRun 514 --- &gt; $ModLoad imudp &gt; $UDPServerRun 514 46a47,52 &gt; &gt; # &gt; # Queue &gt; # &gt; $MainMsgQueueType LinkedList &gt; #$ActionQueueType Direct $ $ sudo vi /etc/rsyslog.d/network-device.conf $template NetworkDeviceFileName,&quot;/var/log/network-device/%hostname:::secpath-replace%/%hostname:::secpath-replace%-%$year%%$month%%$day%.log&quot; if $fromhost-ip != '127.0.0.1' then ?NetworkDeviceFileName &amp; ~ rsyslogの再起動 $ sudo systemctl restart rsyslog 20.4.
-                  </p>
-                </a>
-                
               </div>
               <div class="pagination">
                 <ul class="pager">
@@ -413,6 +401,8 @@
   <div id="recent_posts" class="list-group">
     
       
+      <a href="http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
       <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
       
       <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
@@ -441,8 +431,6 @@
       
       <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を構築する [ 2017-01-04 ]</a>
       
-      <a href="http://www.shinayoshi.net/post/2017/01/03/setting-proxy/" class="list-group-item">Raspberry Pi 2でSquidサーバを構築する [ 2017-01-03 ]</a>
-      
     
   </div>
 </section>
@@ -455,6 +443,8 @@
   <div id="categories" class="list-group">
     
     <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
     
     <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
     
@@ -556,6 +546,10 @@
     
     
     <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/macos" >macos (1)</a>
     
     
     

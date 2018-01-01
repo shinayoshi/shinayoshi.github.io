@@ -7,8 +7,169 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2017 shinayoshi</copyright>
-    <lastBuildDate>Wed, 17 May 2017 22:43:05 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 25 Dec 2017 21:31:09 +0900</lastBuildDate>
     <atom:link href="http://www.shinayoshi.net/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>MacOS High Sierraにアプリケーションを自動インストールする</title>
+      <link>http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/</link>
+      <pubDate>Mon, 25 Dec 2017 21:31:09 +0900</pubDate>
+      
+      <guid>http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/</guid>
+      <description>
+
+&lt;h2 id=&#34;概要:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;概要&lt;/h2&gt;
+
+&lt;p&gt;MacOS HighSierraにアプリケーションをインストールします。
+1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。&lt;/p&gt;
+
+&lt;p&gt;インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。&lt;/p&gt;
+
+&lt;h2 id=&#34;homebrewでアプリケーションを自動インストールする:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;homebrewでアプリケーションを自動インストールする&lt;/h2&gt;
+
+&lt;h3 id=&#34;step1-準備-homebrewのインストール:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP1.準備(homebrewのインストール)&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してhomebrewをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ xcode-select --install
+$ sudo xcodebuild -license
+$ /usr/bin/ruby -e &amp;quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&amp;quot;
+$ brew tap caskroom/cask
+$ brew tap homebrew/bundle
+$ brew install mas
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step2-brewfile作成:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP2.Brewfile作成&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してBrewfileを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew bundle dump
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Brewfileにインストールしたいアプリケーションを追記します。
+homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew search &amp;quot;検索文字列(アプリケーション名)&amp;quot;
+$ mas search &amp;quot;検索文字列(アプリケーション名)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;私のBrewfileは以下の感じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tap &amp;quot;caskroot/cask&amp;quot;
+tap &amp;quot;homebrew/core&amp;quot;
+tap &amp;quot;homebrew/bundle&amp;quot;
+brew &amp;quot;mas&amp;quot;
+brew &amp;quot;git&amp;quot;
+brew &amp;quot;hub&amp;quot;
+brew &amp;quot;go&amp;quot;
+brew &amp;quot;hugo&amp;quot;
+cask &amp;quot;osxfuse&amp;quot;
+brew &amp;quot;encfs&amp;quot;
+brew &amp;quot;lv&amp;quot;
+brew &amp;quot;nkf&amp;quot;
+brew &amp;quot;wget&amp;quot;
+brew &amp;quot;ansible&amp;quot;
+brew &amp;quot;emacs&amp;quot;, args: [&amp;quot;with-cocoa&amp;quot;]
+brew &amp;quot;macvim&amp;quot;, args: [&amp;quot;HEAD&amp;quot;, &amp;quot;with-lua&amp;quot;]
+brew &amp;quot;markdown&amp;quot;
+brew &amp;quot;fish&amp;quot;
+cask &amp;quot;iterm2&amp;quot;
+cask &amp;quot;keepassx&amp;quot;
+cask &amp;quot;sublime-text&amp;quot;
+cask &amp;quot;atom&amp;quot;
+cask &amp;quot;google-chrome&amp;quot;
+cask &amp;quot;firefox&amp;quot;
+cask &amp;quot;flash-player&amp;quot;
+cask &amp;quot;flsah-npapi&amp;quot;
+cask &amp;quot;flsah-ppapi&amp;quot;
+cask &amp;quot;mamp&amp;quot;
+cask &amp;quot;sequel-pro&amp;quot;
+cask &amp;quot;virtualBox&amp;quot;
+cask &amp;quot;virtualBox-extension-pack&amp;quot;
+cask &amp;quot;vagrant&amp;quot;
+cask &amp;quot;xquartz&amp;quot;
+cask &amp;quot;dropbox&amp;quot;
+cask &amp;quot;wireshark&amp;quot;
+cask &amp;quot;krita&amp;quot;
+cask &amp;quot;java&amp;quot;
+cask &amp;quot;java-jdk-javadoc&amp;quot;
+cask &amp;quot;intellij-idea-ce&amp;quot;
+cask &amp;quot;alfred&amp;quot;
+cask &amp;quot;github&amp;quot;
+cask &amp;quot;hosts&amp;quot;
+cask &amp;quot;omnifocus&amp;quot;
+cask &amp;quot;atok&amp;quot;
+mas &amp;quot;Xcode&amp;quot;, id: 497799835
+mas &amp;quot;Slack&amp;quot;, id: 803453959
+mas &amp;quot;OneDrive&amp;quot;, id: 823766827
+mas &amp;quot;Marked 2&amp;quot;, id: 890031187
+mas &amp;quot;Microsoft OneNote&amp;quot;, id: 784801555
+mas &amp;quot;Twitter&amp;quot;, id: 409789998
+mas &amp;quot;The Unarchiver&amp;quot;, id: 425424353
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;step3-自動インストール:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP3.自動インストール&lt;/h3&gt;
+
+&lt;p&gt;以下のコマンドを実行してアプリケーションをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew bundle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;ソフトウェアインストール時にエラーが発生した場合の対処法:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;ソフトウェアインストール時にエラーが発生した場合の対処法&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;MacVim&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;The following build commands failed:
+        StripNIB English.lproj/Preferences.nib
+(1 failure)
+make[1]: *** [macvim] Error 65
+make: *** [first] Error 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒Xcodeを実行してaddtional componentsをインストールします。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;virtualbox/virtualbox-extension-pack&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;System Preferences -&amp;gt; Security &amp;amp; Privacy -&amp;gt; General
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒Oracleのソフトウェアインストールを許可します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;all packages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;curl: (56) LibreSSL SSL_read: SSL_ERROR_SYSCALL, errno 54
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;⇒ネットワークの問題のようです。めげずに再度&lt;code&gt;$ brew bundle&lt;/code&gt;を実行します。&lt;/p&gt;
+
+&lt;h3 id=&#34;step4-アプリケーションのメンテナンス:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;STEP4.アプリケーションのメンテナンス&lt;/h3&gt;
+
+&lt;p&gt;定期的に以下のコマンドを実行してアプリケーションを最新化します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ brew update
+$ brew bundle dump --force
+$ brew bundle cleanup
+$ brew bundle check
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;手動でインストールするもの:cb9efa90068fba2e65ed2164b4d6dab3&#34;&gt;手動でインストールするもの&lt;/h2&gt;
+
+&lt;p&gt;homebrewでインストールできないアプリケーションは手動でインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ESET Cyber Security
+Microsoft Office 2016 for Mac
+ScanSnap
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>LinuxでUTF-8のBOMを削除する</title>
@@ -5041,197 +5202,6 @@ $ sudo supervisorctl status
 cowrie                           RUNNING    pid 20292, uptime 0:00:04
 $
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Raspberry Pi 2でSquidサーバを構築する</title>
-      <link>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</link>
-      <pubDate>Tue, 03 Jan 2017 23:25:23 +0900</pubDate>
-      
-      <guid>http://www.shinayoshi.net/post/2017/01/03/setting-proxy/</guid>
-      <description>
-
-&lt;p&gt;FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
-最終的には以下のような構成を想定しています。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.shinayoshi.net/img/20161022_01/home-network.png&#34; alt=&#34;home network&#34; width=&#34;640px&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;前回に引き続き&lt;code&gt;homepxy1&lt;/code&gt;を構築していきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;raspberry-pi-2でプロキシサーバ構築:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspberry Pi 2でプロキシサーバ構築&lt;/h2&gt;
-
-&lt;p&gt;家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。
-今回はプロキシサーバを構築していきます。&lt;/p&gt;
-
-&lt;h3 id=&#34;squidの設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Squidの設定&lt;/h3&gt;
-
-&lt;p&gt;squidのインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install squid
-パッケージリストを読み込んでいます... 完了
-依存関係ツリーを作成しています                
-状態情報を読み取っています... 完了
-以下の追加パッケージがインストールされます:
-  squid-common squid-langpack
-提案パッケージ:
-  squidclient squid-cgi logcheck-database smbclient winbind
-以下のパッケージが新たにインストールされます:
-  squid squid-common squid-langpack
-アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
-1,106 kB のアーカイブを取得する必要があります。
-この操作後に追加で 3,882 kB のディスク容量が消費されます。
-続行しますか? [Y/n] y
-取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-langpack all 20140506-1 [150 kB]
-取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid-common all 2.7.STABLE9-4.1 [352 kB]
-取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main squid armhf 2.7.STABLE9-4.1+b1 [604 kB]
-1,106 kB を 4秒 で取得しました (267 kB/s)
-パッケージを事前設定しています ...
-以前に未選択のパッケージ squid-langpack を選択しています。
-(データベースを読み込んでいます ... 現在 31342 個のファイルとディレクトリがインストールされています。)
-.../squid-langpack_20140506-1_all.deb を展開する準備をしています ...
-squid-langpack (20140506-1) を展開しています...
-以前に未選択のパッケージ squid-common を選択しています。
-.../squid-common_2.7.STABLE9-4.1_all.deb を展開する準備をしています ...
-squid-common (2.7.STABLE9-4.1) を展開しています...
-以前に未選択のパッケージ squid を選択しています。
-.../squid_2.7.STABLE9-4.1+b1_armhf.deb を展開する準備をしています ...
-squid (2.7.STABLE9-4.1+b1) を展開しています...
-systemd (215-17+deb8u5) のトリガを処理しています ...
-man-db (2.7.0.2-5) のトリガを処理しています ...
-squid-langpack (20140506-1) を設定しています ...
-squid-common (2.7.STABLE9-4.1) を設定しています ...
-squid (2.7.STABLE9-4.1+b1) を設定しています ...
-Creating squid spool directory structure
-2017/01/03 23:26:35| Creating Swap Directories
-systemd (215-17+deb8u5) のトリガを処理しています ...
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidの設定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cp -p /etc/squid/squid.conf{,.org}
-$ ls -l /etc/squid/squid.conf*
--rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf
--rw------- 1 root root 169404  1月  3 23:26 /etc/squid/squid.conf.org
-$
-$ sudo vi /etc/squid/squid.conf
-$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
-609,611c609,616
-&amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
-&amp;lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
-&amp;lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
----
-&amp;gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
-&amp;gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
-&amp;gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
-&amp;gt; acl localnet src 192.168.10.0/24
-&amp;gt; acl localnet src 192.168.20.0/24
-&amp;gt; acl localnet src 192.168.30.0/24
-&amp;gt; acl localnet src 192.168.40.0/24
-&amp;gt; 
-676c681
-&amp;lt; #http_access allow localnet
----
-&amp;gt; http_access allow localnet
-1738a1744
-&amp;gt; cache_mem 256 MB
-1747a1754
-&amp;gt; maximum_object_size_in_memory 512 KB
-1945a1953
-&amp;gt; cache_dir ufs /var/spool/squid 10000 16 256
-1988a1997
-&amp;gt; maximum_object_size 20480 KB
-2097a2107
-&amp;gt; logformat combined %&amp;gt;a %ui %un [%tl] &amp;quot;%rm %ru HTTP/%rv&amp;quot; %Hs %&amp;lt;st &amp;quot;%{Referer}&amp;gt;h&amp;quot; &amp;quot;%{User-Agent}&amp;gt;h&amp;quot; %Ss:%Sh
-2121c2131,2132
-&amp;lt; access_log /var/log/squid/access.log squid
----
-&amp;gt; #access_log /var/log/squid/access.log squid
-&amp;gt; access_log /var/log/squid/access.log combined
-2217a2229
-&amp;gt; emulate_httpd_log off
-2751c2763,2768
-&amp;lt; refresh_pattern .		0	20%	4320
----
-&amp;gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
-&amp;gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
-&amp;gt; refresh_pattern . 45 20% 4320
-2944a2962
-&amp;gt; via off
-3100a3119,3122
-&amp;gt; header_access Referer deny all
-&amp;gt; header_access X-Forwarded-For deny all
-&amp;gt; header_access Via deny all
-&amp;gt; header_access Cache-Control deny all
-3392a3415
-&amp;gt; visible_hostname unknown
-4699a4723
-&amp;gt; forwarded_for off
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidの設定不備を確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo squid -k parse
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Squidの起動&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart squid
-$ sudo systemctl enable squid
-Synchronizing state for squid.service with sysvinit using update-rc.d...
-Executing /usr/sbin/update-rc.d squid defaults
-Executing /usr/sbin/update-rc.d squid enable
-$
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.unix-power.net/linux/squid.html&#34;&gt;CentOS Squidの設定&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://tech.ckme.co.jp/proxy.shtml&#34;&gt;Proxyサーバの設定（squid）：tech.ckme.co.jp&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid&#34;&gt;Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://blog.asial.co.jp/1076&#34;&gt;Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;ブラウザのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;ブラウザのプロキシ設定&lt;/h3&gt;
-
-&lt;p&gt;ブラウザ使用するプロキシ設定をSquidに変更する。&lt;/p&gt;
-
-&lt;p&gt;Squidのログを確認してSquid経由でWebアクセスができていることを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cat /var/log/squid/access.log
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;raspbianのプロキシ設定:4d2b653e7f73799c1b8de9cc6a404282&#34;&gt;Raspbianのプロキシ設定&lt;/h3&gt;
-
-&lt;p&gt;起動時にプロキシを使用するように設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/profile.d/proxy.sh
-PROXY=&amp;quot;192.168.20.10:3128&amp;quot;
-export http_proxy=&amp;quot;http://${PROXY}&amp;quot;
-export https_proxy=&amp;quot;http://${PROXY}&amp;quot;
-export no_proxy=&amp;quot;localhost,127.0.0.1,192.168.*&amp;quot;
-
-export HTTP_PROXY=&amp;quot;${http_proxy}&amp;quot;
-export HTTPS_PROXY=&amp;quot;${https_proxy}&amp;quot;
-export NO_PROXY=&amp;quot;${no_proxy}&amp;quot;
-$ source /etc/profile.d/proxy.sh
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には&lt;code&gt;-E&lt;/code&gt;オプションを指定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo -E apt-get update
-$ sudo -E apt-get upgrade
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://karaage.hatenadiary.jp/entry/2015/11/26/073000&#34;&gt;Mac/Linux/Raspberry Piでプロキシサーバを手軽に設定する方法 - karaage. [からあげ]&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
 &lt;p&gt;以上&lt;/p&gt;
 </description>

@@ -1,0 +1,585 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.15" />
+
+    <base href="http://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="http://www.shinayoshi.net/" />
+    <link href="http://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link href="" rel="alternate" title="shinayoshi&#39;s note" type="application/rss+xml" />
+
+    
+    <link href="http://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="http://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="http://www.shinayoshi.net//">Home</a></li>
+                <li><a href="http://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+                <li>
+                  <a class="subscribe-rss" href="" title="subscribe via RSS">
+                    <i class="fa fa-rss fa-lg"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>MacOS High Sierraにアプリケーションを自動インストールする</h1>
+                  <p>
+                    <span class="label label-primary">Mon Dec 25, 2017</span> in
+                    
+                    
+                    <a href="http://www.shinayoshi.net//categories/mac">mac</a>
+                     using tags
+                    
+                    
+                    <a href="http://www.shinayoshi.net//tags/macos">macos</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#概要:cb9efa90068fba2e65ed2164b4d6dab3">概要</a></li>
+<li><a href="#homebrewでアプリケーションを自動インストールする:cb9efa90068fba2e65ed2164b4d6dab3">homebrewでアプリケーションを自動インストールする</a>
+<ul>
+<li><a href="#step1-準備-homebrewのインストール:cb9efa90068fba2e65ed2164b4d6dab3">STEP1.準備(homebrewのインストール)</a></li>
+<li><a href="#step2-brewfile作成:cb9efa90068fba2e65ed2164b4d6dab3">STEP2.Brewfile作成</a></li>
+<li><a href="#step3-自動インストール:cb9efa90068fba2e65ed2164b4d6dab3">STEP3.自動インストール</a>
+<ul>
+<li><a href="#ソフトウェアインストール時にエラーが発生した場合の対処法:cb9efa90068fba2e65ed2164b4d6dab3">ソフトウェアインストール時にエラーが発生した場合の対処法</a></li>
+</ul></li>
+<li><a href="#step4-アプリケーションのメンテナンス:cb9efa90068fba2e65ed2164b4d6dab3">STEP4.アプリケーションのメンテナンス</a></li>
+</ul></li>
+<li><a href="#手動でインストールするもの:cb9efa90068fba2e65ed2164b4d6dab3">手動でインストールするもの</a></li>
+</ul></li>
+</ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  
+
+<h2 id="概要:cb9efa90068fba2e65ed2164b4d6dab3">概要</h2>
+
+<p>MacOS HighSierraにアプリケーションをインストールします。
+1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。</p>
+
+<p>インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。</p>
+
+<h2 id="homebrewでアプリケーションを自動インストールする:cb9efa90068fba2e65ed2164b4d6dab3">homebrewでアプリケーションを自動インストールする</h2>
+
+<h3 id="step1-準備-homebrewのインストール:cb9efa90068fba2e65ed2164b4d6dab3">STEP1.準備(homebrewのインストール)</h3>
+
+<p>以下のコマンドを実行してhomebrewをインストールします。</p>
+
+<pre><code>$ xcode-select --install
+$ sudo xcodebuild -license
+$ /usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;
+$ brew tap caskroom/cask
+$ brew tap homebrew/bundle
+$ brew install mas
+</code></pre>
+
+<h3 id="step2-brewfile作成:cb9efa90068fba2e65ed2164b4d6dab3">STEP2.Brewfile作成</h3>
+
+<p>以下のコマンドを実行してBrewfileを作成します。</p>
+
+<pre><code>$ brew bundle dump
+</code></pre>
+
+<p>Brewfileにインストールしたいアプリケーションを追記します。
+homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。</p>
+
+<pre><code>$ brew search &quot;検索文字列(アプリケーション名)&quot;
+$ mas search &quot;検索文字列(アプリケーション名)&quot;
+</code></pre>
+
+<p>私のBrewfileは以下の感じです。</p>
+
+<pre><code>tap &quot;caskroot/cask&quot;
+tap &quot;homebrew/core&quot;
+tap &quot;homebrew/bundle&quot;
+brew &quot;mas&quot;
+brew &quot;git&quot;
+brew &quot;hub&quot;
+brew &quot;go&quot;
+brew &quot;hugo&quot;
+cask &quot;osxfuse&quot;
+brew &quot;encfs&quot;
+brew &quot;lv&quot;
+brew &quot;nkf&quot;
+brew &quot;wget&quot;
+brew &quot;ansible&quot;
+brew &quot;emacs&quot;, args: [&quot;with-cocoa&quot;]
+brew &quot;macvim&quot;, args: [&quot;HEAD&quot;, &quot;with-lua&quot;]
+brew &quot;markdown&quot;
+brew &quot;fish&quot;
+cask &quot;iterm2&quot;
+cask &quot;keepassx&quot;
+cask &quot;sublime-text&quot;
+cask &quot;atom&quot;
+cask &quot;google-chrome&quot;
+cask &quot;firefox&quot;
+cask &quot;flash-player&quot;
+cask &quot;flsah-npapi&quot;
+cask &quot;flsah-ppapi&quot;
+cask &quot;mamp&quot;
+cask &quot;sequel-pro&quot;
+cask &quot;virtualBox&quot;
+cask &quot;virtualBox-extension-pack&quot;
+cask &quot;vagrant&quot;
+cask &quot;xquartz&quot;
+cask &quot;dropbox&quot;
+cask &quot;wireshark&quot;
+cask &quot;krita&quot;
+cask &quot;java&quot;
+cask &quot;java-jdk-javadoc&quot;
+cask &quot;intellij-idea-ce&quot;
+cask &quot;alfred&quot;
+cask &quot;github&quot;
+cask &quot;hosts&quot;
+cask &quot;omnifocus&quot;
+cask &quot;atok&quot;
+mas &quot;Xcode&quot;, id: 497799835
+mas &quot;Slack&quot;, id: 803453959
+mas &quot;OneDrive&quot;, id: 823766827
+mas &quot;Marked 2&quot;, id: 890031187
+mas &quot;Microsoft OneNote&quot;, id: 784801555
+mas &quot;Twitter&quot;, id: 409789998
+mas &quot;The Unarchiver&quot;, id: 425424353
+</code></pre>
+
+<h3 id="step3-自動インストール:cb9efa90068fba2e65ed2164b4d6dab3">STEP3.自動インストール</h3>
+
+<p>以下のコマンドを実行してアプリケーションをインストールします。</p>
+
+<pre><code>$ brew bundle
+</code></pre>
+
+<h4 id="ソフトウェアインストール時にエラーが発生した場合の対処法:cb9efa90068fba2e65ed2164b4d6dab3">ソフトウェアインストール時にエラーが発生した場合の対処法</h4>
+
+<ul>
+<li>MacVim</li>
+</ul>
+
+<pre><code>The following build commands failed:
+        StripNIB English.lproj/Preferences.nib
+(1 failure)
+make[1]: *** [macvim] Error 65
+make: *** [first] Error 2
+</code></pre>
+
+<p>⇒Xcodeを実行してaddtional componentsをインストールします。</p>
+
+<ul>
+<li>virtualbox/virtualbox-extension-pack</li>
+</ul>
+
+<pre><code>System Preferences -&gt; Security &amp; Privacy -&gt; General
+</code></pre>
+
+<p>⇒Oracleのソフトウェアインストールを許可します。</p>
+
+<ul>
+<li>all packages</li>
+</ul>
+
+<pre><code>curl: (56) LibreSSL SSL_read: SSL_ERROR_SYSCALL, errno 54
+</code></pre>
+
+<p>⇒ネットワークの問題のようです。めげずに再度<code>$ brew bundle</code>を実行します。</p>
+
+<h3 id="step4-アプリケーションのメンテナンス:cb9efa90068fba2e65ed2164b4d6dab3">STEP4.アプリケーションのメンテナンス</h3>
+
+<p>定期的に以下のコマンドを実行してアプリケーションを最新化します。</p>
+
+<pre><code>$ brew update
+$ brew bundle dump --force
+$ brew bundle cleanup
+$ brew bundle check
+</code></pre>
+
+<h2 id="手動でインストールするもの:cb9efa90068fba2e65ed2164b4d6dab3">手動でインストールするもの</h2>
+
+<p>homebrewでインストールできないアプリケーションは手動でインストールします。</p>
+
+<pre><code>ESET Cyber Security
+Microsoft Office 2016 for Mac
+ScanSnap
+</code></pre>
+
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/">LinuxでUTF-8のBOMを削除する</a></li>
+                  
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="http://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="http://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="http://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+      <a href="http://www.shinayoshi.net/post/2017/01/04/setting-cowrie/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を構築する [ 2017-01-04 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="http://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="http://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="http://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="http://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="http://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="http://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2017 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="http://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+
