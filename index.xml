@@ -55,7 +55,7 @@ $ mas search &amp;quot;検索文字列(アプリケーション名)&amp;quot;
 
 &lt;p&gt;私のBrewfileは以下の感じです。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;tap &amp;quot;caskroot/cask&amp;quot;
+&lt;pre&gt;&lt;code&gt;tap &amp;quot;caskroom/cask&amp;quot;
 tap &amp;quot;homebrew/core&amp;quot;
 tap &amp;quot;homebrew/bundle&amp;quot;
 brew &amp;quot;mas&amp;quot;
@@ -99,11 +99,11 @@ cask &amp;quot;github&amp;quot;
 cask &amp;quot;hosts&amp;quot;
 cask &amp;quot;omnifocus&amp;quot;
 cask &amp;quot;atok&amp;quot;
+cask &amp;quot;xmind-zen&amp;quot;
 mas &amp;quot;Xcode&amp;quot;, id: 497799835
 mas &amp;quot;Slack&amp;quot;, id: 803453959
 mas &amp;quot;OneDrive&amp;quot;, id: 823766827
 mas &amp;quot;Marked 2&amp;quot;, id: 890031187
-mas &amp;quot;Microsoft OneNote&amp;quot;, id: 784801555
 mas &amp;quot;Twitter&amp;quot;, id: 409789998
 mas &amp;quot;The Unarchiver&amp;quot;, id: 425424353
 &lt;/code&gt;&lt;/pre&gt;
