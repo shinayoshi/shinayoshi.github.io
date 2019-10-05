@@ -2,160 +2,25 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Bind on shinayoshi&#39;s note</title>
-    <link>http://www.shinayoshi.net/tags/bind/</link>
+    <link>https://www.shinayoshi.net/tags/bind/</link>
     <description>Recent content in Bind on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <copyright>Copyright (c) 2019 shinayoshi</copyright>
     <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate>
-    <atom:link href="http://www.shinayoshi.net/tags/bind/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://www.shinayoshi.net/tags/bind/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
-      <link>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</link>
+      <link>https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</link>
       <pubDate>Wed, 24 Aug 2016 19:15:14 +0900</pubDate>
       
-      <guid>http://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
-      <description>
-
-&lt;p&gt;Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
-Raspbianの基本的な設定は完了している前提です。&lt;/p&gt;
-
-&lt;h2 id=&#34;bind9のインストール:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;bind9のインストール&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo apt-get install bind9 dnsutils
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo cat /etc/bind/named.conf.options
-controls {
-	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
-};
-include &amp;quot;/etc/bind/rndc.key&amp;quot;;
-
-acl &amp;quot;internal-network&amp;quot; {
-	localhost;
-	127.0.0.1/32;
-	192.168.10.0/24;
-	192.168.20.0/24;
-	192.168.30.0/24;
-	192.168.40.0/24;
-};
-
-options {
-	version &amp;quot;unknown&amp;quot;;
-
-	directory &amp;quot;/var/cache/bind&amp;quot;;
-
-	listen-on {
-		internal-network;
-	};
-
-	querylog yes;
-	allow-query {
-		internal-network;
-	};
-
-	recursion yes;
-	allow-recursion {
-		internal-network;
-	};
-
-	forwarders {
-		192.168.100.1;
-	};
-
-	notify no;
-
-	max-ncache-ttl	300;
-	max-cache-ttl	3600;
-	recursive-clients	300;
-	cleaning-interval	60;
-	lame-ttl	600;
-	max-cache-size	256m;
-
-	allow-transfer {
-		none;
-	};
-
-	allow-update {
-		none;
-	};
-};
-
-logging {
-	channel &amp;quot;log_default&amp;quot; {
-		file &amp;quot;/var/log/bind/named.log&amp;quot; versions 5 size 5m;
-		print-time yes;
-		severity info;
-		print-category yes;
-	};
-	channel &amp;quot;alert&amp;quot; {
-		file &amp;quot;/var/log/bind/alert.log&amp;quot; versions 8 size 4m;
-		severity info;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-	channel &amp;quot;query&amp;quot; {
-		file &amp;quot;/var/log/bind/query.log&amp;quot; versions 8 size 50m;
-		severity debug;
-		print-time yes;
-		print-severity yes;
-		print-category yes;
-	};
-
-	category default { &amp;quot;log_default&amp;quot;; };
-	category security { &amp;quot;alert&amp;quot;; };
-	category queries { &amp;quot;query&amp;quot;; };
-	category lame-servers { null; };
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンフィグの不備を確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo named-checkconf /etc/bind/named.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ログ保存先のディレクトリを作成する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo mkdir -p /var/log/bind
-$ sudo chown bind:bind /var/log/bind
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;bind9を再起動する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo systemctl restart bind9
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;iptablesの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;iptablesの設定&lt;/h2&gt;
-
-&lt;p&gt;iptablesでfirewallを設定する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
-
-$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
-$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;iptablesの設定を保存する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;iptables-save &amp;gt; /etc/iptables/rules.v4&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;dnsの設定:de7ee9c067a99fe782c9ccc491d85d09&#34;&gt;DNSの設定&lt;/h2&gt;
-
-&lt;p&gt;キャッシュDNSを使用するように設定変更を行う。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo vi /etc/dhcpcd.conf
-static domain_name_servers=127.0.0.1
-$ sudo systemctl restart dhcpcd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
+      <guid>https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
+      <description>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。
+bind9のインストール $ sudo apt-get install bind9 dnsutils  bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。
+$ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &amp;quot;/etc/bind/rndc.key&amp;quot;; acl &amp;quot;internal-network&amp;quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &amp;quot;unknown&amp;quot;; directory &amp;quot;/var/cache/bind&amp;quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl	300; max-cache-ttl	3600; recursive-clients	300; cleaning-interval	60; lame-ttl	600; max-cache-size	256m; allow-transfer { none; }; allow-update { none; }; }; logging { channel &amp;quot;log_default&amp;quot; { file &amp;quot;/var/log/bind/named.</description>
     </item>
     
   </channel>

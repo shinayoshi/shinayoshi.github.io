@@ -2,26 +2,25 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on shinayoshi&#39;s note</title>
-    <link>http://www.shinayoshi.net/tags/blog/</link>
+    <link>https://www.shinayoshi.net/tags/blog/</link>
     <description>Recent content in Blog on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <copyright>Copyright (c) 2019 shinayoshi</copyright>
     <lastBuildDate>Sun, 06 Sep 2015 16:43:36 +0900</lastBuildDate>
-    <atom:link href="http://www.shinayoshi.net/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://www.shinayoshi.net/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>hugo始めました</title>
-      <link>http://www.shinayoshi.net/post/2015/09/06/first-post/</link>
+      <link>https://www.shinayoshi.net/post/2015/09/06/first-post/</link>
       <pubDate>Sun, 06 Sep 2015 16:43:36 +0900</pubDate>
       
-      <guid>http://www.shinayoshi.net/post/2015/09/06/first-post/</guid>
-      <description>&lt;p&gt;Hugoでブログ始めました。&lt;/p&gt;
-
-&lt;p&gt;本ブログでは私が得た技術的な知識・経験を投稿していく予定です。&lt;/p&gt;
-
-&lt;p&gt;今後ともよろしくお願いします。&lt;/p&gt;
-</description>
+      <guid>https://www.shinayoshi.net/post/2015/09/06/first-post/</guid>
+      <description>Hugoでブログ始めました。
+本ブログでは私が得た技術的な知識・経験を投稿していく予定です。
+今後ともよろしくお願いします。</description>
     </item>
     
   </channel>

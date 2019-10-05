@@ -2,93 +2,28 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Backup on shinayoshi&#39;s note</title>
-    <link>http://www.shinayoshi.net/tags/backup/</link>
+    <link>https://www.shinayoshi.net/tags/backup/</link>
     <description>Recent content in Backup on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Copyright (c) 2017 shinayoshi</copyright>
+    <copyright>Copyright (c) 2019 shinayoshi</copyright>
     <lastBuildDate>Sun, 07 Aug 2016 22:29:12 +0900</lastBuildDate>
-    <atom:link href="http://www.shinayoshi.net/tags/backup/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://www.shinayoshi.net/tags/backup/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Raspbianをバックアップ・リストアする</title>
-      <link>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</link>
+      <link>https://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</link>
       <pubDate>Sun, 07 Aug 2016 22:29:12 +0900</pubDate>
       
-      <guid>http://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</guid>
-      <description>
-
-&lt;p&gt;RaspbianをSDカード丸ごとバックアップ・リストアするメモです。
-今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。&lt;/p&gt;
-
-&lt;h2 id=&#34;バックアップ:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;バックアップ&lt;/h2&gt;
-
-&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
-   2:                      Linux                         32.2 GB    disk1s2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードのディスクイメージをバックアップする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img
-Password:
-30735+0 records in
-30735+0 records out
-32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;リストア:6cd0cb3f4c453418b61672dbcf967693&#34;&gt;リストア&lt;/h2&gt;
-
-&lt;p&gt;SDカードデバイスを確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil list
-/dev/disk1
-   #:                       TYPE NAME                    SIZE       IDENTIFIER
-   0:     FDisk_partition_scheme                        *32.2 GB    disk1
-   1:             Windows_FAT_32 boot                    66.1 MB    disk1s1
-   2:                      Linux                         32.2 GB    disk1s2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスをアンマウントする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil unmountDisk /dev/disk1
-Unmount of all volumes on disk1 was successful
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ディスクイメージをSDカードにリストアする。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ sudo dd bs=1m if=~/Desktop/raspi_backup.img of=/dev/rdisk1
-Password:
-30735+0 records in
-30735+0 records out
-32227983360 bytes transferred in 2153.545392 secs (14965082 bytes/sec)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SDカードデバイスを取り出す。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ diskutil eject /dev/disk1
-Disk /dev/disk1 ejected
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上&lt;/p&gt;
-</description>
+      <guid>https://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</guid>
+      <description>RaspbianをSDカード丸ごとバックアップ・リストアするメモです。 今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。
+バックアップ SDカードデバイスを確認する。
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2  SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful  SDカードのディスクイメージをバックアップする。
+$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)  SDカードデバイスを取り出す。
+$ diskutil eject /dev/disk1 Disk /dev/disk1 ejected  リストア SDカードデバイスを確認する。</description>
     </item>
     
   </channel>
