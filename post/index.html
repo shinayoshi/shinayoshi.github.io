@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link rel="alternate" type="application/rss+xml" href="https://www.shinayoshi.net/post/index.xml" title="shinayoshi's note" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <h1>Posts</h1>
+              <div class="list-group">
+                
+                <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">
+                  <h2 class="list-group-item-heading">MacOS High Sierraにアプリケーションを自動インストールする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Dec 25, 2017</span> in
+                    
+                    
+                    mac
+                     using tags
+                    
+                    
+                    macos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    概要 MacOS HighSierraにアプリケーションをインストールします。 1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。
+インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。
+homebrewでアプリケーションを自動インストールする STEP1.準備(homebrewのインストール) 以下のコマンドを実行してhomebrewをインストールします。
+$ xcode-select --install $ sudo xcodebuild -license $ /usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot; $ brew tap caskroom/cask $ brew tap homebrew/bundle $ brew install mas STEP2.Brewfile作成 以下のコマンドを実行してBrewfileを作成します。
+$ brew bundle dump Brewfileにインストールしたいアプリケーションを追記します。 homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。
+$ brew search &quot;検索文字列(アプリケーション名)&quot; $ mas search &quot;検索文字列(アプリケーション名)&quot; 私のBrewfileは以下の感じです。
+tap &quot;caskroom/cask&quot; tap &quot;homebrew/core&quot; tap &quot;homebrew/bundle&quot; brew &quot;mas&quot; brew &quot;git&quot; brew &quot;hub&quot; brew &quot;go&quot; brew &quot;hugo&quot; cask &quot;osxfuse&quot; brew &quot;encfs&quot; brew &quot;lv&quot; brew &quot;nkf&quot; brew &quot;wget&quot; brew &quot;ansible&quot; brew &quot;emacs&quot;, args: [&quot;with-cocoa&quot;] brew &quot;macvim&quot;, args: [&quot;HEAD&quot;, &quot;with-lua&quot;] brew &quot;markdown&quot; brew &quot;fish&quot; cask &quot;iterm2&quot; cask &quot;keepassx&quot; cask &quot;sublime-text&quot; cask &quot;atom&quot; cask &quot;google-chrome&quot; cask &quot;firefox&quot; cask &quot;flash-player&quot; cask &quot;flash-npapi&quot; cask &quot;flash-ppapi&quot; cask &quot;mamp&quot; cask &quot;sequel-pro&quot; cask &quot;virtualBox&quot; cask &quot;virtualBox-extension-pack&quot; cask &quot;vagrant&quot; cask &quot;xquartz&quot; cask &quot;dropbox&quot; cask &quot;wireshark&quot; cask &quot;krita&quot; cask &quot;java&quot; cask &quot;java-jdk-javadoc&quot; cask &quot;intellij-idea-ce&quot; cask &quot;alfred&quot; cask &quot;github&quot; cask &quot;hosts&quot; cask &quot;omnifocus&quot; cask &quot;atok&quot; cask &quot;xmind-zen&quot; mas &quot;Xcode&quot;, id: 497799835 mas &quot;Slack&quot;, id: 803453959 mas &quot;OneDrive&quot;, id: 823766827 mas &quot;Marked 2&quot;, id: 890031187 mas &quot;Twitter&quot;, id: 409789998 mas &quot;The Unarchiver&quot;, id: 425424353 STEP3.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">
+                  <h2 class="list-group-item-heading">LinuxでUTF-8のBOMを削除する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    vim
+                    
+                     , 
+                    utf-8
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。
+きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。 Windowsのnotepadで保存するとBOM付きで保存されるようです。
+BOMの確認 ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。&lt;U+FEFF&gt;がBOMです。
+$ less bom.txt &lt;U+FEFF&gt;#!/bin/sh echo hoge BOMの削除 通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。
+$ vim -b bom.txt &lt;feff\&gt;#!/bin/sh echo hoge あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。
+以上
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">
+                  <h2 class="list-group-item-heading">OCJP, Silver SE 8を取得しました</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat May 6, 2017</span> in
+                    
+                    
+                    program
+                     using tags
+                    
+                    
+                    java
+                    
+                     , 
+                    certificate
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。 資格取得までに勉強したことをメモしておきます。
+Java経験 私のJava経験は以下ととおりです。
+ 2010年にSun認定JavaプログラマSE6(SJC-P)を取得 Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません)  勉強方法 試験まで以下の参考書を使用して勉強しました。
+ オラクル認定資格教科書 Javaプログラマ Silver SE 8  SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。
+参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。 Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。
+新しく勉強した内容 過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。
+2進数表記 0bを先頭につけることで2進数を表現できるようになりました。
+ex) 0b1010 // 10進数で10 0b1111 // 10進数で15 数値リテラルのアンダーバー 数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。
+ex) 1_234 5_6 インタフェースのdefaultメソッドとstaticメソッド インタフェースにメソッドの実装を記載できるようになりました。 結果、多重継承が実現可能となりました。
+インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。
+ex) interface MyInterface { void method1(); default void method2() { System.out.println(&quot;method2&quot;); } static void method3() { System.out.println(&quot;method3&quot;); } } ラムダ式 ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">
+                  <h2 class="list-group-item-heading">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed May 3, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    centos
+                    
+                     , 
+                    Let&#39;s Encrypt
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    前提  OS  CentOS Linux release 7.3.1611 (Core)   Web Server  Apache 2.4.6   firewalld  enabled   SELinux  disabled    firewalldでhttpsを有効化 インターネットからhttpsアクセスを許可する。
+$ sudo firewall-cmd --permanent --zone=public --add-service=https success $ sudo firewall-cmd --reload success $ sudo firewall-cmd --zone=public --list-all public (active) target: default icmp-block-inversion: no interfaces: eth0 sources: services: http https ports: protocols: masquerade: no forward-ports: sourceports: icmp-blocks: rich rules: EPELリポジトリのインストール EPELリポジトリをインストールする。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2のイメージバックアップを行う</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Jan 15, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+今回はhomenas1のバックアップを行います。
+gitのインストール $ sudo -E apt-get install git パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: git-man liberror-perl 提案パッケージ: gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn 以下のパッケージが新たにインストールされます: git git-man liberror-perl アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 4,015 kB のアーカイブを取得する必要があります。 この操作後に追加で 20.4 MB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でファイルバックアップを行う</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Jan 12, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+今回はhomenas1にrsnapshotを導入してファイルバックアップを行う設定を行います。
+なおバックアップ元は/mnt/nas/、バックアップ先は/mnt/backup/を想定しています。
+$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $ rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でCactiを導入する(サーバの登録)</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                     , 
+                    homepxy1
+                    
+                     , 
+                    homepot1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
+snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でCactiを導入する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+今回はhomemon1、homemon2にCactiを導入します。
+Cactiのインストール Cactiをインストールします。 途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答します。
+$ sudo -E apt-get install cacti cacti-spine パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp rrdtool snmp 提案パッケージ: moreutils snmp-mibs-downloader php5-adodb librrds-perl 以下のパッケージが新たにインストールされます: cacti cacti-spine dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp rrdtool snmp アップグレード: 0 個、新規インストール: 26 個、削除: 0 個、保留: 1 個。 6,777 kB のアーカイブを取得する必要があります。 この操作後に追加で 16.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でZabbixサーバを構築する(Agent導入)</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homenas1
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                     , 
+                    homepxy1
+                    
+                     , 
+                    homepot1
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+前回はZabbix Serverを導入しました。 今回はhomenas1、homemon1、homemon2、homepxy1、homepot1にZabbix Agentを導入していきます。
+Zabbix Agentのインストール Zabbix Agentをインストールします。
+$ sudo -E apt-get install zabbix-agent パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libcurl3-gnutls libpci3 pciutils 以下のパッケージが新たにインストールされます: libcurl3-gnutls libpci3 pciutils zabbix-agent アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。 819 kB のアーカイブを取得する必要があります。 この操作後に追加で 2,344 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 2でZabbixサーバを構築する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Jan 8, 2017</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    home-network
+                    
+                     , 
+                    homemon1
+                    
+                     , 
+                    homemon2
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
+前回に引き続きhomemon1、homemon2を構築していきます。 本環境の監視を行うためにZabbixを導入します。
+Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server mysql-server-5.
+                  </p>
+                </a>
+                
+              </div>
+              <div class="pagination">
+                <ul class="pager">
+  
+  <li>Page 1 of 5</li>
+  
+  <li class="next"><a href="/post/page/2/">Older &rarr;</a></li>
+  
+</ul>
+
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

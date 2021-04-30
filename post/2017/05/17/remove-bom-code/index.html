@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>LinuxでUTF-8のBOMを削除する</h1>
+                  <p>
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/vim">vim</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/utf-8">utf-8</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#bomの確認">BOMの確認</a></li>
+    <li><a href="#bomの削除">BOMの削除</a></li>
+  </ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  <p>Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。</p>
+<p>きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。
+Windowsのnotepadで保存するとBOM付きで保存されるようです。</p>
+<h2 id="bomの確認">BOMの確認</h2>
+<p>ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。<code>&lt;U+FEFF&gt;</code>がBOMです。</p>
+<pre><code>$ less bom.txt
+&lt;U+FEFF&gt;#!/bin/sh
+echo hoge
+</code></pre><h2 id="bomの削除">BOMの削除</h2>
+<p>通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。</p>
+<pre><code>$ vim -b bom.txt
+&lt;feff\&gt;#!/bin/sh
+echo hoge
+</code></pre><p>あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。</p>
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/">OCJP, Silver SE 8を取得しました</a></li>
+                  
+                  
+                  <li class="previous"><a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/">MacOS High Sierraにアプリケーションを自動インストールする</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

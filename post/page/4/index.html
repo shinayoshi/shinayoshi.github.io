@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link rel="alternate" type="application/rss+xml" href="https://www.shinayoshi.net/post/index.xml" title="shinayoshi's note" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <h1>Posts</h1>
+              <div class="list-group">
+                
+                <a href="https://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Agentをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Thu Aug 11, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。
+パッケージの更新 Raspbianのパッケージを最新する。
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール
+$ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。
+$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
+ホスト名の設定やテンプレートの選択を行い、保存を選択する。
+以上
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbian(Jessie)にZabbix Serverをインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Wed Aug 10, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                     , 
+                    zabbix
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。
+ 3 Installation from packages [Zabbix Documentation 2.2]  パッケージの更新 Raspbianのパッケージを最新する。
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール
+インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
+$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定
+$ mysql_secure_installation In order to log into MySQL to secure it, we'll need the current password for the root user. If you've just installed MySQL, and you haven't set the root password yet, the password will be blank, so you should just press enter here.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/08/07/backup-raspbian/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianをバックアップ・リストアする</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Aug 7, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    backup
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    RaspbianをSDカード丸ごとバックアップ・リストアするメモです。 今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。
+バックアップ SDカードデバイスを確認する。
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2 SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードのディスクイメージをバックアップする。
+$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec) SDカードデバイスを取り出す。
+$ diskutil eject /dev/disk1 Disk /dev/disk1 ejected リストア SDカードデバイスを確認する。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">RaspbianにKivyをセットアップ</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    kivy
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 7&quot; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。
+Kivyのインストール Kivyに必要なパッケージをインストールする。
+$ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。
+$ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&quot; &gt;&gt; ~/.profile $ source ~/.profile  Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation  Raspberry Pi 7&quot; Touch Screen LCDの利用設定 $ vi ~/.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3にRaspberry Pi 7&#34; Touch Screen LCDを接続</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Tue Jul 12, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3のディスプレイとして「Official 7&quot; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。
+接続 以下のWebサイトを参考に接続する。
+ Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi  天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。
+$ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot  Getting Started with the Raspberry Pi 7&quot; Touchscreen LCD - Pimoroni Yarr-niversity  日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。
+$ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspberry Pi 3でWiFi設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun Jul 10, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    WiFi
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。
+WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。
+$ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。
+$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &quot;wpa_passphrase 'アクセスポイント名(ESSID)' 'アクセスポイントのパスワード' &gt;&gt; /etc/wpa_supplicant/wpa_supplicant.conf&quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&quot;アクセスポイント名(ESSID)&quot; #psk=&quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。
+$ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。
+$ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static domain_name_servers=192.
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianの初期設定</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。
+前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。
+パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade  Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。
+$ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=  &ldquo;man dhcpcd.conf&rdquo;  USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。
+$ sudo vi /boot/config.txt #Add the following line max_usb_current=1  RPiconfig - eLinux.org  NTP設定 NTP同期先を設定する。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-install/" class="list-group-item">
+                  <h2 class="list-group-item-heading">Raspbianのインストール</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jul 9, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    raspberrypi
+                    
+                     , 
+                    jessie
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    何番煎じかわかりませんが、ディスプレイ、キーボード、マウスを使用せずにRaspbianのインストールを行い、リモートPCからSSH接続が行えるようにするまでのメモです。
+使用したもの  Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用)  Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。
+ Download Raspbian for Raspberry Pi  Raspbian書き込み SDカードにRaspbianのイメージを書き込む。
+SDカードデバイスを確認する。
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/05/15/apache-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">ApacheでWebサイトを公開する</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sun May 15, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    centos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    ApacheでWebサイトを公開するまでの手順のメモです。
+ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。
+# yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。
+# vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。
+$ sudo systemctl start httpd $ sudo systemctl enable httpd Firewallの設定 FirewallでWeb通信を許可します。
+                  </p>
+                </a>
+                
+                <a href="https://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/" class="list-group-item">
+                  <h2 class="list-group-item-heading">お名前.com VPS(KVM)の初期設定(CentOS 7 1511)</h2>
+                  <p class="list-group-item-text">
+                    <span class="label label-primary">Sat Jan 16, 2016</span> in
+                    
+                    
+                    server
+                     using tags
+                    
+                    
+                    centos
+                    
+                  </p>
+                  <p class="list-group-item-text">
+                    お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。
+rootでログイン お名前.comのコンソール画面でログインを行います。
+login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。
+[root@&lt;ホスト名&gt; ~]# 以降の手順では、rootアカウントのプロンプトを#で表現します。
+シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。
+# vi /etc/default/grub GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&quot; ↓変更 GRUB_CMDLINE_LINUX=&quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&quot; # grub2-mkconfig -o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。
+SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド
+ホスト名変更 ホスト名の変更を行います。
+# hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。
+# reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。
+パッケージの更新 パッケージを最新の状態に更新します。
+# yum -y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。
+# reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。
+# useradd centos # passwd centos Changing password for user centos.
+                  </p>
+                </a>
+                
+              </div>
+              <div class="pagination">
+                <ul class="pager">
+  
+  <li class="previous"><a href="/post/page/3/">&larr; Newer</a></li>
+  
+  <li>Page 4 of 5</li>
+  
+  <li class="next"><a href="/post/page/5/">Older &rarr;</a></li>
+  
+</ul>
+
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

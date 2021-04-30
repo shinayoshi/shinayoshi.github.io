@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>diary on shinayoshi&#39;s note</title>
+    <link>https://www.shinayoshi.net/categories/diary/</link>
+    <description>Recent content in diary on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2021 shinayoshi</copyright>
+    <lastBuildDate>Sat, 31 Oct 2015 12:09:15 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/categories/diary/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>囲碁・将棋の思考エンジンの覚え書き</title>
+      <link>https://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/</link>
+      <pubDate>Sat, 31 Oct 2015 12:09:15 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/</guid>
+      <description>囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。
+実際に使用したことはないため、使用方法や強さはわかりません。あしからず。
+囲碁の思考エンジン  Pachi Fuego GNU Go  将棋の思考エンジン  Bonanza Apery GPSshogi  将棋GUIソフト  将棋所  </description>
+    </item>
+    
+    <item>
+      <title>hugo始めました</title>
+      <link>https://www.shinayoshi.net/post/2015/09/06/first-post/</link>
+      <pubDate>Sun, 06 Sep 2015 16:43:36 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/post/2015/09/06/first-post/</guid>
+      <description>Hugoでブログ始めました。
+本ブログでは私が得た技術的な知識・経験を投稿していく予定です。
+今後ともよろしくお願いします。</description>
+    </item>
+    
+  </channel>
+</rss>

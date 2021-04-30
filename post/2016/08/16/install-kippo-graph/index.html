@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>Kippo-GraphをインストールしてCowrieのログを可視化する</h1>
+                  <p>
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/kippo-graph">kippo-graph</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mysqlのインストールと初期設定">MySQLのインストールと初期設定</a></li>
+    <li><a href="#cowrieのログ出力先を変更">Cowrieのログ出力先を変更</a></li>
+    <li><a href="#apache2のインストール">Apache2のインストール</a></li>
+    <li><a href="#kippo-graphのインストール">Kippo-Graphのインストール</a></li>
+    <li><a href="#kippo-graphの修正">Kippo-Graphの修正</a></li>
+  </ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  <p>Kippo-Graphの公式(<a href="http://bruteforce.gr/kippo-graph">Kippo-Graph - BruteForce Lab&rsquo;s Blog</a>)を参考にKippo-Graphをインストールするまでのメモです。</p>
+<h2 id="mysqlのインストールと初期設定">MySQLのインストールと初期設定</h2>
+<p>MySQLをインストールする。</p>
+<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install mysql-server
+</code></pre><p>MySQLのセキュア設定</p>
+<pre><code>$ mysql_secure_installation
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we'll need the current
+password for the root user.  If you've just installed MySQL, and
+you haven't set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you've completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+</code></pre><p>MySQLの初期設定</p>
+<pre><code>$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+</code></pre><ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
+</ul>
+<p>MySQLの再起動</p>
+<pre><code>$ sudo systemctl restart mysql
+</code></pre><h2 id="cowrieのログ出力先を変更">Cowrieのログ出力先を変更</h2>
+<p>Cowrie用データベースの作成</p>
+<pre><code>$ mysql -uroot -p
+Enter password:
+mysql&gt; create database cowrie character set utf8 collate utf8_bin;
+mysql&gt; grant all privileges on cowrie.* to cowrie@localhost identified by 'cowrie_password';
+mysql&gt; quit
+
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
+</code></pre><p>CowrieのログをMySQLのデータベースに出力する。</p>
+<pre><code>$ cd ${COWRIE_INSTALL_DIR}
+$ vi cowrie.cfg
+↓コメントアウト
+#[iutput_jsonloi]
+#logfile = log/cowrie.json
+
+#[output_mysql]
+#host = localhost
+#database = cowrie
+#username = cowrie
+#password = secret
+#port = 3306
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
+</code></pre><p>Cowrieの再起動</p>
+<pre><code>$ ./stop.sh
+$ ./start.sh
+</code></pre><h2 id="apache2のインストール">Apache2のインストール</h2>
+<p>Apache2をインストールする。</p>
+<pre><code>$ sudo apt-get install apache2
+</code></pre><p>Apache2のセキュリティ設定。</p>
+<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+</code></pre><p>Apache2の文字コード設定。</p>
+<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+</code></pre><p>Apache2のServerName設定。</p>
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
+$ sudo a2enconf fqdn
+</code></pre><p>Apache2の再起動。</p>
+<pre><code>$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre><h2 id="kippo-graphのインストール">Kippo-Graphのインストール</h2>
+<p>関連パッケージのインストール。</p>
+<pre><code>$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+$ sudo apt-get install dnsutils
+$ sudo systemctl restart apache2
+</code></pre><p>Kippo-Graphのインストール。</p>
+<pre><code>$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&lt;IfModule mod_alias.c&gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&lt;/IfModule&gt;
+$ sudo a2enconf kippo-graph
+$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre><p>Kippo-Graphの設定。</p>
+<pre><code>$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'cowrie');
+define('DB_PASS', 'cowrie_password');
+define('DB_NAME', 'cowrie');
+define('DB_PORT', '3306');
+</code></pre><h2 id="kippo-graphの修正">Kippo-Graphの修正</h2>
+<p>KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。</p>
+<p>PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。</p>
+<p><code>class/KippoPlayLog.class.php</code>の修正</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+</code></pre><p><code>include/play.php</code>の修正</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php include/play.php.org
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&lt;                 $log = base64_encode($row['ttylog']);
+---
+&gt;                 $log = base64_encode(file_get_contents($row['ttylog']));
+</code></pre><p>ttylogへのシンボリックリンク作成</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
+$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+</code></pre><p>Cowrie起動スクリプトの修正</p>
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}/
+$ cp -p start.sh start.sh.org
+$ vi start.sh
+$ diff start.sh.org start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre><p>Cowrieの再起動</p>
+<pre><code>$ ./stop.sh
+$ ./start.sh
+</code></pre><p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="https://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/">Raspbian(Jessie)にCowrieをインストールする</a></li>
+                  
+                  
+                  <li class="previous"><a href="https://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/">Cowrieのセキュリティ設定</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

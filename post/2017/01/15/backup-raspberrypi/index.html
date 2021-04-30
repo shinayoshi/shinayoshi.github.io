@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>Raspberry Pi 2のイメージバックアップを行う</h1>
+                  <p>
+                    <span class="label label-primary">Sun Jan 15, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#gitのインストール">gitのインストール</a></li>
+  </ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>今回は<code>homenas1</code>のバックアップを行います。</p>
+<h2 id="gitのインストール">gitのインストール</h2>
+<pre><code>$ sudo -E apt-get install git
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  git-man liberror-perl
+提案パッケージ:
+  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn
+以下のパッケージが新たにインストールされます:
+  git git-man liberror-perl
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+4,015 kB のアーカイブを取得する必要があります。
+この操作後に追加で 20.4 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
+4,015 kB を 6秒 で取得しました (630 kB/s)                                      
+以前に未選択のパッケージ liberror-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33218 個のファイルとディレクトリがインストールされています。)
+.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
+liberror-perl (0.17-1.1) を展開しています...
+以前に未選択のパッケージ git-man を選択しています。
+.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
+git-man (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ git を選択しています。
+.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
+git (1:2.1.4-2.1+deb8u2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+liberror-perl (0.17-1.1) を設定しています ...
+git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
+git (1:2.1.4-2.1+deb8u2) を設定しています ...
+$
+</code></pre><p>rpi-cloneのインストール</p>
+<pre><code>$ git clone https://github.com/billw2/rpi-clone.git
+Cloning into 'rpi-clone'...
+remote: Counting objects: 58, done.
+remote: Total 58 (delta 0), reused 0 (delta 0), pack-reused 58
+Unpacking objects: 100% (58/58), done.
+Checking connectivity... done.
+$
+$ ls -l rpi-clone/
+合計 20
+-rw-r--r-- 1 pi pi  4026  1月 15 00:57 README.md
+-rwxr-xr-x 1 pi pi 13933  1月 15 00:57 rpi-clone
+$
+$ sudo cp -p rpi-clone/rpi-clone /usr/local/sbin/
+</code></pre><p>rpi-cloneでのバックアップ</p>
+<p>今回、バックアップ先のmicroSDカードのデバイスは<code>sdd</code>でしたので、<code>rpi-clone</code>コマンドの引数には<code>sdd</code>を指定しています。32GBのmicroSDカードのバックアップには5分程度かかりました。</p>
+<pre><code>$ sudo rpi-clone sdd -f
+
+Forcing a partition initialization of destination disk sdd
+The existing destination disk 'sdd' partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+*** All data on destination disk sdd will be overwritten! ***
+
+Do you want to initialize the destination disk /dev/sdd? (yes/no): yes
+
+Imaging the partition structure, copying 78 megabytes...
+78+0 レコード入力
+78+0 レコード出力
+81788928 バイト (82 MB) コピーされました、 25.7102 秒、 3.2 MB/秒
+Running fsck on /dev/sdd1...
+Sizing partition 2 (root partition) to use all SD card space...
+mke2fs 1.42.12 (29-Aug-2014)
+/dev/sdd2 contains a ext4 file system
+	last mounted on / on Sun Jan  1 18:13:44 2017
+Creating filesystem with 7728128 4k blocks and 1933312 inodes
+Filesystem UUID: bffb6652-49b7-45ce-a9c6-46e745372a7c
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information:        
+done
+
+
+/dev/sdd is initialized and resized.  Its partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+
+Your booted /dev/mmcblk0p2 rootfs existing label: 
+You may enter a label for the destination rootfs /dev/sdd2: 
+======== Clone Summary ========
+Clone mode               :  rsync all files to sdd root file system
+Clone destination disk   :  sdd
+Clone destination rootfs :  /dev/sdd2 (no label) on /mnt/clone
+Clone destination bootfs :  /dev/sdd1 on /mnt/clone/boot
+Verbose mode             :  off
+===============================
+Final check, is it Ok to proceed with the clone (yes/no)?: yes
+=&gt; Mounting /dev/sdd2 (no label) on /mnt/clone
+=&gt; Mounting /dev/sdd1 on /mnt/clone/boot
+===============================
+Starting the filesystem rsync to sdd
+(This may take several minutes)...
+*** Done with clone to /dev/sdd ***
+    Started: 01:07:27    Finished: 01:10:05
+
+Hit Enter when ready to unmount the /dev/sdd partitions...
+unmounting /mnt/clone/boot
+unmounting /mnt/clone
+===============================
+$
+</code></pre><p>バックアップmicroSDカードからのリストア</p>
+<p>バックアップmicroSDカードをRaspberry Piにセットして起動するだけです。特にリストアという作業は必要ありません。</p>
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/">Raspberry Pi 2でファイルバックアップを行う</a></li>
+                  
+                  
+                  <li class="previous"><a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

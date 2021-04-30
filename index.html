@@ -1,0 +1,1957 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link rel="alternate" type="application/rss+xml" href="https://www.shinayoshi.net/index.xml" title="shinayoshi's note" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/">Posts</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Dec 25, 2017</span> in
+                     using tags
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/">MacOS High Sierraにアプリケーションを自動インストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Dec 25, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/mac">mac</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/macos">macos</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <h2 id="概要">概要</h2>
+<p>MacOS HighSierraにアプリケーションをインストールします。
+1つ1つをWebサイトからダウンロードしてインストールするのは大変なので、なるべく自動化します。</p>
+<p>インストールするアプリケーションは私がよく使用するものです(ありていに言えば私の備忘録です)。</p>
+<h2 id="homebrewでアプリケーションを自動インストールする">homebrewでアプリケーションを自動インストールする</h2>
+<h3 id="step1準備homebrewのインストール">STEP1.準備(homebrewのインストール)</h3>
+<p>以下のコマンドを実行してhomebrewをインストールします。</p>
+<pre><code>$ xcode-select --install
+$ sudo xcodebuild -license
+$ /usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;
+$ brew tap caskroom/cask
+$ brew tap homebrew/bundle
+$ brew install mas
+</code></pre><h3 id="step2brewfile作成">STEP2.Brewfile作成</h3>
+<p>以下のコマンドを実行してBrewfileを作成します。</p>
+<pre><code>$ brew bundle dump
+</code></pre><p>Brewfileにインストールしたいアプリケーションを追記します。
+homebrewでアプリケーションがインストールできるかは以下のコマンドで検索できます。</p>
+<pre><code>$ brew search &quot;検索文字列(アプリケーション名)&quot;
+$ mas search &quot;検索文字列(アプリケーション名)&quot;
+</code></pre><p>私のBrewfileは以下の感じです。</p>
+<pre><code>tap &quot;caskroom/cask&quot;
+tap &quot;homebrew/core&quot;
+tap &quot;homebrew/bundle&quot;
+brew &quot;mas&quot;
+brew &quot;git&quot;
+brew &quot;hub&quot;
+brew &quot;go&quot;
+brew &quot;hugo&quot;
+cask &quot;osxfuse&quot;
+brew &quot;encfs&quot;
+brew &quot;lv&quot;
+brew &quot;nkf&quot;
+brew &quot;wget&quot;
+brew &quot;ansible&quot;
+brew &quot;emacs&quot;, args: [&quot;with-cocoa&quot;]
+brew &quot;macvim&quot;, args: [&quot;HEAD&quot;, &quot;with-lua&quot;]
+brew &quot;markdown&quot;
+brew &quot;fish&quot;
+cask &quot;iterm2&quot;
+cask &quot;keepassx&quot;
+cask &quot;sublime-text&quot;
+cask &quot;atom&quot;
+cask &quot;google-chrome&quot;
+cask &quot;firefox&quot;
+cask &quot;flash-player&quot;
+cask &quot;flash-npapi&quot;
+cask &quot;flash-ppapi&quot;
+cask &quot;mamp&quot;
+cask &quot;sequel-pro&quot;
+cask &quot;virtualBox&quot;
+cask &quot;virtualBox-extension-pack&quot;
+cask &quot;vagrant&quot;
+cask &quot;xquartz&quot;
+cask &quot;dropbox&quot;
+cask &quot;wireshark&quot;
+cask &quot;krita&quot;
+cask &quot;java&quot;
+cask &quot;java-jdk-javadoc&quot;
+cask &quot;intellij-idea-ce&quot;
+cask &quot;alfred&quot;
+cask &quot;github&quot;
+cask &quot;hosts&quot;
+cask &quot;omnifocus&quot;
+cask &quot;atok&quot;
+cask &quot;xmind-zen&quot;
+mas &quot;Xcode&quot;, id: 497799835
+mas &quot;Slack&quot;, id: 803453959
+mas &quot;OneDrive&quot;, id: 823766827
+mas &quot;Marked 2&quot;, id: 890031187
+mas &quot;Twitter&quot;, id: 409789998
+mas &quot;The Unarchiver&quot;, id: 425424353
+</code></pre><h3 id="step3自動インストール">STEP3.自動インストール</h3>
+<p>以下のコマンドを実行してアプリケーションをインストールします。</p>
+<pre><code>$ brew bundle
+</code></pre><h4 id="ソフトウェアインストール時にエラーが発生した場合の対処法">ソフトウェアインストール時にエラーが発生した場合の対処法</h4>
+<ul>
+<li>MacVim</li>
+</ul>
+<pre><code>The following build commands failed:
+        StripNIB English.lproj/Preferences.nib
+(1 failure)
+make[1]: *** [macvim] Error 65
+make: *** [first] Error 2
+</code></pre><p>⇒Xcodeを実行してaddtional componentsをインストールします。</p>
+<ul>
+<li>virtualbox/virtualbox-extension-pack</li>
+</ul>
+<pre><code>System Preferences -&gt; Security &amp; Privacy -&gt; General
+</code></pre><p>⇒Oracleのソフトウェアインストールを許可します。</p>
+<ul>
+<li>all packages</li>
+</ul>
+<pre><code>curl: (56) LibreSSL SSL_read: SSL_ERROR_SYSCALL, errno 54
+</code></pre><p>⇒ネットワークの問題のようです。めげずに再度<code>$ brew bundle</code>を実行します。</p>
+<h3 id="step4アプリケーションのメンテナンス">STEP4.アプリケーションのメンテナンス</h3>
+<p>定期的に以下のコマンドを実行してアプリケーションを最新化します。</p>
+<pre><code>$ brew update
+$ brew bundle dump --force
+$ brew bundle cleanup
+$ brew bundle check
+</code></pre><h2 id="手動でインストールするもの">手動でインストールするもの</h2>
+<p>homebrewでインストールできないアプリケーションは手動でインストールします。</p>
+<pre><code>ESET Cyber Security
+Microsoft Office 2016 for Mac
+ScanSnap
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/">LinuxでUTF-8のBOMを削除する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed May 17, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/vim">vim</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/utf-8">utf-8</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。</p>
+<p>きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。
+Windowsのnotepadで保存するとBOM付きで保存されるようです。</p>
+<h2 id="bomの確認">BOMの確認</h2>
+<p>ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。<code>&lt;U+FEFF&gt;</code>がBOMです。</p>
+<pre><code>$ less bom.txt
+&lt;U+FEFF&gt;#!/bin/sh
+echo hoge
+</code></pre><h2 id="bomの削除">BOMの削除</h2>
+<p>通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。</p>
+<pre><code>$ vim -b bom.txt
+&lt;feff\&gt;#!/bin/sh
+echo hoge
+</code></pre><p>あとはBOM(↑でいうところの&lt;feff&gt;)を削除して保存すれば、BOMなしファイルができます。</p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/">OCJP, Silver SE 8を取得しました</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat May 6, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/program">program</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/java">java</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/certificate">certificate</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>2017年7月にJava 9のリリースが予定されている中で、「Oracle Certified Java Programmer, Silver SE 8 (1Z0-808)」を取得しました。
+資格取得までに勉強したことをメモしておきます。</p>
+<h2 id="java経験">Java経験</h2>
+<p>私のJava経験は以下ととおりです。</p>
+<ul>
+<li>2010年にSun認定JavaプログラマSE6(SJC-P)を取得</li>
+<li>Javaはたまに趣味で書く程度(仕事ではプログラミングはしていません)</li>
+</ul>
+<h2 id="勉強方法">勉強方法</h2>
+<p>試験まで以下の参考書を使用して勉強しました。</p>
+<ul>
+<li>オラクル認定資格教科書 Javaプログラマ Silver SE 8</li>
+</ul>
+<p>SJC-Pを取得していたこともあり、基本的な文法やオブジェクト指向については復習程度の学習で問題ありませんでした。</p>
+<p>参考書の1章から8章までを一通り読んでから模擬試験問題にチャレンジしました。
+Java SE 8で新しく勉強した部分で不安がありましたが、正解率90%ぐらいとれたため試験に申し込みました。</p>
+<h2 id="新しく勉強した内容">新しく勉強した内容</h2>
+<p>過去に取得したSJC-PからSilver SE 8を取得するにあたり新しく勉強した内容は以下のとおりです。</p>
+<h3 id="2進数表記">2進数表記</h3>
+<p>0bを先頭につけることで2進数を表現できるようになりました。</p>
+<pre><code>ex)
+0b1010    // 10進数で10
+0b1111    // 10進数で15
+</code></pre><h3 id="数値リテラルのアンダーバー">数値リテラルのアンダーバー</h3>
+<p>数値リテラルにアンダーバーを使用してカンマのように表現できるようになりました。</p>
+<pre><code>ex)
+1_234
+5_6
+</code></pre><h3 id="インタフェースのdefaultメソッドとstaticメソッド">インタフェースのdefaultメソッドとstaticメソッド</h3>
+<p>インタフェースにメソッドの実装を記載できるようになりました。
+結果、多重継承が実現可能となりました。</p>
+<p>インタフェースと抽象クラスで同じようなことができるようになったため、使い分けが難しそうです。</p>
+<pre><code>ex)
+interface MyInterface {
+    void method1();
+    default void method2() { System.out.println(&quot;method2&quot;); }
+    static void method3() { System.out.println(&quot;method3&quot;); }
+}
+</code></pre><h3 id="ラムダ式">ラムダ式</h3>
+<p>ラムダ式という構文が追加されました。ラムダ式を使用するとこれまで匿名クラスを使用していた場面での実装を、よりシンプルにできます。</p>
+<p>ラムダ式を使用するにあたり、Java SE 8のAPIに関数型インタフェースというものが追加されています。(参考：<a href="https://docs.oracle.com/javase/jp/8/docs/api/java/util/function/package-summary.html">java.util.function (Java Platform SE 8)</a>)</p>
+<pre><code>ex)
+import java.util.function.Predicate;
+public class LambdaSample {
+    public static void main(String[] args) {
+        // ラムダ式(省略あり)
+        Predicate&lt;String&gt; pre = str -&gt; str.isEmpty();
+
+        /*
+        // ラムダ式(省略なし)
+        Predicate&lt;String&gt; pre = (String str) -&gt; { return str.isEmpty(); };
+        */
+
+        /*
+        // 匿名クラスの実装
+        Predicate&lt;String&gt; pre = new Predicate&lt;String&gt;() {
+            public boolean test(String str) {
+                return str.isEmpty();
+            }
+        };
+        */
+
+        System.out.println(pre.test(&quot;&quot;));
+        System.out.println(pre.test(&quot;LambdaSample&quot;));
+    }
+}
+</code></pre><h3 id="date-and-time-api">Date and Time API</h3>
+<p>Dateクラスの代わりとなる新しいDate/Time APIが追加されました。
+例えば、LocalDateクラスやLocalTimeクラス、LocalDateTimeクラス等が追加されています。</p>
+<pre><code>ex)
+LocalDate date = LocalDate.now();
+LocalTime time = LocalTime.parse(&quot;18:23:11&quot;);
+LocalDateTime dateTime = LocalDateTime.of(2017, 5, 6, 18, 23, 11);
+</code></pre><h2 id="今後">今後</h2>
+<p>Oracle Certified Java Programmer, Gold SE 8 (1Z0-809)の取得に向けて勉強をしています。</p>
+<p>勉強を始めたばかりなのですが、Gold SE 8ではSilver SE 8以上に深い言語仕様の理解と標準APIの理解が必要なことがわかります。</p>
+<p>仕事でJavaを書くことはないのですが、趣味に生かしていければと考えています。</p>
+<p>以上です。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/">CentOS 7.3にLet&#39;s Encryptの証明書を導入する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed May 3, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/centos">centos</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/lets-encrypt">Let&#39;s Encrypt</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <h2 id="前提">前提</h2>
+<ul>
+<li>OS
+<ul>
+<li>CentOS Linux release 7.3.1611 (Core)</li>
+</ul>
+</li>
+<li>Web Server
+<ul>
+<li>Apache 2.4.6</li>
+</ul>
+</li>
+<li>firewalld
+<ul>
+<li>enabled</li>
+</ul>
+</li>
+<li>SELinux
+<ul>
+<li>disabled</li>
+</ul>
+</li>
+</ul>
+<h2 id="firewalldでhttpsを有効化">firewalldでhttpsを有効化</h2>
+<p>インターネットからhttpsアクセスを許可する。</p>
+<pre><code>$ sudo firewall-cmd --permanent --zone=public --add-service=https
+success
+$ sudo firewall-cmd --reload
+success
+$ sudo firewall-cmd --zone=public --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: eth0
+  sources: 
+  services: http https
+  ports: 
+  protocols: 
+  masquerade: no
+  forward-ports: 
+  sourceports: 
+  icmp-blocks: 
+  rich rules: 
+</code></pre><h2 id="epelリポジトリのインストール">EPELリポジトリのインストール</h2>
+<p>EPELリポジトリをインストールする。</p>
+<pre><code>$ sudo yum install epel-release
+[sudo] password for ryota:
+読み込んだプラグイン:fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: ftp.iij.ad.jp
+ * extras: ftp.iij.ad.jp
+ * updates: ftp.iij.ad.jp
+依存性の解決をしています
+--&gt; トランザクションの確認を実行しています。
+---&gt; パッケージ epel-release.noarch 0:7-9 を インストール
+--&gt; 依存性解決を終了しました。
+
+依存性を解決しました
+
+================================================================================
+ Package                アーキテクチャー バージョン      リポジトリー      容量
+================================================================================
+インストール中:
+ epel-release           noarch           7-9             extras            14 k
+
+トランザクションの要約
+================================================================================
+インストール  1 パッケージ
+
+総ダウンロード容量: 14 k
+インストール容量: 24 k
+Is this ok [y/d/N]: y
+Downloading packages:
+epel-release-7-9.noarch.rpm                                |  14 kB   00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  インストール中          : epel-release-7-9.noarch                         1/1
+  検証中                  : epel-release-7-9.noarch                         1/1
+
+インストール:
+  epel-release.noarch 0:7-9
+
+完了しました!
+</code></pre><p>通常時EPELリポジトリを無効化する。</p>
+<pre><code>$ sudo cp -p /etc/yum.repos.d/epel.repo{,.org}
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+$
+$ sudo sed -i -e &quot;s/^enabled=1/enabled=0/g&quot; /etc/yum.repos.d/epel.repo
+$
+$ diff /etc/yum.repos.d/epel.repo{.org,}
+6c6
+&lt; enabled=1
+---
+&gt; enabled=0
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957  5月  3 16:17 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+</code></pre><h2 id="certbotのインストール">Certbotのインストール</h2>
+<p>EPELリポジトリからCertbotをインストールする。</p>
+<pre><code>$ sudo yum --enablerepo=epel install certbot python-certbot-apache
+</code></pre><h2 id="lets-encryptで証明書を取得">Let&rsquo;s Encryptで証明書を取得</h2>
+<p>以下のコマンドを実行してLet&rsquo;s Encryptの証明書を取得する。</p>
+<pre><code>$ sudo certbot --apache
+[sudo] password for ryota: 
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Enter email address (used for urgent renewal and security notices) (Enter 'c' to
+cancel):&lt;メールアドレス&gt;
+Starting new HTTPS connection (1): acme-v01.api.letsencrypt.org
+
+-------------------------------------------------------------------------------
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf. You must agree
+in order to register with the ACME server at
+https://acme-v01.api.letsencrypt.org/directory
+-------------------------------------------------------------------------------
+(A)gree/(C)ancel: A
+
+-------------------------------------------------------------------------------
+Would you be willing to share your email address with the Electronic Frontier
+Foundation, a founding partner of the Let's Encrypt project and the non-profit
+organization that develops Certbot? We'd like to send you email about EFF and
+our work to encrypt the web, protect its users and defend digital rights.
+-------------------------------------------------------------------------------
+(Y)es/(N)o: N
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter 'c' to cancel):www.shinayoshi.net
+Obtaining a new certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press 'c' to cancel): 1
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0000_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0000_csr-certbot.pem
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press 'c' to cancel): 1
+Deploying Certificate to VirtualHost /etc/httpd/conf.d/ssl.conf
+
+Please choose whether HTTPS access is required or optional.
+-------------------------------------------------------------------------------
+1: Easy - Allow both HTTP and HTTPS access to these sites
+2: Secure - Make all requests redirect to secure HTTPS access
+-------------------------------------------------------------------------------
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
+Created redirect file: le-redirect-www.shinayoshi.net.conf
+Rollback checkpoint is empty (no changes made?)
+
+-------------------------------------------------------------------------------
+Congratulations! You have successfully enabled https://www.shinayoshi.net
+
+You should test your configuration at:
+https://www.ssllabs.com/ssltest/analyze.html?d=www.shinayoshi.net
+-------------------------------------------------------------------------------
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at
+   /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem. Your
+   cert will expire on 2017-08-01. To obtain a new or tweaked version
+   of this certificate in the future, simply run certbot again with
+   the &quot;certonly&quot; option. To non-interactively renew *all* of your
+   certificates, run &quot;certbot renew&quot;
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+$
+</code></pre><h2 id="lets-encryptの証明書確認">Let&rsquo;s Encryptの証明書確認</h2>
+<p>ブラウザから証明書を作成したWebサイトにアクセスし、Let&rsquo;s Encryptの証明書が使用されていることを確認する。</p>
+<h2 id="systemdで証明書の自動更新">systemdで証明書の自動更新</h2>
+<p>以下のコマンドを実行して自動更新が正常に完了することを確認する。</p>
+<pre><code>$ sudo certbot renew --dry-run
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+-------------------------------------------------------------------------------
+Processing /etc/letsencrypt/renewal/www.shinayoshi.net.conf
+-------------------------------------------------------------------------------
+Cert not due for renewal, but simulating renewal for dry run
+Starting new HTTPS connection (1): acme-staging.api.letsencrypt.org
+Renewing an existing certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0003_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0003_csr-certbot.pem
+
+-------------------------------------------------------------------------------
+new certificate deployed with reload of apache server; fullchain is
+/etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem
+-------------------------------------------------------------------------------
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates below have not been saved.)
+
+Congratulations, all renewals succeeded. The following certs have been renewed:
+  /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem (success)
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates above have not been saved.)
+</code></pre><p><code>certbot renew --dry-run</code>の実行結果に問題がないことを確認し、以下のコマンドを実行して自動更新を有効化する。</p>
+<pre><code>$ sudo systemctl enable certbot-renew.timer
+Created symlink from /etc/systemd/system/timer.target.wants/certbot-renew.timer to /usr/lib/systemd/system/certbot-renew.timer.
+$ sudo systemctl start certbot-renew.timer
+</code></pre><h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://letsencrypt.org/">Let&rsquo;s Encrypt</a></li>
+<li><a href="https://certbot.eff.org/#centosrhel7-apache">Certbot</a></li>
+<li><a href="https://letsencrypt.jp/">Let&rsquo;s Encrypt 総合ポータル</a></li>
+<li><a href="https://hyper-text.org/archives/2016/10/lets_encrypt_ssl_quick_start.shtml">Let&rsquo;s Encrypt （無料 SSL サーバ証明書） の設定が超簡単になったと聞いて試してみた件 | WWW WATCH</a></li>
+</ul>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/">Raspberry Pi 2のイメージバックアップを行う</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Jan 15, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>今回は<code>homenas1</code>のバックアップを行います。</p>
+<h2 id="gitのインストール">gitのインストール</h2>
+<pre><code>$ sudo -E apt-get install git
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  git-man liberror-perl
+提案パッケージ:
+  gettext-base git-daemon-run git-daemon-sysvinit git-doc git-el git-email
+  git-gui gitk gitweb git-arch git-cvs git-mediawiki git-svn
+以下のパッケージが新たにインストールされます:
+  git git-man liberror-perl
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+4,015 kB のアーカイブを取得する必要があります。
+この操作後に追加で 20.4 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liberror-perl all 0.17-1.1 [22.4 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main git-man all 1:2.1.4-2.1+deb8u2 [1,267 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main git armhf 1:2.1.4-2.1+deb8u2 [2,725 kB]
+4,015 kB を 6秒 で取得しました (630 kB/s)                                      
+以前に未選択のパッケージ liberror-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33218 個のファイルとディレクトリがインストールされています。)
+.../liberror-perl_0.17-1.1_all.deb を展開する準備をしています ...
+liberror-perl (0.17-1.1) を展開しています...
+以前に未選択のパッケージ git-man を選択しています。
+.../git-man_1%3a2.1.4-2.1+deb8u2_all.deb を展開する準備をしています ...
+git-man (1:2.1.4-2.1+deb8u2) を展開しています...
+以前に未選択のパッケージ git を選択しています。
+.../git_1%3a2.1.4-2.1+deb8u2_armhf.deb を展開する準備をしています ...
+git (1:2.1.4-2.1+deb8u2) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+liberror-perl (0.17-1.1) を設定しています ...
+git-man (1:2.1.4-2.1+deb8u2) を設定しています ...
+git (1:2.1.4-2.1+deb8u2) を設定しています ...
+$
+</code></pre><p>rpi-cloneのインストール</p>
+<pre><code>$ git clone https://github.com/billw2/rpi-clone.git
+Cloning into 'rpi-clone'...
+remote: Counting objects: 58, done.
+remote: Total 58 (delta 0), reused 0 (delta 0), pack-reused 58
+Unpacking objects: 100% (58/58), done.
+Checking connectivity... done.
+$
+$ ls -l rpi-clone/
+合計 20
+-rw-r--r-- 1 pi pi  4026  1月 15 00:57 README.md
+-rwxr-xr-x 1 pi pi 13933  1月 15 00:57 rpi-clone
+$
+$ sudo cp -p rpi-clone/rpi-clone /usr/local/sbin/
+</code></pre><p>rpi-cloneでのバックアップ</p>
+<p>今回、バックアップ先のmicroSDカードのデバイスは<code>sdd</code>でしたので、<code>rpi-clone</code>コマンドの引数には<code>sdd</code>を指定しています。32GBのmicroSDカードのバックアップには5分程度かかりました。</p>
+<pre><code>$ sudo rpi-clone sdd -f
+
+Forcing a partition initialization of destination disk sdd
+The existing destination disk 'sdd' partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+*** All data on destination disk sdd will be overwritten! ***
+
+Do you want to initialize the destination disk /dev/sdd? (yes/no): yes
+
+Imaging the partition structure, copying 78 megabytes...
+78+0 レコード入力
+78+0 レコード出力
+81788928 バイト (82 MB) コピーされました、 25.7102 秒、 3.2 MB/秒
+Running fsck on /dev/sdd1...
+Sizing partition 2 (root partition) to use all SD card space...
+mke2fs 1.42.12 (29-Aug-2014)
+/dev/sdd2 contains a ext4 file system
+	last mounted on / on Sun Jan  1 18:13:44 2017
+Creating filesystem with 7728128 4k blocks and 1933312 inodes
+Filesystem UUID: bffb6652-49b7-45ce-a9c6-46e745372a7c
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information:        
+done
+
+
+/dev/sdd is initialized and resized.  Its partitions are:
+Disk /dev/sdd: 31725MB
+Partition Table: msdos
+
+Number  Start   End      Size     Type     File system  Flags
+ 1      4.19MB  70.3MB   66.1MB   primary  fat16        lba
+ 2      70.3MB  31725MB  31654MB  primary  ext4
+
+
+Your booted /dev/mmcblk0p2 rootfs existing label: 
+You may enter a label for the destination rootfs /dev/sdd2: 
+======== Clone Summary ========
+Clone mode               :  rsync all files to sdd root file system
+Clone destination disk   :  sdd
+Clone destination rootfs :  /dev/sdd2 (no label) on /mnt/clone
+Clone destination bootfs :  /dev/sdd1 on /mnt/clone/boot
+Verbose mode             :  off
+===============================
+Final check, is it Ok to proceed with the clone (yes/no)?: yes
+=&gt; Mounting /dev/sdd2 (no label) on /mnt/clone
+=&gt; Mounting /dev/sdd1 on /mnt/clone/boot
+===============================
+Starting the filesystem rsync to sdd
+(This may take several minutes)...
+*** Done with clone to /dev/sdd ***
+    Started: 01:07:27    Finished: 01:10:05
+
+Hit Enter when ready to unmount the /dev/sdd partitions...
+unmounting /mnt/clone/boot
+unmounting /mnt/clone
+===============================
+$
+</code></pre><p>バックアップmicroSDカードからのリストア</p>
+<p>バックアップmicroSDカードをRaspberry Piにセットして起動するだけです。特にリストアという作業は必要ありません。</p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/">Raspberry Pi 2でファイルバックアップを行う</a></h1>
+                  <p>
+                    <span class="label label-primary">Thu Jan 12, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>今回は<code>homenas1</code>にrsnapshotを導入してファイルバックアップを行う設定を行います。</p>
+<p>なおバックアップ元は<code>/mnt/nas/</code>、バックアップ先は<code>/mnt/backup/</code>を想定しています。</p>
+<pre><code>$ df -h
+/dev/sdc1        917G   72M  871G    1% /mnt/backup
+/dev/md0         394G   71M  374G    1% /mnt/nas
+$
+</code></pre><h2 id="rsnapshotのインストール">rsnapshotのインストール</h2>
+<pre><code>$ sudo -E apt-get install rsnapshot
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  liblchown-perl rsync
+以下のパッケージが新たにインストールされます:
+  liblchown-perl rsnapshot rsync
+アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。
+507 kB のアーカイブを取得する必要があります。
+この操作後に追加で 1,133 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.1.1-3 [373 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsnapshot all 1.3.1-4+deb8u1 [125 kB]
+507 kB を 1秒 で取得しました (286 kB/s)
+以前に未選択のパッケージ liblchown-perl を選択しています。
+(データベースを読み込んでいます ... 現在 33129 個のファイルとディレクトリがインストールされています。)
+.../liblchown-perl_1.01-2+b1_armhf.deb を展開する準備をしています ...
+liblchown-perl (1.01-2+b1) を展開しています...
+以前に未選択のパッケージ rsync を選択しています。
+.../rsync_3.1.1-3_armhf.deb を展開する準備をしています ...
+rsync (3.1.1-3) を展開しています...
+以前に未選択のパッケージ rsnapshot を選択しています。
+.../rsnapshot_1.3.1-4+deb8u1_all.deb を展開する準備をしています ...
+rsnapshot (1.3.1-4+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+liblchown-perl (1.01-2+b1) を設定しています ...
+rsync (3.1.1-3) を設定しています ...
+rsnapshot (1.3.1-4+deb8u1) を設定しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre><h2 id="rsnapshotの設定">rsnapshotの設定</h2>
+<p>rsnapshot.confの設定変更</p>
+<pre><code>$ sudo cp -p /etc/rsnapshot.conf{,.org}
+$ ls -l /etc/rsnapshot.conf*
+-rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf
+-rw-r--r-- 1 root root 8414  3月 10  2016 /etc/rsnapshot.conf.org
+$
+$ sudo vi /etc/rsnapshot
+#snapshot_root  /var/cache/rsnapshot/
+snapshot_root   /mnt/backup/
+
+#retain         hourly  6
+retain          daily   7
+retain          weekly  4
+retain  monthly 3
+
+#backup /home/          localhost/
+#backup /etc/           localhost/
+#backup /usr/local/     localhost/
+backup	/mnt/nas/	localhost/
+$
+$ diff /etc/rsnapshot.conf.org /etc/rsnapshot.conf
+27c27,28
+&lt; snapshot_root	/var/cache/rsnapshot/
+---
+&gt; #snapshot_root	/var/cache/rsnapshot/
+&gt; snapshot_root	/mnt/backup/
+97c98
+&lt; retain		hourly	6
+---
+&gt; #retain		hourly	6
+100c101
+&lt; #retain	monthly	3
+---
+&gt; retain	monthly	3
+230,232c231,233
+&lt; backup	/home/		localhost/
+&lt; backup	/etc/		localhost/
+&lt; backup	/usr/local/	localhost/
+---
+&gt; #backup	/home/		localhost/
+&gt; #backup	/etc/		localhost/
+&gt; #backup	/usr/local/	localhost/
+239a241
+&gt; backup	/mnt/nas/	localhost/
+$
+</code></pre><p>rsnapshot.confのコンフィグテスト</p>
+<pre><code>$ sudo rsnapshot configtest
+Syntax OK
+$
+</code></pre><p>crontabの設定変更</p>
+<pre><code>$ sudo crontab -l &gt; crontab.backup20170112
+no crontab for root
+$
+$ sudo crontab -e
+50 2 * * * /usr/bin/rsnapshot daily
+40 2 * * 1 /usr/bin/rsnapshot weekly
+30 2 1 * * /usr/bin/rsnapshot monthly
+$
+$ sudo crontab -l &gt; crontab.backup20170112-01
+$ diff crontab.backup20170112 crontab.backup20170112-01
+&gt; 50 2 * * * /usr/bin/rsnapshot daily
+&gt; 40 2 * * 1 /usr/bin/rsnapshot weekly
+&gt; 30 2 1 * * /usr/bin/rsnapshot monthly
+$
+</code></pre><h2 id="restoreについて">Restoreについて</h2>
+<pre><code>$ rsync -a /mnt/backup/localhost/monthly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/weekly.0/localhost/. /mnt/nas/
+$ rsync -a /mnt/backup/localhost/daily.0/localhost/. /mnt/nas/
+</code></pre><h2 id="参考">参考</h2>
+<ul>
+<li><a href="http://rsnapshot.org/">rsnapshot | rsnapshot</a></li>
+<li><a href="https://workaround.org/rsnapshot-and-usb-drives/">Backups with rsnaphot to external USB drives</a></li>
+<li><a href="https://wiki.gentoo.org/wiki/A_simple_backup_scheme_using_rsnapshot">A simple backup scheme using rsnapshot - Gentoo Wiki</a></li>
+</ul>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/">Raspberry Pi 2でCactiを導入する(サーバの登録)</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon1">homemon1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon2">homemon2</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homepxy1">homepxy1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homepot1">homepot1</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>前回はCactiを導入しました。
+今回はCactiに<code>homenas1</code>、<code>homemon1</code>、<code>homemon2</code>、<code>homepxy1</code>、<code>homepot1</code>を登録していきます。SNMPv3を使用してSNMPの値を取得します。</p>
+<h2 id="snmpdのインストール">snmpdのインストール</h2>
+<p>追加するデバイス(Server)にsnmpdをインストールする。</p>
+<pre><code>$ sudo -E apt-get install snmpd snmp
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30
+提案パッケージ:
+  lm-sensors snmp-mibs-downloader snmptrapd
+以下のパッケージが新たにインストールされます:
+  libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd
+アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。
+3,836 kB のアーカイブを取得する必要があります。
+この操作後に追加で 7,088 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp-base all 5.7.2.1+dfsg-1 [1,544 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsnmp30 armhf 5.7.2.1+dfsg-1 [2,040 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmpd armhf 5.7.2.1+dfsg-1 [56.8 kB]
+3,836 kB を 2秒 で取得しました (1,283 kB/s)
+パッケージを事前設定しています ...
+以前に未選択のパッケージ libsensors4:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 32914 個のファイルとディレクトリがインストールされています。)
+.../libsensors4_1%3a3.3.5-2_armhf.deb を展開する準備をしています ...
+libsensors4:armhf (1:3.3.5-2) を展開しています...
+以前に未選択のパッケージ libperl5.20 を選択しています。
+.../libperl5.20_5.20.2-3+deb8u6_armhf.deb を展開する準備をしています ...
+libperl5.20 (5.20.2-3+deb8u6) を展開しています...
+以前に未選択のパッケージ libsnmp-base を選択しています。
+.../libsnmp-base_5.7.2.1+dfsg-1_all.deb を展開する準備をしています ...
+libsnmp-base (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ libsnmp30:armhf を選択しています。
+.../libsnmp30_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ snmpd を選択しています。
+.../snmpd_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmpd (5.7.2.1+dfsg-1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libsensors4:armhf (1:3.3.5-2) を設定しています ...
+libperl5.20 (5.20.2-3+deb8u6) を設定しています ...
+libsnmp-base (5.7.2.1+dfsg-1) を設定しています ...
+libsnmp30:armhf (5.7.2.1+dfsg-1) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+snmpd (5.7.2.1+dfsg-1) を設定しています ...
+adduser: 警告: ホームディレクトリ `/var/lib/snmp' は、現在作成中のユーザの所属になっていません。
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre><p>snmpconfツールを使用してsnmpd.confを作成します。
+SNMPv3を使用する前提で質問に回答していきます。</p>
+<pre><code>$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent's access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent's ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I'll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I'll copy them there automatically for you.
+$
+</code></pre><p>snmpd.confを設置します。</p>
+<pre><code>$ sudo mv /etc/snmp/snmpd.conf{,.org}
+$ sudo mv snmpd.conf /etc/snmp/
+$
+$ sudo chown root:root /etc/snmp/snmpd.conf
+$ sudo chmod 600 /etc/snmp/snmpd.conf
+$
+$ ls -l /etc/snmp/*
+-rw-r--r-- 1 root root  211  4月 15  2015 /etc/snmp/snmp.conf
+-rw------- 1 root root  472  1月  9 17:39 /etc/snmp/snmpd.conf
+-rw------- 1 root root 7116  4月 18  2015 /etc/snmp/snmpd.conf.org
+$
+</code></pre><p>SNMPv3ユーザを作成します。</p>
+<pre><code>$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$
+$ ls -l /var/lib/snmp/snmpd.conf*
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf
+-rw------- 1 snmp snmp 1089  1月  9 17:43 /var/lib/snmp/snmpd.conf.org
+$
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+$
+</code></pre><p>SNMPv3で値を取得できることを確認します。</p>
+<pre><code>$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+</code></pre><ul>
+<li><a href="http://www.infraexpert.com/study/tcpip21.html">TCP/IP - SNMPとは</a></li>
+</ul>
+<h2 id="iptablesの通信許可">iptablesの通信許可</h2>
+<p>CactiからのSNMP通信を許可します。</p>
+<pre><code>##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+</code></pre><p>iptablesの設定を保存します。</p>
+<pre><code>$ sudo netfilter-persistent save
+</code></pre><h2 id="cactiにデバイスserverを登録">Cactiにデバイス(Server)を登録</h2>
+<p>↓Cactiにログイン。<code>User Name</code>と<code>Password</code>を入力して<code>Login</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Cactiログイン後の画面。<code>Devices</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの管理画面。<code>Add</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの登録画面。必要事項を入力して<code>Create</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの登録完了画面。<code>SNMP Information</code>にデバイスの情報が表示されていることを確認します。<code>Create Graphs for this Host</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓作成したいグラフを選択して<code>Create</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓グラフが作成されたことを確認します。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓左のメニューから<code>Graph Trees</code>をクリックし、<code>Default Tree</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーの管理画面。<code>Add</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーへのデバイス登録画面。必要事項を入力して<code>Create</code>をクリックします。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーの管理画面。デバイスが登録されたことを確認します。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓グラフ画面。追加したデバイスのグラフが表示されることを確認します。</p>
+<p><!-- raw HTML omitted --></p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/">Raspberry Pi 2でCactiを導入する</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon1">homemon1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon2">homemon2</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>今回は<code>homemon1</code>、<code>homemon2</code>にCactiを導入します。</p>
+<h2 id="cactiのインストール">Cactiのインストール</h2>
+<p>Cactiをインストールします。
+途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答します。</p>
+<pre><code>$ sudo -E apt-get install cacti cacti-spine
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  dbconfig-common fontconfig javascript-common libcairo2 libdatrie1 libdbi1
+  libgraphite2-3 libharfbuzz0b libjs-jquery libjs-jquery-cookie libpango-1.0-0
+  libpangocairo-1.0-0 libpangoft2-1.0-0 libphp-adodb libpixman-1-0 librrd4
+  libthai-data libthai0 libxcb-render0 libxcb-shm0 libxrender1 php5-snmp
+  rrdtool snmp
+提案パッケージ:
+  moreutils snmp-mibs-downloader php5-adodb librrds-perl
+以下のパッケージが新たにインストールされます:
+  cacti cacti-spine dbconfig-common fontconfig javascript-common libcairo2
+  libdatrie1 libdbi1 libgraphite2-3 libharfbuzz0b libjs-jquery
+  libjs-jquery-cookie libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0
+  libphp-adodb libpixman-1-0 librrd4 libthai-data libthai0 libxcb-render0
+  libxcb-shm0 libxrender1 php5-snmp rrdtool snmp
+アップグレード: 0 個、新規インストール: 26 個、削除: 0 個、保留: 1 個。
+6,777 kB のアーカイブを取得する必要があります。
+この操作後に追加で 16.6 MB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main fontconfig armhf 2.11.0-6.3+deb8u1 [402 kB]
+取得:2 http://archive.raspberrypi.org/debian/ jessie/main libpixman-1-0 armhf 0.33.3+git20151011-7de61d8-rpi1 [156 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxcb-render0 armhf 1.10-3 [16.0 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxcb-shm0 armhf 1.10-3 [11.0 kB]
+取得:5 http://mirrordirector.raspbian.org/raspbian/ jessie/main libxrender1 armhf 1:0.9.8-1 [30.4 kB]
+取得:6 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdatrie1 armhf 0.2.8-1 [29.1 kB]
+取得:7 http://mirrordirector.raspbian.org/raspbian/ jessie/main libgraphite2-3 armhf 1.3.6-1~deb8u1 [62.5 kB]
+取得:8 http://archive.raspberrypi.org/debian/ jessie/main libcairo2 armhf 1.14.0-2.1+deb8u1+rpi1 [662 kB]
+取得:9 http://mirrordirector.raspbian.org/raspbian/ jessie/main libharfbuzz0b armhf 0.9.35-2 [464 kB]
+取得:10 http://mirrordirector.raspbian.org/raspbian/ jessie/main libthai-data all 0.1.21-1 [159 kB]
+取得:11 http://mirrordirector.raspbian.org/raspbian/ jessie/main libthai0 armhf 0.1.21-1 [43.4 kB]
+取得:12 http://mirrordirector.raspbian.org/raspbian/ jessie/main dbconfig-common all 1.8.47+nmu3+deb8u1 [628 kB]
+取得:13 http://mirrordirector.raspbian.org/raspbian/ jessie/main javascript-common all 11 [6,120 B]
+取得:14 http://mirrordirector.raspbian.org/raspbian/ jessie/main libdbi1 armhf 0.9.0-4 [27.4 kB]
+取得:15 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjs-jquery all 1.7.2+dfsg-3.2 [97.5 kB]
+取得:16 http://mirrordirector.raspbian.org/raspbian/ jessie/main libjs-jquery-cookie all 10-1 [7,978 B]
+取得:17 http://mirrordirector.raspbian.org/raspbian/ jessie/main libphp-adodb all 5.15-1 [567 kB]
+取得:18 http://mirrordirector.raspbian.org/raspbian/ jessie/main librrd4 armhf 1.4.8-1.2 [195 kB]
+取得:19 http://mirrordirector.raspbian.org/raspbian/ jessie/main php5-snmp armhf 5.6.29+dfsg-0+deb8u1 [16.1 kB]
+取得:20 http://mirrordirector.raspbian.org/raspbian/ jessie/main rrdtool armhf 1.4.8-1.2 [424 kB]
+取得:21 http://archive.raspberrypi.org/debian/ jessie/ui libpango-1.0-0 armhf 1.36.8-3+rpi1 [274 kB]
+取得:22 http://mirrordirector.raspbian.org/raspbian/ jessie/main snmp armhf 5.7.2.1+dfsg-1 [145 kB]
+取得:23 http://mirrordirector.raspbian.org/raspbian/ jessie/main cacti all 0.8.8b+dfsg-8+deb8u6 [1,895 kB]
+取得:24 http://archive.raspberrypi.org/debian/ jessie/ui libpangoft2-1.0-0 armhf 1.36.8-3+rpi1 [208 kB]
+取得:25 http://mirrordirector.raspbian.org/raspbian/ jessie/main cacti-spine armhf 0.8.8b-1+b3 [53.9 kB]
+取得:26 http://archive.raspberrypi.org/debian/ jessie/ui libpangocairo-1.0-0 armhf 1.36.8-3+rpi1 [197 kB]
+6,777 kB を 21秒 で取得しました (311 kB/s)                                     
+パッケージを事前設定しています ...
+
+↓&lt;了解&gt;を選択してEnter
+ ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
+ │                                                                           │ 
+ │ 警告: php に対するインクルードパスが変更されています!                     │ 
+ │                                                                           │ 
+ │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
+ │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
+ │                                                                           │ 
+ │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
+ │ かもしれません。                                                          │ 
+ │                                                                           │ 
+ │                                  &lt;了解&gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓apache2を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
+ │                                                                           │ 
+ │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
+ │                                                                           │ 
+ │ ウェブサーバ:                                                             │ 
+ │                                                                           │ 
+ │                               apache2                                     │ 
+ │                               lighttpd                                    │ 
+ │                               どれでもない                                │ 
+ │                                                                           │ 
+ │                                                                           │ 
+ │                                  &lt;了解&gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+以前に未選択のパッケージ fontconfig を選択しています。
+(データベースを読み込んでいます ... 現在 37219 個のファイルとディレクトリがインストールされています。)
+.../fontconfig_2.11.0-6.3+deb8u1_armhf.deb を展開する準備をしています ...
+fontconfig (2.11.0-6.3+deb8u1) を展開しています...
+以前に未選択のパッケージ libpixman-1-0:armhf を選択しています。
+.../libpixman-1-0_0.33.3+git20151011-7de61d8-rpi1_armhf.deb を展開する準備をしています ...
+libpixman-1-0:armhf (0.33.3+git20151011-7de61d8-rpi1) を展開しています...
+以前に未選択のパッケージ libxcb-render0:armhf を選択しています。
+.../libxcb-render0_1.10-3_armhf.deb を展開する準備をしています ...
+libxcb-render0:armhf (1.10-3) を展開しています...
+以前に未選択のパッケージ libxcb-shm0:armhf を選択しています。
+.../libxcb-shm0_1.10-3_armhf.deb を展開する準備をしています ...
+libxcb-shm0:armhf (1.10-3) を展開しています...
+以前に未選択のパッケージ libxrender1:armhf を選択しています。
+.../libxrender1_1%3a0.9.8-1_armhf.deb を展開する準備をしています ...
+libxrender1:armhf (1:0.9.8-1) を展開しています...
+以前に未選択のパッケージ libcairo2:armhf を選択しています。
+.../libcairo2_1.14.0-2.1+deb8u1+rpi1_armhf.deb を展開する準備をしています ...
+libcairo2:armhf (1.14.0-2.1+deb8u1+rpi1) を展開しています...
+以前に未選択のパッケージ libdatrie1:armhf を選択しています。
+.../libdatrie1_0.2.8-1_armhf.deb を展開する準備をしています ...
+libdatrie1:armhf (0.2.8-1) を展開しています...
+以前に未選択のパッケージ libgraphite2-3:armhf を選択しています。
+.../libgraphite2-3_1.3.6-1~deb8u1_armhf.deb を展開する準備をしています ...
+libgraphite2-3:armhf (1.3.6-1~deb8u1) を展開しています...
+以前に未選択のパッケージ libharfbuzz0b:armhf を選択しています。
+.../libharfbuzz0b_0.9.35-2_armhf.deb を展開する準備をしています ...
+libharfbuzz0b:armhf (0.9.35-2) を展開しています...
+以前に未選択のパッケージ libthai-data を選択しています。
+.../libthai-data_0.1.21-1_all.deb を展開する準備をしています ...
+libthai-data (0.1.21-1) を展開しています...
+以前に未選択のパッケージ libthai0:armhf を選択しています。
+.../libthai0_0.1.21-1_armhf.deb を展開する準備をしています ...
+libthai0:armhf (0.1.21-1) を展開しています...
+以前に未選択のパッケージ libpango-1.0-0:armhf を選択しています。
+.../libpango-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpango-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ libpangoft2-1.0-0:armhf を選択しています。
+.../libpangoft2-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpangoft2-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ libpangocairo-1.0-0:armhf を選択しています。
+.../libpangocairo-1.0-0_1.36.8-3+rpi1_armhf.deb を展開する準備をしています ...
+libpangocairo-1.0-0:armhf (1.36.8-3+rpi1) を展開しています...
+以前に未選択のパッケージ dbconfig-common を選択しています。
+.../dbconfig-common_1.8.47+nmu3+deb8u1_all.deb を展開する準備をしています ...
+dbconfig-common (1.8.47+nmu3+deb8u1) を展開しています...
+以前に未選択のパッケージ javascript-common を選択しています。
+.../javascript-common_11_all.deb を展開する準備をしています ...
+javascript-common (11) を展開しています...
+以前に未選択のパッケージ libdbi1:armhf を選択しています。
+.../libdbi1_0.9.0-4_armhf.deb を展開する準備をしています ...
+libdbi1:armhf (0.9.0-4) を展開しています...
+以前に未選択のパッケージ libjs-jquery を選択しています。
+.../libjs-jquery_1.7.2+dfsg-3.2_all.deb を展開する準備をしています ...
+libjs-jquery (1.7.2+dfsg-3.2) を展開しています...
+以前に未選択のパッケージ libjs-jquery-cookie を選択しています。
+.../libjs-jquery-cookie_10-1_all.deb を展開する準備をしています ...
+libjs-jquery-cookie (10-1) を展開しています...
+以前に未選択のパッケージ libphp-adodb を選択しています。
+.../libphp-adodb_5.15-1_all.deb を展開する準備をしています ...
+libphp-adodb (5.15-1) を展開しています...
+以前に未選択のパッケージ librrd4 を選択しています。
+.../librrd4_1.4.8-1.2_armhf.deb を展開する準備をしています ...
+librrd4 (1.4.8-1.2) を展開しています...
+以前に未選択のパッケージ php5-snmp を選択しています。
+.../php5-snmp_5.6.29+dfsg-0+deb8u1_armhf.deb を展開する準備をしています ...
+php5-snmp (5.6.29+dfsg-0+deb8u1) を展開しています...
+以前に未選択のパッケージ rrdtool を選択しています。
+.../rrdtool_1.4.8-1.2_armhf.deb を展開する準備をしています ...
+rrdtool (1.4.8-1.2) を展開しています...
+以前に未選択のパッケージ snmp を選択しています。
+.../snmp_5.7.2.1+dfsg-1_armhf.deb を展開する準備をしています ...
+snmp (5.7.2.1+dfsg-1) を展開しています...
+以前に未選択のパッケージ cacti を選択しています。
+.../cacti_0.8.8b+dfsg-8+deb8u6_all.deb を展開する準備をしています ...
+cacti (0.8.8b+dfsg-8+deb8u6) を展開しています...
+以前に未選択のパッケージ cacti-spine を選択しています。
+.../cacti-spine_0.8.8b-1+b3_armhf.deb を展開する準備をしています ...
+cacti-spine (0.8.8b-1+b3) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+fontconfig (2.11.0-6.3+deb8u1) を設定しています ...
+Regenerating fonts cache... done.
+libpixman-1-0:armhf (0.33.3+git20151011-7de61d8-rpi1) を設定しています ...
+libxcb-render0:armhf (1.10-3) を設定しています ...
+libxcb-shm0:armhf (1.10-3) を設定しています ...
+libxrender1:armhf (1:0.9.8-1) を設定しています ...
+libcairo2:armhf (1.14.0-2.1+deb8u1+rpi1) を設定しています ...
+libdatrie1:armhf (0.2.8-1) を設定しています ...
+libgraphite2-3:armhf (1.3.6-1~deb8u1) を設定しています ...
+libharfbuzz0b:armhf (0.9.35-2) を設定しています ...
+libthai-data (0.1.21-1) を設定しています ...
+libthai0:armhf (0.1.21-1) を設定しています ...
+libpango-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+libpangoft2-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+libpangocairo-1.0-0:armhf (1.36.8-3+rpi1) を設定しています ...
+dbconfig-common (1.8.47+nmu3+deb8u1) を設定しています ...
+
+Creating config file /etc/dbconfig-common/config with new version
+javascript-common (11) を設定しています ...
+apache2_invoke: Enable configuration javascript-common
+libdbi1:armhf (0.9.0-4) を設定しています ...
+libjs-jquery (1.7.2+dfsg-3.2) を設定しています ...
+libjs-jquery-cookie (10-1) を設定しています ...
+libphp-adodb (5.15-1) を設定しています ...
+librrd4 (1.4.8-1.2) を設定しています ...
+php5-snmp (5.6.29+dfsg-0+deb8u1) を設定しています ...
+
+Creating config file /etc/php5/mods-available/snmp.ini with new version
+php5_invoke: Enable module snmp for cli SAPI
+php5_invoke: Enable module snmp for apache2 SAPI
+rrdtool (1.4.8-1.2) を設定しています ...
+snmp (5.7.2.1+dfsg-1) を設定しています ...
+cacti (0.8.8b+dfsg-8+deb8u6) を設定しています ...
+
+↓&lt;はい&gt;を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
+ │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
+ │                                                                           │ 
+ │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
+ │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
+ │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
+ │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
+ │                                                                           │ 
+ │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
+ │                                                                           │ 
+ │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
+ │                                                                           │ 
+ │                    &lt;はい&gt;                      &lt;いいえ&gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのrootユーザのパスワードを入力し、&lt;了解&gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
+  │ ウントのパスワードを入力してください。                                   │ 
+  │                                                                          │ 
+  │ データベースの管理権限を持つユーザのパスワード:                          │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &lt;了解&gt;                     &lt;取消&gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのcactiユーザのパスワードを入力し、&lt;了解&gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
+  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
+  │                                                                          │ 
+  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &lt;了解&gt;                     &lt;取消&gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓再度MySQLのcactiユーザのパスワード入力し、&lt;了解&gt;を選択してEnter
+  ┌────┤ cacti を設定しています ├─────┐
+  │                                   │ 
+  │                                   │ 
+  │ パスワードの確認:                 │ 
+  │                                   │ 
+  │ _________________________________ │ 
+  │                                   │ 
+  │      &lt;了解&gt;        &lt;取消&gt;         │ 
+  │                                   │ 
+  └───────────────────────────────────┘ 
+
+dbconfig-common: writing config to /etc/dbconfig-common/cacti.conf
+
+Creating config file /etc/dbconfig-common/cacti.conf with new version
+
+Creating config file /etc/cacti/debian.php with new version
+granting access to database cacti for cacti@localhost: success.
+verifying access for cacti@localhost: success.
+creating database cacti: success.
+verifying database cacti exists: success.
+populating database via sql...  done.
+dbconfig-common: flushing administrative password
+
+Creating config file /etc/apache2/conf-available/cacti.conf with new version
+
+Creating config file /etc/lighttpd/conf-available/20-cacti.conf with new version
+apache2_invoke: Enable configuration cacti
+cacti-spine (0.8.8b-1+b3) を設定しています ...
+
+Creating config file /etc/cacti/spine.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+libapache2-mod-php5 (5.6.29+dfsg-0+deb8u1) のトリガを処理しています ...
+$
+</code></pre><p>データベースをMyISAMからInnoDBに変更します。</p>
+<pre><code>$ cd /usr/share/cacti/cli
+$ sudo php convert_innodb.php
+Converting All Non-Memory Cacti Database Tables to Innodb with Less than '300000' Records
+Converting Table -&gt; 'cdef' Successful
+Converting Table -&gt; 'cdef_items' Successful
+Converting Table -&gt; 'colors' Successful
+Converting Table -&gt; 'data_input' Successful
+Converting Table -&gt; 'data_input_data' Successful
+Converting Table -&gt; 'data_input_fields' Successful
+Converting Table -&gt; 'data_local' Successful
+Converting Table -&gt; 'data_template' Successful
+Converting Table -&gt; 'data_template_data' Successful
+Converting Table -&gt; 'data_template_data_rra' Successful
+Converting Table -&gt; 'data_template_rrd' Successful
+Converting Table -&gt; 'graph_local' Successful
+Converting Table -&gt; 'graph_template_input' Successful
+Converting Table -&gt; 'graph_template_input_defs' Successful
+Converting Table -&gt; 'graph_templates' Successful
+Converting Table -&gt; 'graph_templates_gprint' Successful
+Converting Table -&gt; 'graph_templates_graph' Successful
+Converting Table -&gt; 'graph_templates_item' Successful
+Converting Table -&gt; 'graph_tree' Successful
+Converting Table -&gt; 'graph_tree_items' Successful
+Converting Table -&gt; 'host' Successful
+Converting Table -&gt; 'host_graph' Successful
+Converting Table -&gt; 'host_snmp_cache' Successful
+Converting Table -&gt; 'host_snmp_query' Successful
+Converting Table -&gt; 'host_template' Successful
+Converting Table -&gt; 'host_template_graph' Successful
+Converting Table -&gt; 'host_template_snmp_query' Successful
+Converting Table -&gt; 'plugin_config' Successful
+Converting Table -&gt; 'plugin_db_changes' Successful
+Converting Table -&gt; 'plugin_hooks' Successful
+Converting Table -&gt; 'plugin_realms' Successful
+Converting Table -&gt; 'poller' Successful
+Converting Table -&gt; 'poller_command' Successful
+Converting Table -&gt; 'poller_item' Successful
+Converting Table -&gt; 'poller_output' Successful
+Converting Table -&gt; 'poller_reindex' Successful
+Converting Table -&gt; 'poller_time' Successful
+Converting Table -&gt; 'rra' Successful
+Converting Table -&gt; 'rra_cf' Successful
+Converting Table -&gt; 'settings' Successful
+Converting Table -&gt; 'settings_graphs' Successful
+Converting Table -&gt; 'settings_tree' Successful
+Converting Table -&gt; 'snmp_query' Successful
+Converting Table -&gt; 'snmp_query_graph' Successful
+Converting Table -&gt; 'snmp_query_graph_rrd' Successful
+Converting Table -&gt; 'snmp_query_graph_rrd_sv' Successful
+Converting Table -&gt; 'snmp_query_graph_sv' Successful
+Converting Table -&gt; 'user_auth' Successful
+Converting Table -&gt; 'user_auth_perms' Successful
+Converting Table -&gt; 'user_auth_realm' Successful
+Converting Table -&gt; 'user_log' Successful
+Converting Table -&gt; 'version' Successful
+$
+</code></pre><h3 id="cactiへのアクセス">Cactiへのアクセス</h3>
+<p>ブラウザからCactiのURL(<code>http://IPアドレス/cacti</code>)にアクセスします。</p>
+<p>Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
+<p>↓Nextをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Nextをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Errorがないことを確認してFinishをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓admin/adminでログイン</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓adminの新しいパスワードを入力してSaveをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ログイン後の初期画面</p>
+<p><!-- raw HTML omitted --></p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/">Raspberry Pi 2でZabbixサーバを構築する(Agent導入)</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Jan 9, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homenas1">homenas1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon1">homemon1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homemon2">homemon2</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homepxy1">homepxy1</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/homepot1">homepot1</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<p>前回はZabbix Serverを導入しました。
+今回は<code>homenas1</code>、<code>homemon1</code>、<code>homemon2</code>、<code>homepxy1</code>、<code>homepot1</code>にZabbix Agentを導入していきます。</p>
+<h2 id="zabbix-agentのインストール">Zabbix Agentのインストール</h2>
+<p>Zabbix Agentをインストールします。</p>
+<pre><code>$ sudo -E apt-get install zabbix-agent
+パッケージリストを読み込んでいます... 完了
+依存関係ツリーを作成しています                
+状態情報を読み取っています... 完了
+以下の追加パッケージがインストールされます:
+  libcurl3-gnutls libpci3 pciutils
+以下のパッケージが新たにインストールされます:
+  libcurl3-gnutls libpci3 pciutils zabbix-agent
+アップグレード: 0 個、新規インストール: 4 個、削除: 0 個、保留: 1 個。
+819 kB のアーカイブを取得する必要があります。
+この操作後に追加で 2,344 kB のディスク容量が消費されます。
+続行しますか? [Y/n] y
+取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libpci3 armhf 1:3.2.1-3 [48.2 kB]
+取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libcurl3-gnutls armhf 7.38.0-4+deb8u5 [225 kB]
+取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main pciutils armhf 1:3.2.1-3 [251 kB]
+取得:4 http://mirrordirector.raspbian.org/raspbian/ jessie/main zabbix-agent armhf 1:2.2.7+dfsg-2+deb8u1 [296 kB]
+819 kB を 2秒 で取得しました (346 kB/s)
+以前に未選択のパッケージ libpci3:armhf を選択しています。
+(データベースを読み込んでいます ... 現在 33530 個のファイルとディレクトリがインストールされています。)
+.../libpci3_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+libpci3:armhf (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ libcurl3-gnutls:armhf を選択しています。
+.../libcurl3-gnutls_7.38.0-4+deb8u5_armhf.deb を展開する準備をしています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を展開しています...
+以前に未選択のパッケージ pciutils を選択しています。
+.../pciutils_1%3a3.2.1-3_armhf.deb を展開する準備をしています ...
+pciutils (1:3.2.1-3) を展開しています...
+以前に未選択のパッケージ zabbix-agent を選択しています。
+.../zabbix-agent_1%3a2.2.7+dfsg-2+deb8u1_armhf.deb を展開する準備をしています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を展開しています...
+man-db (2.7.0.2-5) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+libpci3:armhf (1:3.2.1-3) を設定しています ...
+libcurl3-gnutls:armhf (7.38.0-4+deb8u5) を設定しています ...
+pciutils (1:3.2.1-3) を設定しています ...
+zabbix-agent (1:2.2.7+dfsg-2+deb8u1) を設定しています ...
+
+Creating config file /etc/zabbix/zabbix_agentd.conf with new version
+libc-bin (2.19-18+deb8u6) のトリガを処理しています ...
+systemd (215-17+deb8u5) のトリガを処理しています ...
+$
+</code></pre><h3 id="zabbix-agentの設定">Zabbix Agentの設定</h3>
+<p>Zabbix Agentを設定します。
+以下では<code>homepxy1</code>を設定した際の例を記載します。</p>
+<pre><code>$ sudo cp -p /etc/zabbix/zabbix_agentd.conf{,.org}
+$ ls -l /etc/zabbix/zabbix_agentd.conf*
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf
+-rw-r--r-- 1 root root 7570  9月 18 03:38 /etc/zabbix/zabbix_agentd.conf.org
+$
+$ sudo vi /etc/zabbix/zabbix_agentd.conf
+#Server=127.0.0.1
+Server=192.168.30.10,192.168.30.20
+
+#ServerActive=127.0.0.1
+ServerActive=192.168.30.10,192.168.30.20
+
+#Hostname=Zabbix server
+Hostname=homepxy1
+$
+</code></pre><p>Zabbix Agentを再起動します。</p>
+<pre><code>$ sudo systemctl restart zabbix-agent
+$ sudo systemctl enable zabbix-agent
+Synchronizing state for zabbix-agent.service with sysvinit using update-rc.d...
+Executing /usr/sbin/update-rc.d zabbix-agent defaults
+Executing /usr/sbin/update-rc.d zabbix-agent enable
+$
+</code></pre><h3 id="iptablesの通信許可iptablesを設定しているホストのみ">iptablesの通信許可(iptablesを設定しているホストのみ)</h3>
+<p>Zabbix Serverとの通信を許可する。</p>
+<pre><code>#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+</code></pre><p>iptablesの設定を保存します。</p>
+<pre><code>$ sudo netfilter-persistent save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/15-ip4tables save
+run-parts: executing /usr/share/netfilter-persistent/plugins.d/25-ip6tables save
+$
+</code></pre><h3 id="zabbix-serverでの監視登録">Zabbix Serverでの監視登録</h3>
+<ul>
+<li>Zabbixへのログイン</li>
+</ul>
+<p>ブラウザからZabbix ServerのURL(<code>http://IPアドレス/zabbix</code>)にアクセスしてログインします。</p>
+<p><!-- raw HTML omitted --></p>
+<ul>
+<li>監視対象ホストの追加</li>
+</ul>
+<p><code>Configuration</code> -&gt; <code>Hosts</code>を選択します。</p>
+<p><!-- raw HTML omitted --></p>
+<p><code>Create host</code>を選択し、<code>Host</code>タブの以下の項目を入力します。</p>
+<pre><code>Host name: homepxy1
+Groups: Linux servers
+Agent interfaces: 192.168.20.10
+</code></pre><p><!-- raw HTML omitted --></p>
+<p><code>Templates</code>タブの以下の項目を入力します。</p>
+<pre><code>Linked templates: Template OS Linux
+</code></pre><p><!-- raw HTML omitted --></p>
+<p><code>Save</code>をクリックします。</p>
+<ul>
+<li>監視対象ホストの追加確認</li>
+</ul>
+<p><code>Hosts</code>のリストに追加したホスト名が表示されていること、StatusがMonitoredになっていることを確認します。</p>
+<p><!-- raw HTML omitted --></p>
+<p>以下は対象ホストをすべて登録した状態になります。</p>
+<p><!-- raw HTML omitted --></p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <div class="pagination">
+                <ul class="pager">
+  
+  <li>Page 1 of 5</li>
+  
+  <li class="next"><a href="/page/2/">Older &rarr;</a></li>
+  
+</ul>
+
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

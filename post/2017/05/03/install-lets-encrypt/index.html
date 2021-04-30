@@ -1,0 +1,653 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              <article>
+                <div class="title">
+                  <h1>CentOS 7.3にLet&#39;s Encryptの証明書を導入する</h1>
+                  <p>
+                    <span class="label label-primary">Wed May 3, 2017</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/centos">centos</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/lets-encrypt">Let&#39;s Encrypt</a>
+                    
+                  </p>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <p class="panel-title">Table of Contents</p>
+                  </div>
+                  <div class="panel-body">
+                    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#前提">前提</a></li>
+    <li><a href="#firewalldでhttpsを有効化">firewalldでhttpsを有効化</a></li>
+    <li><a href="#epelリポジトリのインストール">EPELリポジトリのインストール</a></li>
+    <li><a href="#certbotのインストール">Certbotのインストール</a></li>
+    <li><a href="#lets-encryptで証明書を取得">Let&rsquo;s Encryptで証明書を取得</a></li>
+    <li><a href="#lets-encryptの証明書確認">Let&rsquo;s Encryptの証明書確認</a></li>
+    <li><a href="#systemdで証明書の自動更新">systemdで証明書の自動更新</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+                  </div>
+                </div>
+                <div class="contents">
+                  <h2 id="前提">前提</h2>
+<ul>
+<li>OS
+<ul>
+<li>CentOS Linux release 7.3.1611 (Core)</li>
+</ul>
+</li>
+<li>Web Server
+<ul>
+<li>Apache 2.4.6</li>
+</ul>
+</li>
+<li>firewalld
+<ul>
+<li>enabled</li>
+</ul>
+</li>
+<li>SELinux
+<ul>
+<li>disabled</li>
+</ul>
+</li>
+</ul>
+<h2 id="firewalldでhttpsを有効化">firewalldでhttpsを有効化</h2>
+<p>インターネットからhttpsアクセスを許可する。</p>
+<pre><code>$ sudo firewall-cmd --permanent --zone=public --add-service=https
+success
+$ sudo firewall-cmd --reload
+success
+$ sudo firewall-cmd --zone=public --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: eth0
+  sources: 
+  services: http https
+  ports: 
+  protocols: 
+  masquerade: no
+  forward-ports: 
+  sourceports: 
+  icmp-blocks: 
+  rich rules: 
+</code></pre><h2 id="epelリポジトリのインストール">EPELリポジトリのインストール</h2>
+<p>EPELリポジトリをインストールする。</p>
+<pre><code>$ sudo yum install epel-release
+[sudo] password for ryota:
+読み込んだプラグイン:fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: ftp.iij.ad.jp
+ * extras: ftp.iij.ad.jp
+ * updates: ftp.iij.ad.jp
+依存性の解決をしています
+--&gt; トランザクションの確認を実行しています。
+---&gt; パッケージ epel-release.noarch 0:7-9 を インストール
+--&gt; 依存性解決を終了しました。
+
+依存性を解決しました
+
+================================================================================
+ Package                アーキテクチャー バージョン      リポジトリー      容量
+================================================================================
+インストール中:
+ epel-release           noarch           7-9             extras            14 k
+
+トランザクションの要約
+================================================================================
+インストール  1 パッケージ
+
+総ダウンロード容量: 14 k
+インストール容量: 24 k
+Is this ok [y/d/N]: y
+Downloading packages:
+epel-release-7-9.noarch.rpm                                |  14 kB   00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  インストール中          : epel-release-7-9.noarch                         1/1
+  検証中                  : epel-release-7-9.noarch                         1/1
+
+インストール:
+  epel-release.noarch 0:7-9
+
+完了しました!
+</code></pre><p>通常時EPELリポジトリを無効化する。</p>
+<pre><code>$ sudo cp -p /etc/yum.repos.d/epel.repo{,.org}
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+$
+$ sudo sed -i -e &quot;s/^enabled=1/enabled=0/g&quot; /etc/yum.repos.d/epel.repo
+$
+$ diff /etc/yum.repos.d/epel.repo{.org,}
+6c6
+&lt; enabled=1
+---
+&gt; enabled=0
+$
+$ ls -l /etc/yum.repos.d/epel.repo*
+-rw-r--r--. 1 root root 957  5月  3 16:17 /etc/yum.repos.d/epel.repo
+-rw-r--r--. 1 root root 957 12月 28 02:37 /etc/yum.repos.d/epel.repo.org
+</code></pre><h2 id="certbotのインストール">Certbotのインストール</h2>
+<p>EPELリポジトリからCertbotをインストールする。</p>
+<pre><code>$ sudo yum --enablerepo=epel install certbot python-certbot-apache
+</code></pre><h2 id="lets-encryptで証明書を取得">Let&rsquo;s Encryptで証明書を取得</h2>
+<p>以下のコマンドを実行してLet&rsquo;s Encryptの証明書を取得する。</p>
+<pre><code>$ sudo certbot --apache
+[sudo] password for ryota: 
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Enter email address (used for urgent renewal and security notices) (Enter 'c' to
+cancel):&lt;メールアドレス&gt;
+Starting new HTTPS connection (1): acme-v01.api.letsencrypt.org
+
+-------------------------------------------------------------------------------
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.1.1-August-1-2016.pdf. You must agree
+in order to register with the ACME server at
+https://acme-v01.api.letsencrypt.org/directory
+-------------------------------------------------------------------------------
+(A)gree/(C)ancel: A
+
+-------------------------------------------------------------------------------
+Would you be willing to share your email address with the Electronic Frontier
+Foundation, a founding partner of the Let's Encrypt project and the non-profit
+organization that develops Certbot? We'd like to send you email about EFF and
+our work to encrypt the web, protect its users and defend digital rights.
+-------------------------------------------------------------------------------
+(Y)es/(N)o: N
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter 'c' to cancel):www.shinayoshi.net
+Obtaining a new certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press 'c' to cancel): 1
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0000_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0000_csr-certbot.pem
+
+We were unable to find a vhost with a ServerName or Address of www.shinayoshi.net.
+Which virtual host would you like to choose?
+(note: conf files with multiple vhosts are not yet supported)
+-------------------------------------------------------------------------------
+1: ssl.conf                       |                       | HTTPS | Enabled
+-------------------------------------------------------------------------------
+Press 1 [enter] to confirm the selection (press 'c' to cancel): 1
+Deploying Certificate to VirtualHost /etc/httpd/conf.d/ssl.conf
+
+Please choose whether HTTPS access is required or optional.
+-------------------------------------------------------------------------------
+1: Easy - Allow both HTTP and HTTPS access to these sites
+2: Secure - Make all requests redirect to secure HTTPS access
+-------------------------------------------------------------------------------
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
+Created redirect file: le-redirect-www.shinayoshi.net.conf
+Rollback checkpoint is empty (no changes made?)
+
+-------------------------------------------------------------------------------
+Congratulations! You have successfully enabled https://www.shinayoshi.net
+
+You should test your configuration at:
+https://www.ssllabs.com/ssltest/analyze.html?d=www.shinayoshi.net
+-------------------------------------------------------------------------------
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at
+   /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem. Your
+   cert will expire on 2017-08-01. To obtain a new or tweaked version
+   of this certificate in the future, simply run certbot again with
+   the &quot;certonly&quot; option. To non-interactively renew *all* of your
+   certificates, run &quot;certbot renew&quot;
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+$
+</code></pre><h2 id="lets-encryptの証明書確認">Let&rsquo;s Encryptの証明書確認</h2>
+<p>ブラウザから証明書を作成したWebサイトにアクセスし、Let&rsquo;s Encryptの証明書が使用されていることを確認する。</p>
+<h2 id="systemdで証明書の自動更新">systemdで証明書の自動更新</h2>
+<p>以下のコマンドを実行して自動更新が正常に完了することを確認する。</p>
+<pre><code>$ sudo certbot renew --dry-run
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+-------------------------------------------------------------------------------
+Processing /etc/letsencrypt/renewal/www.shinayoshi.net.conf
+-------------------------------------------------------------------------------
+Cert not due for renewal, but simulating renewal for dry run
+Starting new HTTPS connection (1): acme-staging.api.letsencrypt.org
+Renewing an existing certificate
+Performing the following challenges:
+tls-sni-01 challenge for www.shinayoshi.net
+Waiting for verification...
+Cleaning up challenges
+Generating key (2048 bits): /etc/letsencrypt/keys/0003_key-certbot.pem
+Creating CSR: /etc/letsencrypt/csr/0003_csr-certbot.pem
+
+-------------------------------------------------------------------------------
+new certificate deployed with reload of apache server; fullchain is
+/etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem
+-------------------------------------------------------------------------------
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates below have not been saved.)
+
+Congratulations, all renewals succeeded. The following certs have been renewed:
+  /etc/letsencrypt/live/www.shinayoshi.net/fullchain.pem (success)
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates above have not been saved.)
+</code></pre><p><code>certbot renew --dry-run</code>の実行結果に問題がないことを確認し、以下のコマンドを実行して自動更新を有効化する。</p>
+<pre><code>$ sudo systemctl enable certbot-renew.timer
+Created symlink from /etc/systemd/system/timer.target.wants/certbot-renew.timer to /usr/lib/systemd/system/certbot-renew.timer.
+$ sudo systemctl start certbot-renew.timer
+</code></pre><h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://letsencrypt.org/">Let&rsquo;s Encrypt</a></li>
+<li><a href="https://certbot.eff.org/#centosrhel7-apache">Certbot</a></li>
+<li><a href="https://letsencrypt.jp/">Let&rsquo;s Encrypt 総合ポータル</a></li>
+<li><a href="https://hyper-text.org/archives/2016/10/lets_encrypt_ssl_quick_start.shtml">Let&rsquo;s Encrypt （無料 SSL サーバ証明書） の設定が超簡単になったと聞いて試してみた件 | WWW WATCH</a></li>
+</ul>
+<p>以上</p>
+
+                  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+   
+  var disqus_shortname = 'shinayoshi';
+
+   
+  (function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+                </div>
+              </article>
+              <div class="pagination">
+                <ul class="pager">
+                  
+                  <li class="next"><a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/">Raspberry Pi 2のイメージバックアップを行う</a></li>
+                  
+                  
+                  <li class="previous"><a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/">OCJP, Silver SE 8を取得しました</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,1734 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="generator" content="Hugo 0.82.0" />
+
+    <base href="https://www.shinayoshi.net/" />
+    <title>shinayoshi&#39;s note</title>
+    <link rel="canonical" href="https://www.shinayoshi.net/" />
+    <link href="https://www.shinayoshi.net//img/favicon.ico" type="image/vnd.microsoft.icon" rel="icon" />
+    <link rel="alternate" type="application/rss+xml" href="https://www.shinayoshi.net/index.xml" title="shinayoshi's note" />
+    
+    <link href="https://www.shinayoshi.net//css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://yandex.st/highlightjs/8.0/styles/default.min.css">
+
+    
+    
+    
+  </head>
+  <body>
+    <div id="wrap">
+
+
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" title="toggle navbar" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="https://www.shinayoshi.net//">shinayoshi&#39;s note</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="https://www.shinayoshi.net//">Home</a></li>
+                <li><a href="https://www.shinayoshi.net//post/">All posts</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                
+                <li>
+                  <form class="search navbar-form navbar-right" role="search" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="sitesearch" value="www.shinayoshi.net" />
+                    <div class="form-group">
+                      <input type="text" class="form-control" placeholder="Search" name="q" />
+                    </div>
+                  </form>
+                </li>
+                
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+
+      <div id="main" role="main" class="container">
+        <div id="content">
+          <div class="row">
+            <div class="page-content col-md-9">
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/">Raspberry Pi 2の初期設定</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <h2 id="raspberry-pi-2共通初期設定">Raspberry Pi 2共通初期設定</h2>
+<p>家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。</p>
+<h2 id="前提">前提</h2>
+<p>Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。
+セキュリティ関連の設定は個別に行いますので、ここでは省略します。</p>
+<h2 id="パッケージ更新">パッケージ更新</h2>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre><ul>
+<li><a href="https://www.raspberrypi.org/documentation/raspbian/updating.md">Updating and Upgrading Raspbian - Raspberry Pi Documentation</a></li>
+</ul>
+<h2 id="ipアドレス固定化">IPアドレス固定化</h2>
+<p>Raspberry Pi 2のIPアドレスを固定する。</p>
+<pre><code>$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org
+$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.40.10/24
+static routers=192.168.40.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+
+interface eth1
+static ip_address=172.31.10.110/24
+static routers=
+static domain_name_servers=
+#static domain_name=
+#static domain_search=
+</code></pre><ul>
+<li>&ldquo;man dhcpcd.conf&rdquo;</li>
+</ul>
+<h2 id="usbポートの電流供給増加">USBポートの電流供給増加</h2>
+<p>USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。</p>
+<pre><code>$ sudo cp -p /boot/config.txt /boot/config.txt.org
+$ sudo vi /boot/config.txt
+#Add the following line
+max_usb_current=1
+</code></pre><ul>
+<li><a href="http://elinux.org/RPiconfig">RPiconfig - eLinux.org</a></li>
+</ul>
+<h2 id="ntp設定">NTP設定</h2>
+<p>NTP同期先を設定する。</p>
+<pre><code>$ sudo cp -p /etc/ntp.conf /etc/ntp.conf.org
+$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre><p>NTPサーバを再起動する。</p>
+<pre><code>$ sudo systemctl restart ntp
+</code></pre><p>時刻同期の状態を確認する。</p>
+<pre><code>$ ntpq -p
+</code></pre><ul>
+<li><a href="http://vogel.at.webry.info/201501/article_5.html">NTPサーバの設定 パソコン鳥のブログ/ウェブリブログ</a></li>
+</ul>
+<h2 id="raspi-config関連">raspi-config関連</h2>
+<pre><code>$ sudo raspi-config
+</code></pre><h3 id="文字コード設定">文字コード設定</h3>
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I1 Change Locale」を選択する。</li>
+<li>「en_GB.UTF-8 UTF-8」の選択を外す。</li>
+<li>「ja_JP.UTF-8 UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>「ja_JP.UTF-8」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+<h3 id="タイムゾーン設定">タイムゾーン設定</h3>
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I2 Change Timezone」を選択する。</li>
+<li>「Asia」を選択する。</li>
+<li>「Tokyo」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+<h3 id="wifiの国設定">Wifiの国設定</h3>
+<ol>
+<li>「4 Internationalisation Options」を選択する。</li>
+<li>「I4 Change Wi-fi Country」を選択する。</li>
+<li>「JP Japan」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+<h3 id="ホスト名変更">ホスト名変更</h3>
+<ol>
+<li>「7 Advanced Options」を選択する。</li>
+<li>「A2 Hostname」を選択する。</li>
+<li>「Ok」を選択する。</li>
+<li>ホスト名を設定する。</li>
+<li>「Ok」を選択する。</li>
+<li>raspi-configの初期画面に戻る。</li>
+</ol>
+<h3 id="raspi-config終了">raspi-config終了</h3>
+<ol>
+<li>「Finish」を選択する。</li>
+<li>リブートの確認が求められるため、「Yes」を選択する。</li>
+</ol>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/10/22/build-home-network-01/">家庭内インターネット接続環境を構築する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Oct 22, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/fortigate">fortigate</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/home-network">home-network</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。
+最終的には以下のような構成を想定しています。</p>
+<p><!-- raw HTML omitted --></p>
+<h2 id="機材">機材</h2>
+<p>本環境を構築するために以下の機材を用意しました。</p>
+<ul>
+<li>FortiGate 60D : 1台</li>
+<li>Raspberry Pi 2 : 5台</li>
+<li>USB LANアダプタ : 5個</li>
+<li>Switching HUB : 3台</li>
+<li>WANルータ : 1台</li>
+</ul>
+<p>具体的な構築内容は次回から記載します。</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/">Raspbian(Jessie)でキャッシュDNSを構築する</a></h1>
+                  <p>
+                    <span class="label label-primary">Wed Aug 24, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/bind">bind</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。
+Raspbianの基本的な設定は完了している前提です。</p>
+<h2 id="bind9のインストール">bind9のインストール</h2>
+<pre><code>$ sudo apt-get install bind9 dnsutils
+</code></pre><p>bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。</p>
+<pre><code>$ sudo cat /etc/bind/named.conf.options
+controls {
+	inet 127.0.0.1 allow { localhost; } keys { rndc-key; };
+};
+include &quot;/etc/bind/rndc.key&quot;;
+
+acl &quot;internal-network&quot; {
+	localhost;
+	127.0.0.1/32;
+	192.168.10.0/24;
+	192.168.20.0/24;
+	192.168.30.0/24;
+	192.168.40.0/24;
+};
+
+options {
+	version &quot;unknown&quot;;
+
+	directory &quot;/var/cache/bind&quot;;
+
+	listen-on {
+		internal-network;
+	};
+
+	querylog yes;
+	allow-query {
+		internal-network;
+	};
+
+	recursion yes;
+	allow-recursion {
+		internal-network;
+	};
+
+	forwarders {
+		192.168.100.1;
+	};
+
+	notify no;
+
+	max-ncache-ttl	300;
+	max-cache-ttl	3600;
+	recursive-clients	300;
+	cleaning-interval	60;
+	lame-ttl	600;
+	max-cache-size	256m;
+
+	allow-transfer {
+		none;
+	};
+
+	allow-update {
+		none;
+	};
+};
+
+logging {
+	channel &quot;log_default&quot; {
+		file &quot;/var/log/bind/named.log&quot; versions 5 size 5m;
+		print-time yes;
+		severity info;
+		print-category yes;
+	};
+	channel &quot;alert&quot; {
+		file &quot;/var/log/bind/alert.log&quot; versions 8 size 4m;
+		severity info;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+	channel &quot;query&quot; {
+		file &quot;/var/log/bind/query.log&quot; versions 8 size 50m;
+		severity debug;
+		print-time yes;
+		print-severity yes;
+		print-category yes;
+	};
+
+	category default { &quot;log_default&quot;; };
+	category security { &quot;alert&quot;; };
+	category queries { &quot;query&quot;; };
+	category lame-servers { null; };
+};
+</code></pre><p>コンフィグの不備を確認する。</p>
+<pre><code>$ sudo named-checkconf /etc/bind/named.conf
+</code></pre><p>ログ保存先のディレクトリを作成する。</p>
+<pre><code>$ sudo mkdir -p /var/log/bind
+$ sudo chown bind:bind /var/log/bind
+</code></pre><p>bind9を再起動する。</p>
+<pre><code>$ sudo systemctl restart bind9
+</code></pre><h2 id="iptablesの設定">iptablesの設定</h2>
+<p>iptablesでfirewallを設定する。</p>
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 53 -j ACCEPT
+
+$ sudo iptables -A OUTPU -m state --state NEW -m udp -p udp --dport 53 -j ACCEPT
+$ sudo iptables -A OUTPU -m state --state NEW -m tcp -p tcp --dport 53 -j ACCEPT
+</code></pre><p>iptablesの設定を保存する。</p>
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre><h2 id="dnsの設定">DNSの設定</h2>
+<p>キャッシュDNSを使用するように設定変更を行う。</p>
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+static domain_name_servers=127.0.0.1
+$ sudo systemctl restart dhcpcd
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/22/installing-squid-on-raspbian/">Raspbian(Jessie)にSquidをインストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 22, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/squid">squid</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。</p>
+<h2 id="raspbianの初期設定">Raspbianの初期設定</h2>
+<p>過去のブログ記事を参考に初期設定を実施する。</p>
+<ul>
+<li>パッケージの最新化</li>
+<li>パッケージのインストール
+&ndash; chkconfig
+&ndash; tcpdump
+&ndash; telnet
+&ndash; dnsutils</li>
+<li>IPアドレスの固定化</li>
+<li>NTP設定</li>
+<li>rpi-configの設定
+&ndash; ディスク拡張
+&ndash; 文字コード設定
+&ndash; タイムゾーン設定
+&ndash; Wifiの国設定
+&ndash; ホスト名変更</li>
+<li>公開鍵認証方式の設定</li>
+<li>IPv6の無効化</li>
+<li>SELinuxの無効化</li>
+<li>iptablesの設定</li>
+<li>logwatchのインストール</li>
+<li>Zabbix Agentのインストール・監視登録</li>
+<li>SNMPDのインストール・Cacti登録</li>
+</ul>
+<h2 id="squidのインストール">Squidのインストール</h2>
+<p>Squidをインストールする。</p>
+<pre><code>$ sudo apt-get install squid
+</code></pre><p>Squidを設定する。</p>
+<pre><code>$ sudo cp -p /etc/squid/squid.conf{,.org}
+$ sudo vi /etc/squid/squid.conf
+$ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf
+609,611c609,616
+&lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&lt; acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&lt; acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+---
+&gt; #acl localnet src 10.0.0.0/8	# RFC1918 possible internal network
+&gt; #acl localnet src 172.16.0.0/12	# RFC1918 possible internal network
+&gt; #acl localnet src 192.168.0.0/16	# RFC1918 possible internal network
+&gt; acl localnet src 192.168.10.0/24
+&gt; acl localnet src 192.168.20.0/24
+&gt; acl localnet src 192.168.30.0/24
+&gt; acl localnet src 192.168.40.0/24
+&gt; 
+676c681
+&lt; #http_access allow localnet
+---
+&gt; http_access allow localnet
+1738a1744
+&gt; cache_mem 256 MB
+1747a1754
+&gt; maximum_object_size_in_memory 512 KB
+1945a1953
+&gt; cache_dir ufs /var/spool/squid 10000 16 256
+1988a1997
+&gt; maximum_object_size 20480 KB
+2097a2107
+&gt; logformat combined %&gt;a %ui %un [%tl] &quot;%rm %ru HTTP/%rv&quot; %Hs %&lt;st &quot;%{Referer}&gt;h&quot; &quot;%{User-Agent}&gt;h&quot; %Ss:%Sh
+2121c2131,2132
+&lt; access_log /var/log/squid/access.log squid
+---
+&gt; #access_log /var/log/squid/access.log squid
+&gt; access_log /var/log/squid/access.log combined
+2217a2229
+&gt; emulate_httpd_log off
+2751c2763,2768
+&lt; refresh_pattern .		0	20%	4320
+---
+&gt; refresh_pattern -i \.(gif|png|jpe?g|tif?f|bmp)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(mpe?g|avi|ra?m|wmv|mov)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(wav|mp3|mid)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(class|swf|pdf)$ 1440 25% 10080
+&gt; refresh_pattern -i \.(js|css)$ 1440 25% 10080
+&gt; refresh_pattern . 45 20% 4320
+2944a2962
+&gt; via off
+3100a3119,3122
+&gt; header_access Referer deny all
+&gt; header_access X-Forwarded-For deny all
+&gt; header_access Via deny all
+&gt; header_access Cache-Control deny all
+3392a3415
+&gt; visible_hostname unknown
+4699a4723
+&gt; forwarded_for off
+</code></pre><p>Squidの設定に不備がないか確認する。</p>
+<pre><code>$ sudo squid -k parse
+</code></pre><p>Squidの設定を有効にする。</p>
+<pre><code>$ sudo systemctl reload squid
+</code></pre><ul>
+<li><a href="http://www.unix-power.net/linux/squid.html">CentOS Squidの設定</a></li>
+<li><a href="http://tech.ckme.co.jp/proxy.shtml">Proxyサーバの設定（squid）：tech.ckme.co.jp</a></li>
+<li><a href="http://nabeshiki.tumblr.com/post/20000083416/2001-sd-squid">Proxyキャッシュサーバ設定術・Squidの設定(2001年掲載) | なべしき</a></li>
+<li><a href="http://blog.asial.co.jp/1076">Privoxy + Ziproxy + Squidで高速フィルタリングサーバを作ってみた : アシアルブログ</a></li>
+</ul>
+<h2 id="iptablesの通信許可設定">iptablesの通信許可設定</h2>
+<p>内部NWからSquidへの通信を許可する。</p>
+<pre><code>$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.0.0/16 --dport 3128 -j ACCEPT
+</code></pre><p>iptablesの設定を保存する。</p>
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre><h2 id="ブラウザのプロキシ設定">ブラウザのプロキシ設定</h2>
+<p>ブラウザ使用するプロキシ設定をSquidに変更する。</p>
+<p>Squidのログを確認してSquid経由でWebアクセスができていることを確認する。</p>
+<pre><code>$ sudo cat /var/log/squid/access.log
+</code></pre><h2 id="raspbianのプロキシ設定">Raspbianのプロキシ設定</h2>
+<p>起動時にプロキシを使用するように設定する。</p>
+<pre><code>$ sudo vi /etc/profile.d/proxy.sh
+PROXY=&quot;192.168.20.10:3128&quot;
+export http_proxy=&quot;http://${PROXY}&quot;
+export https_proxy=&quot;http://${PROXY}&quot;
+export no_proxy=&quot;localhost,127.0.0.1,192.168.*&quot;
+
+export HTTP_PROXY=&quot;${http_proxy}&quot;
+export HTTPS_PROXY=&quot;${https_proxy}&quot;
+export NO_PROXY=&quot;${no_proxy}&quot;
+$source /etc/profile.d/proxy.sh
+</code></pre><p>上記コマンドではsudo時の環境変数には反映されない。そのため、sudo時には<code>-E</code>オプションを指定する。</p>
+<pre><code>$ sudo -E apt-get update
+$ sudo -E apt-get upgrade
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/">Cactiにデバイスを登録する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sun Aug 21, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cacti">cacti</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Cactiに新規デバイスを登録するメモです。
+SNMPv3を使用してSNMPの値を取得します。</p>
+<h2 id="snmpdのインストール">snmpdのインストール</h2>
+<p>追加するデバイス(Server)にsnmpdをインストールする。</p>
+<pre><code>$ sudo apt-get install snmpd snmp
+</code></pre><p>snmpconfツールを使用してsnmpd.confを作成する。
+SNMPv3を使用する前提で質問に回答していきます。</p>
+<pre><code>$ snmpconf -g basic_setup
+
+The following installed configuration files were found:
+
+   1:  /etc/snmp/snmp.conf
+   2:  /etc/snmp/snmpd.conf
+
+Would you like me to read them in?  Their content will be merged with the
+output files created by this session.
+
+Valid answer examples: &quot;all&quot;, &quot;none&quot;,&quot;3&quot;,&quot;1,2,5&quot;
+
+Read in which (default = all): 2
+************************************************ 
+*** Beginning basic system information setup ***
+************************************************ 
+Do you want to configure the information returned in the system MIB group (contact info, etc)? (default = y): n
+************************************** 
+*** BEGINNING ACCESS CONTROL SETUP ***
+************************************** 
+Do you want to configure the agent's access control? (default = y): y
+Do you want to allow SNMPv3 read-write user based access (default = y): n
+Do you want to allow SNMPv3 read-only user based access (default = y): y
+
+Configuring: rouser
+Description:
+  a SNMPv3 read-only user
+    arguments:  user [noauth|auth|priv] [restriction_oid]
+
+Enter the SNMPv3 user that should have read-only access to the system: snmpuser
+The minimum security level required for that user [noauth|auth|priv, default = auth]: priv
+The OID that this community should be restricted to [if appropriate]: 
+
+Finished Output: rouser  snmpuser priv 
+Do another rouser line? (default = y): n
+Do you want to allow SNMPv1/v2c read-write community access (default = y): n
+Do you want to allow SNMPv1/v2c read-only community access (default = y): n
+**************************************** 
+*** Beginning trap destination setup ***
+**************************************** 
+Do you want to configure where and if the agent will send traps? (default = y): n
+**************************************** 
+*** Beginning monitoring setup ***
+**************************************** 
+Do you want to configure the agent's ability to monitor various aspects of your system? (default = y): n
+
+
+The following files were created:
+
+  snmpd.conf  
+
+These files should be moved to /usr/share/snmp if you
+want them used by everyone on the system.  In the future, if you add 
+the -i option to the command line I'll copy them there automatically for you.
+
+Or, if you want them for your personal use only, copy them to
+/home/pi/.snmp .  In the future, if you add the -p option to the
+command line I'll copy them there automatically for you.
+</code></pre><p>snmpd.confを設置する。</p>
+<pre><code>$ sudo cp -p /etc/snmp/snmpd.conf{,.org}
+$ sudo cp snmpd.conf /etc/snmp/snmpd.conf
+</code></pre><p>SNMPv3ユーザを作成する。</p>
+<pre><code>$ sudo systemctl stop snmpd
+$ sudo cp -p /var/lib/snmp/snmpd.conf{,.org}
+$ sudo vi /var/lib/snmp/snmpd.conf
+createUser snmpuser SHA snmp_pass AES snmp_pass
+$ sudo systemctl start snmpd
+</code></pre><p>SNMPv3で値を取得できることを確認する。</p>
+<pre><code>$ snmpwalk -v 3 -u snmpuser -l authPriv -a SHA -A snmp_pass -x AES -X snmp_pass localhost .
+</code></pre><ul>
+<li><a href="http://www.infraexpert.com/study/tcpip21.html">TCP/IP - SNMPとは</a></li>
+</ul>
+<h2 id="iptablesの通信許可">iptablesの通信許可</h2>
+<p>CactiからのSNMP通信を許可する。</p>
+<pre><code>##INPUTチェーン
+#SNMPは許可
+$ sudo iptables -A INPUT -m state --state NEW -m udp -p udp -s 192.168.30.0/24 --dport 161 -j ACCEPT
+</code></pre><p>iptablesの設定を保存する。</p>
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre><h2 id="cactiにデバイスserverを登録">Cactiにデバイス(Server)を登録</h2>
+<p>↓Cactiにログイン。<code>User Name</code>と<code>Password</code>を入力して<code>Login</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Cactiログイン後の画面。<code>Devices</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの管理画面。<code>Add</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの登録画面。必要事項を入力して<code>Create</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓デバイスの登録完了画面。<code>SNMP Information</code>にデバイスの情報が表示されていることを確認する。<code>Create Graphs for this Host</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓作成したいグラフを選択して<code>Create</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓グラフが作成されたことを確認する。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓左のメニューから<code>Graph Trees</code>をクリックし、<code>Default Tree</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーの管理画面。<code>Add</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーへのデバイス登録画面。必要事項を入力して<code>Create</code>をクリックする。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ツリーの管理画面。デバイスが登録されたことを確認する。</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓グラフ画面。追加したデバイスのグラフが表示されることを確認する。</p>
+<p><!-- raw HTML omitted --></p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/20/installing-cacti-on-raspberrypi/">Raspbian(Jessie)にCactiをインストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Aug 20, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cacti">cacti</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Raspbian(Jessie)にCactiを導入するまでのメモです。
+Apache2やMySQLはインストール済みであることを前提としています。</p>
+<h2 id="cactiのインストール">Cactiのインストール</h2>
+<p>Cactiをインストールする。
+途中でApache2の設定やMySQLのパスワードについて聞かれるので適宜回答する。</p>
+<pre><code>$ sudo apt-get install cacti cacti-spine
+
+↓&lt;了解&gt;を選択してEnter
+ ┌─────────────────────┤ libphp-adodb を設定しています ├─────────────────────┐
+ │                                                                           │ 
+ │ 警告: php に対するインクルードパスが変更されています!                     │ 
+ │                                                                           │ 
+ │ libphp-adobd は /usr/share/adodb にインストールされなくなっています。新   │ 
+ │ しいインストールのパスは /usr/share/php/adodb です。                      │ 
+ │                                                                           │ 
+ │ php.ini ファイルを更新してください。web サーバの設定も変更する必要がある  │ 
+ │ かもしれません。                                                          │ 
+ │                                                                           │ 
+ │                                  &lt;了解&gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓apache2を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │ Cacti が自動的に設定するウェブサーバを選んでください。                    │ 
+ │                                                                           │ 
+ │ ウェブサーバを手作業で設定したい場合は「どれでもない」を選んでください。  │ 
+ │                                                                           │ 
+ │ ウェブサーバ:                                                             │ 
+ │                                                                           │ 
+ │                               apache2                                     │ 
+ │                               lighttpd                                    │ 
+ │                               どれでもない                                │ 
+ │                                                                           │ 
+ │                                                                           │ 
+ │                                  &lt;了解&gt;                                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓&lt;はい&gt;を選択してEnter
+ ┌────────────────────────┤ cacti を設定しています ├─────────────────────────┐
+ │                                                                           │ 
+ │ cacti は利用できるようになる前にはデータベースをインストールして設定する  │ 
+ │ 必要があります。この設定を dbconfig-common で管理するようにもできます。   │ 
+ │                                                                           │ 
+ │ あなたが熟練したデータベース管理者でこの設定について手動で何をするのかを  │ 
+ │ 知っている場合、あるいはデータベースが既にインストール及び設定されている  │ 
+ │ 場合は、この選択を選ばない方が良いでしょう。何をすればいいのかについての  │ 
+ │ 詳細については、大抵 /usr/share/doc/cacti に置かれています。              │ 
+ │                                                                           │ 
+ │ そうでない場合は、恐らくこの設定を選ぶのが良いでしょう。                  │ 
+ │                                                                           │ 
+ │ cacti のデータベースを dbconfig-common で設定しますか?                    │ 
+ │                                                                           │ 
+ │                    &lt;はい&gt;                      &lt;いいえ&gt;                   │ 
+ │                                                                           │ 
+ └───────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのrootユーザのパスワードを入力し、&lt;了解&gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ このパッケージが MySQL データベースとユーザを作る際に使う管理者権限アカ  │ 
+  │ ウントのパスワードを入力してください。                                   │ 
+  │                                                                          │ 
+  │ データベースの管理権限を持つユーザのパスワード:                          │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &lt;了解&gt;                     &lt;取消&gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+↓MySQLのcactiユーザのパスワードを入力し、&lt;了解&gt;を選択してEnter
+  ┌────────────────────────┤ cacti を設定しています ├────────────────────────┐
+  │ データベースサーバに cacti が登録するパスワードを入力してください。空の  │ 
+  │ ままにしておくと、ランダムパスワードが生成されます。                     │ 
+  │                                                                          │ 
+  │ cacti 用の MySQL アプリケーションパスワード:                             │ 
+  │                                                                          │ 
+  │ ________________________________________________________________________ │ 
+  │                                                                          │ 
+  │                   &lt;了解&gt;                     &lt;取消&gt;                      │ 
+  │                                                                          │ 
+  └──────────────────────────────────────────────────────────────────────────┘ 
+
+</code></pre><p>データベースをMyISAMからInnoDBに変更する。</p>
+<pre><code>$ cd /usr/share/cacti/cli
+$ sudo php convert_innodb.php
+Converting All Non-Memory Cacti Database Tables to Innodb with Less than '300000' Records
+Converting Table -&gt; 'cdef' Successful
+Converting Table -&gt; 'cdef_items' Successful
+Converting Table -&gt; 'colors' Successful
+Converting Table -&gt; 'data_input' Successful
+Converting Table -&gt; 'data_input_data' Successful
+Converting Table -&gt; 'data_input_fields' Successful
+Converting Table -&gt; 'data_local' Successful
+Converting Table -&gt; 'data_template' Successful
+Converting Table -&gt; 'data_template_data' Successful
+Converting Table -&gt; 'data_template_data_rra' Successful
+Converting Table -&gt; 'data_template_rrd' Successful
+Converting Table -&gt; 'graph_local' Successful
+Converting Table -&gt; 'graph_template_input' Successful
+Converting Table -&gt; 'graph_template_input_defs' Successful
+Converting Table -&gt; 'graph_templates' Successful
+Converting Table -&gt; 'graph_templates_gprint' Successful
+Converting Table -&gt; 'graph_templates_graph' Successful
+Converting Table -&gt; 'graph_templates_item' Successful
+Converting Table -&gt; 'graph_tree' Successful
+Converting Table -&gt; 'graph_tree_items' Successful
+Converting Table -&gt; 'host' Successful
+Converting Table -&gt; 'host_graph' Successful
+Converting Table -&gt; 'host_snmp_cache' Successful
+Converting Table -&gt; 'host_snmp_query' Successful
+Converting Table -&gt; 'host_template' Successful
+Converting Table -&gt; 'host_template_graph' Successful
+Converting Table -&gt; 'host_template_snmp_query' Successful
+Converting Table -&gt; 'plugin_config' Successful
+Converting Table -&gt; 'plugin_db_changes' Successful
+Converting Table -&gt; 'plugin_hooks' Successful
+Converting Table -&gt; 'plugin_realms' Successful
+Converting Table -&gt; 'poller' Successful
+Converting Table -&gt; 'poller_command' Successful
+Converting Table -&gt; 'poller_item' Successful
+Converting Table -&gt; 'poller_output' Successful
+Converting Table -&gt; 'poller_reindex' Successful
+Converting Table -&gt; 'poller_time' Successful
+Converting Table -&gt; 'rra' Successful
+Converting Table -&gt; 'rra_cf' Successful
+Converting Table -&gt; 'settings' Successful
+Converting Table -&gt; 'settings_graphs' Successful
+Converting Table -&gt; 'settings_tree' Successful
+Converting Table -&gt; 'snmp_query' Successful
+Converting Table -&gt; 'snmp_query_graph' Successful
+Converting Table -&gt; 'snmp_query_graph_rrd' Successful
+Converting Table -&gt; 'snmp_query_graph_rrd_sv' Successful
+Converting Table -&gt; 'snmp_query_graph_sv' Successful
+Converting Table -&gt; 'user_auth' Successful
+Converting Table -&gt; 'user_auth_perms' Successful
+Converting Table -&gt; 'user_auth_realm' Successful
+Converting Table -&gt; 'user_log' Successful
+Converting Table -&gt; 'version' Successful
+$
+</code></pre><h2 id="cactiへのアクセス">Cactiへのアクセス</h2>
+<p>ブラウザからCactiのURL(<code>http://IPアドレス/cacti</code>)にアクセスする。</p>
+<p>Cactiの初期設定画面が表示されるので、画面の指示に従いながら設定を行う。</p>
+<p>↓Nextをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Nextをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓Errorがないことを確認してFinishをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓admin/adminでログイン</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓adminの新しいパスワードを入力してSaveをクリック</p>
+<p><!-- raw HTML omitted --></p>
+<p>↓ログイン後の初期画面</p>
+<p><!-- raw HTML omitted --></p>
+<p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/">Cowrieのセキュリティ設定</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>前回まででCowrieのインストールやKippo-Graphでの可視化を行った。
+Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。</p>
+<h2 id="ipv6の無効化">IPv6の無効化</h2>
+<p>IPv6は使用しないため、IPv6を無効化する。</p>
+<pre><code>$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+$ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+$ sudo sysctl -a | grep disable_ipv6
+</code></pre><p>再起動後もIPv6が無効化するように設定する。</p>
+<pre><code>$ sudo vi /etc/sysctl.d/10-disableipv6.conf
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+</code></pre><h2 id="selinuxの無効化">SELinuxの無効化</h2>
+<p>Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。</p>
+<h2 id="iptablesの設定">iptablesの設定</h2>
+<p>iptablesでfirewallを設定する。</p>
+<pre><code>#Cowrieポートのポートフォワード(別手順で設定済み)
+#$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+
+##INPUTチェーン
+#IPスプーフィング対策
+$ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset
+
+#セッションハイジャック対策
+$ sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+#不正なパケット拒否
+$ sudo iptables -A INPUT -m state --state INVALID -j DROP
+
+#内部からの通信を始めた場合のパケットは許可
+$ sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#ループバックからの通信は通す
+$ sudo iptables -A INPUT -i lo -j ACCEPT
+
+#ICMPパケットは許可
+$ sudo iptables -A INPUT -p icmp -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A INPUT -p udp --dport 67 --sport 68 -j ACCEPT
+
+#SSH(20022/tcp)は許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 20022 -j ACCEPT
+
+#HTTPは許可(ローカルネットワークからの接続のみ許可)
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.10.0/24 --dport 80 -j ACCEPT
+
+#Cowrieは許可(5回まで新規接続許可。それ以降は1分に1回に制限。10分間無接続なら制限解除)
+$ sudo iptables -A INPUT -p tcp --dport 2222 -m state --state NEW -m hashlimit --hashlimit-name ssh_limit --hashlimit 1/m --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-htable-expire 600000 -j ACCEPT
+
+#Zabbix-Agentへの通信は許可
+$ sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp -s 192.168.30.0/24 --dport 10050 -j ACCEPT
+
+##OUTPUTチェーン
+#ループバックへの通信は通す
+$ sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+#ICMP応答のパケットは通す
+$ sudo iptables -A OUTPUT -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#外部からの通信を始めた場合のパケットを許可
+$ sudo iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#tcp-resetの通信は通す
+$ sudo iptables -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST RST -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#DHCPクライアントとしてDHCPに必要な通信は通す
+#$ sudo iptables -A OUTPUT -p udp --dport 68 --sport 67 -j ACCEPT
+
+#ユーザrootが発したパケットは許可
+$ sudo iptables -A OUTPUT -m owner --uid-owner 0 -j ACCEPT
+
+#NTPは許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m udp -p udp --dport 123 -j ACCEPT
+
+#Zabbix-Serverへの通信は許可
+$ sudo iptables -A OUTPUT -m state --state NEW -m tcp -p tcp -d 192.168.30.0/24 --dport 10051 -j ACCEPT
+
+#外部からの通信は拒否。外部への通信も拒否。
+$ sudo iptables -P INPUT DROP
+$ sudo iptables -P FORWARD DROP
+$ sudo iptables -P OUTPUT DROP
+</code></pre><p>iptablesの設定を保存する。</p>
+<pre><code>$ sudo sh -c &quot;iptables-save &gt; /etc/iptables/rules.v4&quot;
+</code></pre><ul>
+<li><a href="http://techracho.bpsinc.jp/yamasita-taisuke/2013_05_01/8351">iptablesで鉄壁？の守りを実現する3つのTips</a></li>
+<li><a href="http://www.unix-power.net/linux/iptables.html">CentOS iptablesによるパケットフィルタ</a></li>
+<li><a href="http://kassyjp.ninja-web.net/ras/jessie/iptables.htm">2.iptables（ファイアウォール）のセットアップ - RaspberryPiで各種サーバー作り！ - ある阪大生の物置小屋</a></li>
+</ul>
+<h2 id="ログ出力先をsyslogに変更">ログ出力先をsyslogに変更</h2>
+<p>twistdの作成するログは1000000MB程度でログローテートされてしまうため、Syslogに出力するように変更して日次でログローテートするように変更する。</p>
+<p>ログ保管用のディレクトリ作成。</p>
+<pre><code>$ sudo mkdir /var/log/cowrie
+$ sudo chown cowrie:adm /var/log/cowrie/
+</code></pre><p>rsyslogの設定。</p>
+<pre><code>$ sudo vi /etc/rsyslog.d/cowrie.conf
+if $programname == 'cowrie' then /var/log/cowrie/cowrie.log
+&amp; ~
+</code></pre><p>rsyslogの再起動。</p>
+<pre><code>$ sudo systemctl restart rsyslog
+</code></pre><p>Cowrieのログ出力先変更。</p>
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}
+$ vi start.sh
+$ diff ./start.sh.back20160818 ./start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS --syslog --prefix cowrie --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre><h2 id="logrotateの設定">logrotateの設定</h2>
+<p>logrotateをインストールする(通常はインストール済みのはず)。</p>
+<pre><code>$ sudo apt-get install logrotate
+</code></pre><p>Cowrie用のlogrotate設定を作成する。</p>
+<pre><code>$ sudo vi /etc/logrotate.d/cowrie
+/var/log/cowrie/cowrie.log
+{
+        daily
+        rotate 92
+        dateext
+        create 0640 cowrie adm
+        missingok
+        ifempty
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate &gt; /dev/null
+        endscript
+}
+</code></pre><p>logrotateをテスト実行し、エラーがないことを確認する。</p>
+<pre><code>$ sudo logrotate -d /etc/logrotate.d/cowrie
+</code></pre><ul>
+<li><a href="http://server-setting.info/centos/loglotation.html">ログローテーション(logrotate)を使ってみる ( httpd(apache)の設定例 ) | レンタルサーバー・自宅サーバー設定・構築のヒント</a></li>
+<li><a href="https://open-groove.net/linux/logrotate-test/">logrotate（ログローテート）の動作確認 | OpenGroove</a></li>
+</ul>
+<h2 id="logwatchのインストール">logwatchのインストール</h2>
+<p>logwatchをインストールする。</p>
+<pre><code>$ sudo apt-get install logwatch
+</code></pre><p>logwatchの実行結果を確認する。</p>
+<pre><code>$ sudo logwatch --output stdout
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/">Kippo-GraphをインストールしてCowrieのログを可視化する</a></h1>
+                  <p>
+                    <span class="label label-primary">Tue Aug 16, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/kippo-graph">kippo-graph</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Kippo-Graphの公式(<a href="http://bruteforce.gr/kippo-graph">Kippo-Graph - BruteForce Lab&rsquo;s Blog</a>)を参考にKippo-Graphをインストールするまでのメモです。</p>
+<h2 id="mysqlのインストールと初期設定">MySQLのインストールと初期設定</h2>
+<p>MySQLをインストールする。</p>
+<p>インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install mysql-server
+</code></pre><p>MySQLのセキュア設定</p>
+<pre><code>$ mysql_secure_installation
+
+
+
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+
+In order to log into MySQL to secure it, we'll need the current
+password for the root user.  If you've just installed MySQL, and
+you haven't set the root password yet, the password will be blank,
+so you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password ensures that nobody can log into the MySQL
+root user without the proper authorisation.
+
+You already have a root password set, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MySQL installation has an anonymous user, allowing anyone
+to log into MySQL without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] Y
+ ... Success!
+
+By default, MySQL comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] Y
+ - Dropping test database...
+ERROR 1008 (HY000) at line 1: Can't drop database 'test'; database doesn't exist
+ ... Failed!  Not critical, keep moving...
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+
+
+All done!  If you've completed all of the above steps, your MySQL
+installation should now be secure.
+
+Thanks for using MySQL!
+</code></pre><p>MySQLの初期設定</p>
+<pre><code>$ sudo vi /etc/mysql/my.cnf
+[mysqld]
+character-set-server=utf8
+collation-server=utf8_general_ci
+skip-character-set-client-handshake
+default-storage-engine=InnoDB
+innodb_file_per_table
+innodb_buffer_pool_size=256M
+skip-name-resolve
+
+[mysqldump]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+</code></pre><ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.5/en/server-system-variables.html">MySQL :: MySQL 5.5 Reference Manual :: 5.1.4 Server System Variables</a></li>
+</ul>
+<p>MySQLの再起動</p>
+<pre><code>$ sudo systemctl restart mysql
+</code></pre><h2 id="cowrieのログ出力先を変更">Cowrieのログ出力先を変更</h2>
+<p>Cowrie用データベースの作成</p>
+<pre><code>$ mysql -uroot -p
+Enter password:
+mysql&gt; create database cowrie character set utf8 collate utf8_bin;
+mysql&gt; grant all privileges on cowrie.* to cowrie@localhost identified by 'cowrie_password';
+mysql&gt; quit
+
+$ cd ${COWRIE_INSTALL_DIR}
+$ cat doc/sql/mysql.sql | mysql -ucowrie -p cowrie
+</code></pre><p>CowrieのログをMySQLのデータベースに出力する。</p>
+<pre><code>$ cd ${COWRIE_INSTALL_DIR}
+$ vi cowrie.cfg
+↓コメントアウト
+#[iutput_jsonloi]
+#logfile = log/cowrie.json
+
+#[output_mysql]
+#host = localhost
+#database = cowrie
+#username = cowrie
+#password = secret
+#port = 3306
+[output_mysql]
+host = localhost
+database = cowrie
+username = cowrie
+password = cowrie_password
+port = 3306
+</code></pre><p>Cowrieの再起動</p>
+<pre><code>$ ./stop.sh
+$ ./start.sh
+</code></pre><h2 id="apache2のインストール">Apache2のインストール</h2>
+<p>Apache2をインストールする。</p>
+<pre><code>$ sudo apt-get install apache2
+</code></pre><p>Apache2のセキュリティ設定。</p>
+<pre><code>$ sudo vi /etc/apache2/conf-available/security.conf
+ServerTokens Prod
+ServerSignature Off
+</code></pre><p>Apache2の文字コード設定。</p>
+<pre><code>$ sudo vi /etc/apache2/conf-available/charset.conf
+#AddDefaultCharset UTF-8
+</code></pre><p>Apache2のServerName設定。</p>
+<pre><code>$ sudo sh -c &quot;echo ServerName ${HOSTNAME} &gt; /etc/apache2/conf-available/fqdn.conf&quot;
+$ sudo a2enconf fqdn
+</code></pre><p>Apache2の再起動。</p>
+<pre><code>$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre><h2 id="kippo-graphのインストール">Kippo-Graphのインストール</h2>
+<p>関連パッケージのインストール。</p>
+<pre><code>$ sudo apt-get install libapache2-mod-php5 php5-mysql php5-gd php5-curl
+$ sudo apt-get install dnsutils
+$ sudo systemctl restart apache2
+</code></pre><p>Kippo-Graphのインストール。</p>
+<pre><code>$ wget http://bruteforce.gr/wp-content/uploads/kippo-graph-1.5.1.tar.gz
+$ sudo tar zxvf kippo-graph-1.5.1.tar.gz -C /usr/share
+$ sudo vi /etc/apache2/conf-available/kippo-graph.conf
+&lt;IfModule mod_alias.c&gt;
+    Alias /kippo-graph /usr/share/kippo-graph-1.5.1
+&lt;/IfModule&gt;
+$ sudo a2enconf kippo-graph
+$ sudo apachectl configtest
+$ sudo systemctl restart apache2
+</code></pre><p>Kippo-Graphの設定。</p>
+<pre><code>$ sudo chmod 777 /usr/share/kippo-graph-1.5.1/generated-graphs/
+$ sudo cp -p /usr/share/kippo-graph-1.5.1/config.php.dist /usr/share/kippo-graph-1.5.1/config.php
+$ sudo vi /usr/share/kippo-graph-1.5.1/config.php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'cowrie');
+define('DB_PASS', 'cowrie_password');
+define('DB_NAME', 'cowrie');
+define('DB_PORT', '3306');
+</code></pre><h2 id="kippo-graphの修正">Kippo-Graphの修正</h2>
+<p>KippoとCowrieのデータベースのテーブル構造の違いにより一部動かない機能(KIPPO-PLAYLOG)があった。</p>
+<p>PLAYLOGを再生するために以下のファイルを修正。一応、PLAYLOGが再生できるようになったが、他の部分に影響がないかは不明。。。試すとしても自己責任でお願いします。</p>
+<p><code>class/KippoPlayLog.class.php</code>の修正</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p class/KippoPlayLog.class.php class/KippoPlayLog.class.php.org
+$ sudo vi class/KippoPlayLog.class.php
+$ diff class/KippoPlayLog.class.php.org class/KippoPlayLog.class.php
+21c21
+&lt;             SELECT ttylog.session, timestamp, ROUND(LENGTH(ttylog)/1024, 2) AS size
+---
+&gt;             SELECT ttylog.session, timestamp, ROUND(size/1024, 2) AS size
+</code></pre><p><code>include/play.php</code>の修正</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1
+$ sudo cp -p include/play.php include/play.php.org
+$ sudo vi include/play.php
+$ diff play.php.org play.php
+70c70
+&lt;                 $log = base64_encode($row['ttylog']);
+---
+&gt;                 $log = base64_encode(file_get_contents($row['ttylog']));
+</code></pre><p>ttylogへのシンボリックリンク作成</p>
+<pre><code>$ cd /usr/share/kippo-graph-1.5.1/include
+$ sudo ln -s ${COWRIE_INSTALL_DIR}/log/ log
+$ sudo chgrp www-data /home/cowrie/cowrie/log/tty/
+$ sudo chmod g+s /home/cowrie/cowrie/log/tty/
+</code></pre><p>Cowrie起動スクリプトの修正</p>
+<pre><code>$ sudo su - cowrie
+$ cd ${COWRIE_INSTALL_DIR}/
+$ cp -p start.sh start.sh.org
+$ vi start.sh
+$ diff start.sh.org start.sh
+31c31
+&lt;     twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+33c33
+&lt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0077 --pidfile cowrie.pid cowrie
+---
+&gt;     authbind --deep twistd $XARGS -l log/cowrie.log --umask 0027 --pidfile cowrie.pid cowrie
+</code></pre><p>Cowrieの再起動</p>
+<pre><code>$ ./stop.sh
+$ ./start.sh
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/15/install-cowrie-on-raspbian/">Raspbian(Jessie)にCowrieをインストールする</a></h1>
+                  <p>
+                    <span class="label label-primary">Mon Aug 15, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/cowrie">cowrie</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。
+はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。</p>
+<p>個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。</p>
+<h2 id="raspbianの初期設定">Raspbianの初期設定</h2>
+<p>Raspbianの初期設定として以下を行いました。</p>
+<h3 id="パッケージの最新化">パッケージの最新化</h3>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade
+</code></pre><h3 id="ipアドレスの固定化">IPアドレスの固定化</h3>
+<pre><code>$ sudo vi /etc/dhcpcd.conf
+#Add the following line
+interface eth0
+static ip_address=192.168.10.10/24
+static routers=192.168.10.254
+static domain_name_servers=192.168.100.1
+#static domain_name=
+#static domain_search=
+</code></pre><h3 id="ntp設定">NTP設定</h3>
+<p>NTP同期先を設定する。</p>
+<pre><code>$ sudo vi /etc/ntp.conf
+#Add the line
+server ntp.nict.jp iburst
+server ntp.jst.mfeed.ad.jp iburst
+# comment out
+#server 0.debian.pool.ntp.org iburst
+#server 1.debian.pool.ntp.org iburst
+#server 2.debian.pool.ntp.org iburst
+#server 3.debian.pool.ntp.org iburst
+</code></pre><p>NTPサーバを再起動する。</p>
+<pre><code>$ sudo systemctl restart ntp
+</code></pre><p>時刻同期の状態を確認する。</p>
+<pre><code>$ ntpq -p
+</code></pre><h3 id="raspi-config関連">raspi-config関連</h3>
+<pre><code>$ sudo raspi-config
+</code></pre><ul>
+<li>ディスク拡張</li>
+<li>文字コード設定</li>
+<li>タイムゾーン設定</li>
+<li>Wifiの国設定</li>
+<li>ホスト名変更</li>
+</ul>
+<h2 id="公開鍵認証方式の設定">公開鍵認証方式の設定</h2>
+<pre><code>$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/pi/.ssh/id_rsa): 
+Created directory '/home/pi/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/pi/.ssh/id_rsa.
+Your public key has been saved in /home/pi/.ssh/id_rsa.pub.
+
+$ cd ~/.ssh/
+$ cat id_rsa.pub &gt;&gt; authorized_keys
+$ chmod 600 authorized_keys
+</code></pre><p>Raspbianで作成した秘密鍵をローカルPCにコピーする。</p>
+<pre><code>$ scp pi@192.168.10.10:~/.ssh/id_rsa ~/.ssh/
+</code></pre><p>公開鍵認証方式でsshログインできることを確認する。</p>
+<pre><code>$ ssh -i ~/.ssh/id_rsa pi@192.168.10.10
+</code></pre><h2 id="sshサーバの設定">SSHサーバの設定</h2>
+<p>Cowrieで<code>22/tcp</code>を使用しているため、SSHサーバのポートを変更します。またログイン設定も変更します。</p>
+<pre><code>$ sudo vi /etc/ssh/sshd_config
+#Port 22
+Port 20022
+
+#PermitRootLogin without-password
+PermitRootLogin no
+
+ChallengeResponseAuthentication no
+
+#PasswordAuthentication yes
+PasswordAuthentication no
+</code></pre><p>SSHサーバの設定を再起動する。</p>
+<pre><code>$ sudo systemctl restart ssh
+</code></pre><p>SSHサーバのポートを変更しているため、以降の手順でSSHログインするためにはポート番号を指定する。</p>
+<pre><code>$ ssh -i ~/.ssh/id_rsa -p 20022 pi@192.168.10.10
+</code></pre><h2 id="ユーザ設定">ユーザ設定</h2>
+<p>rootユーザが無効化されていることを確認する(2列目が<code>L</code>であることを確認)。</p>
+<pre><code>$ sudo passwd -S root
+root L 05/27/2016 0 99999 7 -1
+</code></pre><p>Cowrieユーザを作成する。</p>
+<pre><code>$ sudo adduser --disabled-password cowrie
+ユーザ `cowrie' を追加しています...
+新しいグループ `cowrie' (1001) を追加しています...
+新しいユーザ `cowrie' (1001) をグループ `cowrie' として追加しています...
+ホームディレクトリ `/home/cowrie' を作成しています...
+`/etc/skel' からファイルをコピーしています...
+cowrie のユーザ情報を変更中
+新しい値を入力してください。標準設定値を使うならリターンを押してください
+	フルネーム []: 
+	部屋番号 []: 
+	職場電話番号 []: 
+	自宅電話番号 []: 
+	その他 []: 
+以上で正しいですか? [Y/n] y
+</code></pre><h2 id="cowrieのインストール">Cowrieのインストール</h2>
+<p>Cowrienの公式サイトの<a href="https://github.com/micheloosterhof/cowrie/blob/master/INSTALL.md">INSTALL.md</a>を参考にインストールを行う。</p>
+<pre><code>$ sudo apt-get install python-twisted python-crypto python-pyasn1 python-gmpy2 python-mysqldb python-zope.interface
+
+$ sudo su - cowrie
+$ git clone http://github.com/micheloosterhof/cowrie
+$ cd cowrie/
+$ cp cowrie.cfg.dist cowrie.cfg
+</code></pre><h2 id="cowrieの設定">Cowrieの設定</h2>
+<pre><code>$ vi cowrie.cfg
+#sensor_name=myhostname
+sensor_name=rpicowrie
+
+#hostname = svr04
+hostname = cowrie01
+</code></pre><h2 id="cowrieの起動と終了">Cowrieの起動と終了</h2>
+<p>起動するときは以下のコマンドを実行する。</p>
+<pre><code>$ ./start.sh
+</code></pre><p>終了するときは以下のコマンドを実行する。</p>
+<pre><code>$ ./stop.sh
+</code></pre><h2 id="cowrieポートのポートフォワード">Cowrieポートのポートフォワード</h2>
+<p>Cowrieでは<code>2222/tcp</code>でポート待ち受けをしているため、iptablesで22/tcpにポートフォワードする。</p>
+<pre><code>$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+$ sudo iptables -t nat -n -L
+</code></pre><h2 id="iptables設定の保存">iptables設定の保存</h2>
+<p>再起動時にもポートフォワード設定が有効になるようにiptablesの設定を保存する。</p>
+<pre><code>$ sudo apt-get install iptables-persistent
+$ sudo systemctl enable netfilter-persistent
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <article>
+                <div class="title">
+                  <h1><a href="https://www.shinayoshi.net/post/2016/08/13/add-fortigate-mib-on-raspbian/">Raspbian(Jessie)にFortiGateのプライベートMIBを追加する</a></h1>
+                  <p>
+                    <span class="label label-primary">Sat Aug 13, 2016</span> in
+                    
+                    
+                    <a href="https://www.shinayoshi.net//categories/server">server</a>
+                     using tags
+                    
+                    
+                    <a href="https://www.shinayoshi.net//tags/raspberrypi">raspberrypi</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/jessie">jessie</a>
+                    
+                     , 
+                    <a href="https://www.shinayoshi.net//tags/fgt-60d">FGT-60D</a>
+                    
+                  </p>
+                </div>
+                <div class="contents">
+                  <p>Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。</p>
+<h2 id="mibファイルのアップロード">MIBファイルのアップロード</h2>
+<p>FortiGateのプライベートMIB(<code>FORTINET-CORE-MIB.mib</code>、<code>FORTINET-FORTIGATE-MIB.mib</code>)を<code>/home/pi</code>直下にアップロードします。</p>
+<h2 id="プライベートmibの設定">プライベートMIBの設定</h2>
+<p>プライベートMIBファイルを<code>/usr/share/snmp/mibs/vendor</code>に移動する。</p>
+<pre><code>$ sudo mkdir /usr/share/snmp/mibs/vendor
+$ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/
+$ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*
+</code></pre><p>プライベートMIBを使用するように<code>snmp.conf</code>を設定する。</p>
+<pre><code>$ sudo vi /etc/snmp/snmp.conf
+mibdirs +/usr/share/snmp/mibs/vendor
+mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB
+</code></pre><h2 id="プライベートmibの設定確認">プライベートMIBの設定確認</h2>
+<p>FortiGateのMIBフィールド名が表示されることを確認する。</p>
+<pre><code>$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4
+FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29
+</code></pre><p>以上</p>
+
+                </div>
+              </article>
+              
+              <div class="pagination">
+                <ul class="pager">
+  
+  <li class="previous"><a href="/page/2/">&larr; Newer</a></li>
+  
+  <li>Page 3 of 5</li>
+  
+  <li class="next"><a href="/page/4/">Older &rarr;</a></li>
+  
+</ul>
+
+              </div>
+            </div>
+            <div class="sidebar col-md-3">
+              <aside>
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Profile</h1>
+  </div>
+  <div id="profile" class="panel-body text-center">
+    <img src="https://www.shinayoshi.net//img/logo.png" alt="logo" class="img-responsive center-block" />
+    <p>
+      <a href="https://www.shinayoshi.net//about/">Author: shinayoshi</a>
+    </p>
+    <ul class="list-inline">
+  
+  <li>
+    <a href="https://twitter.com/shinayoshi_net" target="_blank">
+      <i class="fa fa-twitter-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+
+  
+
+  
+  <li>
+    <a href="https://github.com/shinayoshi" target="_blank">
+      <i class="fa fa-github-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="https://bitbucket.org/shinayoshi" target="_blank">
+      <i class="fa fa-bitbucket-square fa-lg"></i>
+    </a>
+  </li>
+  
+
+  
+  <li>
+    <a href="http://www.slideshare.net/shinayoshi" target="_blank">
+      <i class="fa fa-slideshare fa-lg"></i>
+    </a>
+  </li>
+  
+</ul>
+
+  </div>
+</section>
+
+  <section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Recent Posts</h1>
+  </div>
+  <div id="recent_posts" class="list-group">
+    
+      
+      <a href="https://www.shinayoshi.net/post/" class="list-group-item">Posts [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/12/25/install-applications-to-macos-high-sierra/" class="list-group-item">MacOS High Sierraにアプリケーションを自動インストールする [ 2017-12-25 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/" class="list-group-item">LinuxでUTF-8のBOMを削除する [ 2017-05-17 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/06/get_a_java_se_8_silver/" class="list-group-item">OCJP, Silver SE 8を取得しました [ 2017-05-06 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/" class="list-group-item">CentOS 7.3にLet&#39;s Encryptの証明書を導入する [ 2017-05-03 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/" class="list-group-item">Raspberry Pi 2のイメージバックアップを行う [ 2017-01-15 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/12/setting-rsnapshot/" class="list-group-item">Raspberry Pi 2でファイルバックアップを行う [ 2017-01-12 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/" class="list-group-item">Raspberry Pi 2でCactiを導入する(サーバの登録) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-cacti/" class="list-group-item">Raspberry Pi 2でCactiを導入する [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/09/setting-zabbix-agent/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する(Agent導入) [ 2017-01-09 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/" class="list-group-item">Raspberry Pi 2でZabbixサーバを構築する [ 2017-01-08 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-rsyslog/" class="list-group-item">Raspberry Pi 2でSyslogサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/" class="list-group-item">Raspberry Pi 2でNTPサーバを構築する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/07/setting-cowrie-security/" class="list-group-item">Raspberry Pi 2のセキュリティ設定を強化する [ 2017-01-07 ]</a>
+      
+      <a href="https://www.shinayoshi.net/post/2017/01/05/setting-kippo-graph/" class="list-group-item">Raspberry Pi 2でHoney Pot(Cowrie)を視覚化する [ 2017-01-05 ]</a>
+      
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Categories</h1>
+  </div>
+  <div id="categories" class="list-group">
+    
+    <a href="https://www.shinayoshi.net//categories/diary" class="list-group-item"><span class="badge">2</span>diary</a>
+    
+    <a href="https://www.shinayoshi.net//categories/mac" class="list-group-item"><span class="badge">1</span>mac</a>
+    
+    <a href="https://www.shinayoshi.net//categories/program" class="list-group-item"><span class="badge">1</span>program</a>
+    
+    <a href="https://www.shinayoshi.net//categories/server" class="list-group-item"><span class="badge">38</span>server</a>
+    
+  </div>
+</section>
+
+  
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h1 class="panel-title">Tags</h1>
+  </div>
+  <div id="tags" class="panel-body">
+    
+    
+    <a href="https://www.shinayoshi.net//tags/backup" >backup (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/bind" >bind (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/blog" >blog (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cacti" >cacti (2)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/centos" >centos (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/certificate" >certificate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/cowrie" >cowrie (3)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fgt-60d" >fgt-60d (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/fortigate" >fortigate (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/home-network" >home-network (17)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homefw01" >homefw01 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon1" >homemon1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homemon2" >homemon2 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homenas1" >homenas1 (6)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepot1" >homepot1 (5)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/homepxy1" >homepxy1 (4)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/igo" >igo (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/java" >java (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/jessie" >jessie (14)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kippo-graph" >kippo-graph (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/kivy" >kivy (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/lets-encrypt" >lets-encrypt (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/macos" >macos (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/raspberrypi" >raspberrypi (32)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/shogi" >shogi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/squid" >squid (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/utf-8" >utf-8 (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/vim" >vim (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/wifi" >wifi (1)</a>
+    
+    
+    
+    <a href="https://www.shinayoshi.net//tags/zabbix" >zabbix (3)</a>
+    
+    
+  </div>
+</section>
+
+</aside>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
+        </div>
+      </div>
+      <footer role="contentinfo">
+        <div class="container">
+          <p class="text-muted credits">
+            Copyright (c) 2021 shinayoshi<br />
+            <small>
+              <span class="credit">Powered By <a href="http://hugo.spf13.com">Hugo</a></span>
+            </small>
+          </p>
+        </div>
+      </footer>
+
+      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+      <script src="https://www.shinayoshi.net//js/bootstrap.min.js"></script>
+
+      <script src="https://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37226857-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+    </div>
+  </body>
+</html>
+

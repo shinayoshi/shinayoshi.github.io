@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on shinayoshi&#39;s note</title>
+    <link>https://www.shinayoshi.net/categories/</link>
+    <description>Recent content in Categories on shinayoshi&#39;s note</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright (c) 2021 shinayoshi</copyright>
+    <lastBuildDate>Mon, 25 Dec 2017 21:31:09 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>mac</title>
+      <link>https://www.shinayoshi.net/categories/mac/</link>
+      <pubDate>Mon, 25 Dec 2017 21:31:09 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/categories/mac/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>server</title>
+      <link>https://www.shinayoshi.net/categories/server/</link>
+      <pubDate>Wed, 17 May 2017 22:43:05 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/categories/server/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>program</title>
+      <link>https://www.shinayoshi.net/categories/program/</link>
+      <pubDate>Sat, 06 May 2017 15:56:59 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/categories/program/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>diary</title>
+      <link>https://www.shinayoshi.net/categories/diary/</link>
+      <pubDate>Sat, 31 Oct 2015 12:09:15 +0900</pubDate>
+      
+      <guid>https://www.shinayoshi.net/categories/diary/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
