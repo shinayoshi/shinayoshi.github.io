@@ -1,26 +1,21 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Centos on shinayoshi&#39;s note</title>
+    <title>centos on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/centos/</link>
-    <description>Recent content in Centos on shinayoshi&#39;s note</description>
+    <description>Recent content in centos on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Wed, 03 May 2017 15:50:26 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/centos/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 03 May 2017 15:50:26 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/centos/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CentOS 7.3にLet&#39;s Encryptの証明書を導入する</title>
       <link>https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/</link>
       <pubDate>Wed, 03 May 2017 15:50:26 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2017/05/03/install-lets-encrypt/</guid>
-      <description>前提  OS  CentOS Linux release 7.3.1611 (Core)  Web Server  Apache 2.4.6  firewalld  enabled  SELinux  disabled   firewalldでhttpsを有効化 インターネットからhttpsアクセスを許可する。
-$ sudo firewall-cmd --permanent --zone=public --add-service=https success $ sudo firewall-cmd --reload success $ sudo firewall-cmd --zone=public --list-all public (active) target: default icmp-block-inversion: no interfaces: eth0 sources: services: http https ports: protocols: masquerade: no forward-ports: sourceports: icmp-blocks: rich rules:  EPELリポジトリのインストール EPELリポジトリをインストールする。
-$ sudo yum install epel-release [sudo] password for ryota: 読み込んだプラグイン:fastestmirror Loading mirror speeds from cached hostfile * base: ftp.</description>
+      <description>前提  OS  CentOS Linux release 7.3.1611 (Core)   Web Server  Apache 2.4.6   firewalld  enabled   SELinux  disabled    firewalldでhttpsを有効化 インターネットからhttpsアクセスを許可する。
+$ sudo firewall-cmd --permanent --zone=public --add-service=https success $ sudo firewall-cmd --reload success $ sudo firewall-cmd --zone=public --list-all public (active) target: default icmp-block-inversion: no interfaces: eth0 sources: services: http https ports: protocols: masquerade: no forward-ports: sourceports: icmp-blocks: rich rules: EPELリポジトリのインストール EPELリポジトリをインストールする。</description>
     </item>
     
     <item>
@@ -31,9 +26,9 @@ $ sudo yum install epel-release [sudo] password for ryota: 読み込んだプラ
       <guid>https://www.shinayoshi.net/post/2016/05/15/apache-setup/</guid>
       <description>ApacheでWebサイトを公開するまでの手順のメモです。
 ApacheとPHPのインストール Webサーバ(Apache)とPHPをインストールします。
-# yum install httpd php php-mbstring  Apacheの設定 Apacheを設定します。
-# vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &amp;quot;All&amp;quot;, &amp;quot;None&amp;quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8  Apacheの起動 Apacheを起動します。
-$ sudo systemctl start httpd $ sudo systemctl enable httpd  Firewallの設定 FirewallでWeb通信を許可します。</description>
+# yum install httpd php php-mbstring Apacheの設定 Apacheを設定します。
+# vi /etc/httpd/conf/httpd.conf #ServerName www.example.com:80 ↓変更 ServerName www.example.com:80 # # AllowOverride controls what directives may be placed in .htaccess files. # It can be &amp;quot;All&amp;quot;, &amp;quot;None&amp;quot;, or any combination of the keywords: # Options FileInfo AuthConfig Limit # AllowOverride None ↓変更 AllowOverride All AddDefaultCharset UTF-8 ↓変更 #AddDefaultCharset UTF-8 Apacheの起動 Apacheを起動します。
+$ sudo systemctl start httpd $ sudo systemctl enable httpd Firewallの設定 FirewallでWeb通信を許可します。</description>
     </item>
     
     <item>
@@ -44,17 +39,18 @@ $ sudo systemctl start httpd $ sudo systemctl enable httpd  Firewallの設定 Fi
       <guid>https://www.shinayoshi.net/post/2016/01/16/onamae-vpn-setup/</guid>
       <description>お名前.comのVPS(KVM)の初期設定メモを残しておく。 「CentOS-7-x86_64-Minimal-1511.iso」を使用して再インストール後からの設定を記載しています。
 rootでログイン お名前.comのコンソール画面でログインを行います。
-login: root Password:  ログインに成功すると以下のようなプロンプトが表示されます。
-[root@&amp;lt;ホスト名&amp;gt; ~]#  以降の手順では、rootアカウントのプロンプトを#で表現します。
+login: root Password: ログインに成功すると以下のようなプロンプトが表示されます。
+[root@&amp;lt;ホスト名&amp;gt; ~]# 以降の手順では、rootアカウントのプロンプトを#で表現します。
 シリアルコンソール接続の有効化 シリアルコンソールで接続できるように設定します。
-# vi /etc/default/grub GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;quot; ↓変更 GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;quot; # grub2-mkconfig -o /boot/grub2/grub.cfg # reboot  共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。
+# vi /etc/default/grub GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet&amp;quot; ↓変更 GRUB_CMDLINE_LINUX=&amp;quot;rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet console=tty0 console=ttyS0,115200n8r&amp;quot; # grub2-mkconfig -o /boot/grub2/grub.cfg # reboot 共用SSHサーバ経由のシリアルコンソール接続 お名前.comのVPS(KVM)には、VPSにシリアルコンソール接続するための共用SSHサーバが用意されています。以降の設定はこのSSHサーバ経由のシリアルコンソール接続で作業します。
 SSH接続経由のシリアルコンソールの接続方法については、お名前.comのサイトに詳しく書かれているのでそちらをご確認ください。SSH接続経由のシリアルコンソール | SSH接続 | VPS (KVM) 活用ガイド
 ホスト名変更 ホスト名の変更を行います。
-# hostnamectl set-hostname newhost.example.com  ホスト名の変更を反映するために再起動を行います。
-# reboot  再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。
+# hostnamectl set-hostname newhost.example.com ホスト名の変更を反映するために再起動を行います。
+# reboot 再度、お名前.comのコンソール画面でログインを行い、ホスト名が変更されていることを確認します。
 パッケージの更新 パッケージを最新の状態に更新します。
-# yum -y update  kernelのバージョンアップがあった場合にはサーバの再起動を実施します。
-# reboot  管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。</description>
+# yum -y update kernelのバージョンアップがあった場合にはサーバの再起動を実施します。
+# reboot 管理者アカウントの作成 通常使用する管理者アカウントを作成します。また、管理者アカウントにパスワードを設定します。
+# useradd centos # passwd centos Changing password for user centos.</description>
     </item>
     
   </channel>

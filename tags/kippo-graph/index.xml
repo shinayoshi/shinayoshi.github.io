@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kippo Graph on shinayoshi&#39;s note</title>
+    <title>kippo-graph on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/kippo-graph/</link>
-    <description>Recent content in Kippo Graph on shinayoshi&#39;s note</description>
+    <description>Recent content in kippo-graph on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Tue, 16 Aug 2016 08:43:57 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/kippo-graph/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 16 Aug 2016 08:43:57 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/kippo-graph/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kippo-GraphをインストールしてCowrieのログを可視化する</title>
       <link>https://www.shinayoshi.net/post/2016/08/16/install-kippo-graph/</link>
@@ -21,7 +17,7 @@
       <description>Kippo-Graphの公式(Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog)を参考にKippo-Graphをインストールするまでのメモです。
 MySQLのインストールと初期設定 MySQLをインストールする。
 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
-$ sudo apt-get update $ sudo apt-get install mysql-server  MySQLのセキュア設定
+$ sudo apt-get update $ sudo apt-get install mysql-server MySQLのセキュア設定
 $ mysql_secure_installation NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL SERVERS IN PRODUCTION USE! PLEASE READ EACH STEP CAREFULLY! In order to log into MySQL to secure it, we&#39;ll need the current password for the root user. If you&#39;ve just installed MySQL, and you haven&#39;t set the root password yet, the password will be blank, so you should just press enter here.</description>
     </item>
     

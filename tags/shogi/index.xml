@@ -1,24 +1,20 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Shogi on shinayoshi&#39;s note</title>
+    <title>shogi on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/shogi/</link>
-    <description>Recent content in Shogi on shinayoshi&#39;s note</description>
+    <description>Recent content in shogi on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Sat, 31 Oct 2015 12:09:15 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/shogi/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 31 Oct 2015 12:09:15 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/shogi/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>囲碁・将棋の思考エンジンの覚え書き</title>
       <link>https://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/</link>
       <pubDate>Sat, 31 Oct 2015 12:09:15 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2015/10/31/igo-shogi-program/</guid>
-      <description> 囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。
+      <description>囲碁・将棋の思考エンジンは以下が有名らしい。 よく忘れるので覚え書きとして残しておく。
 実際に使用したことはないため、使用方法や強さはわかりません。あしからず。
 囲碁の思考エンジン  Pachi Fuego GNU Go  将棋の思考エンジン  Bonanza Apery GPSshogi  将棋GUIソフト  将棋所  </description>
     </item>

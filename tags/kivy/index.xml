@@ -1,27 +1,23 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kivy on shinayoshi&#39;s note</title>
+    <title>kivy on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/kivy/</link>
-    <description>Recent content in Kivy on shinayoshi&#39;s note</description>
+    <description>Recent content in kivy on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Sat, 16 Jul 2016 20:49:31 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/kivy/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 16 Jul 2016 20:49:31 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/kivy/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>RaspbianにKivyをセットアップ</title>
       <link>https://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</link>
       <pubDate>Sat, 16 Jul 2016 20:49:31 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</guid>
-      <description>Raspberry Pi 7&amp;rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。
+      <description>Raspberry Pi 7&amp;quot; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。
 Kivyのインストール Kivyに必要なパッケージをインストールする。
-$ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot  Kivyをインストールする。
-$ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile $ source ~/.profile   Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation  Raspberry Pi 7&amp;rdquo; Touch Screen LCDの利用設定 $ vi ~/.</description>
+$ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。
+$ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile $ source ~/.profile  Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation  Raspberry Pi 7&amp;quot; Touch Screen LCDの利用設定 $ vi ~/.</description>
     </item>
     
   </channel>

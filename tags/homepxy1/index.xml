@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Homepxy1 on shinayoshi&#39;s note</title>
+    <title>homepxy1 on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/homepxy1/</link>
-    <description>Recent content in Homepxy1 on shinayoshi&#39;s note</description>
+    <description>Recent content in homepxy1 on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/homepxy1/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/homepxy1/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
@@ -21,7 +17,7 @@
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -59,7 +55,7 @@ $ sudo apt-get install squid パッケージリストを読み込んでいます
 今回はhomepxy1を構築していきます。
 Raspberry Pi 2でキャッシュDNSサーバ構築 家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。 まずはキャッシュDNSサーバを構築していきます。
 bind9の設定 bind9のインストール
-$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.</description>
+$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.</description>
     </item>
     
   </channel>

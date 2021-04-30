@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Homenas1 on shinayoshi&#39;s note</title>
+    <title>homenas1 on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/homenas1/</link>
-    <description>Recent content in Homenas1 on shinayoshi&#39;s note</description>
+    <description>Recent content in homenas1 on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/homenas1/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/homenas1/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2のイメージバックアップを行う</title>
       <link>https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</link>
@@ -32,7 +28,7 @@ gitのインストール $ sudo -E apt-get install git パッケージリスト�
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomenas1にrsnapshotを導入してファイルバックアップを行う設定を行います。
 なおバックアップ元は/mnt/nas/、バックアップ先は/mnt/backup/を想定しています。
-$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $  rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.</description>
+$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $ rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.</description>
     </item>
     
     <item>
@@ -44,7 +40,7 @@ $ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/na
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -69,7 +65,7 @@ $ sudo -E apt-get install zabbix-agent パッケージリストを読み込ん�
 前回に引き続きhomenas1を構築していきます。
 Raspberry Pi 2でファイルサーバ構築(NFS/Samba) 前回はUSB Storageを使用してRAIDデバイスを設定しました。 今回はNFSやSambaの設定を行っていきます。
 NFSの設定 NFSのインストール
-$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています.</description>
+$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています... systemd (215-17+deb8u5) のトリガを処理しています .</description>
     </item>
     
     <item>

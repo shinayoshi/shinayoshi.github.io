@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Homemon1 on shinayoshi&#39;s note</title>
+    <title>homemon1 on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/homemon1/</link>
-    <description>Recent content in Homemon1 on shinayoshi&#39;s note</description>
+    <description>Recent content in homemon1 on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/homemon1/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/homemon1/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
@@ -21,7 +17,7 @@
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -56,7 +52,7 @@ $ sudo -E apt-get install zabbix-agent パッケージリストを読み込ん�
       <guid>https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomemon1、homemon2を構築していきます。 本環境の監視を行うためにZabbixを導入します。
-Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.</description>
+Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server mysql-server-5.</description>
     </item>
     
     <item>
@@ -80,7 +76,7 @@ $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 ro
       <guid>https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomemon1、homemon2を構築していきます。 まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。
-NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.</description>
+NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.168.10.0 mask 255.</description>
     </item>
     
   </channel>

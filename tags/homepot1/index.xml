@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Homepot1 on shinayoshi&#39;s note</title>
+    <title>homepot1 on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/homepot1/</link>
-    <description>Recent content in Homepot1 on shinayoshi&#39;s note</description>
+    <description>Recent content in homepot1 on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/homepot1/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 09 Jan 2017 17:30:57 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/homepot1/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2でCactiを導入する(サーバの登録)</title>
       <link>https://www.shinayoshi.net/post/2017/01/09/setting-snmpd/</link>
@@ -21,7 +17,7 @@
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -45,7 +41,7 @@ $ sudo -E apt-get install zabbix-agent パッケージリストを読み込ん�
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。
 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。
-$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $  再起動後もIPv6が無効化するように設定します。</description>
+$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。</description>
     </item>
     
     <item>

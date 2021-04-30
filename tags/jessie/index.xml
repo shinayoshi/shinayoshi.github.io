@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jessie on shinayoshi&#39;s note</title>
+    <title>jessie on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/jessie/</link>
-    <description>Recent content in Jessie on shinayoshi&#39;s note</description>
+    <description>Recent content in jessie on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/jessie/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 24 Aug 2016 19:15:14 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/jessie/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspbian(Jessie)でキャッシュDNSを構築する</title>
       <link>https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</link>
@@ -19,7 +15,7 @@
       
       <guid>https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
       <description>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。
-bind9のインストール $ sudo apt-get install bind9 dnsutils  bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。
+bind9のインストール $ sudo apt-get install bind9 dnsutils bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。
 $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &amp;quot;/etc/bind/rndc.key&amp;quot;; acl &amp;quot;internal-network&amp;quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &amp;quot;unknown&amp;quot;; directory &amp;quot;/var/cache/bind&amp;quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl	300; max-cache-ttl	3600; recursive-clients	300; cleaning-interval	60; lame-ttl	600; max-cache-size	256m; allow-transfer { none; }; allow-update { none; }; }; logging { channel &amp;quot;log_default&amp;quot; { file &amp;quot;/var/log/bind/named.</description>
     </item>
     
@@ -32,7 +28,7 @@ $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localh
       <description>Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。
 Raspbianの初期設定 過去のブログ記事を参考に初期設定を実施する。
  パッケージの最新化 パッケージのインストール &amp;ndash; chkconfig &amp;ndash; tcpdump &amp;ndash; telnet &amp;ndash; dnsutils IPアドレスの固定化 NTP設定 rpi-configの設定 &amp;ndash; ディスク拡張 &amp;ndash; 文字コード設定 &amp;ndash; タイムゾーン設定 &amp;ndash; Wifiの国設定 &amp;ndash; ホスト名変更 公開鍵認証方式の設定 IPv6の無効化 SELinuxの無効化 iptablesの設定 logwatchのインストール Zabbix Agentのインストール・監視登録 SNMPDのインストール・Cacti登録  Squidのインストール Squidをインストールする。
-$ sudo apt-get install squid  Squidを設定する。
+$ sudo apt-get install squid Squidを設定する。
 $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf 609,611c609,616 &amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network &amp;lt; acl localnet src 172.</description>
     </item>
     
@@ -44,7 +40,7 @@ $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo
       <guid>https://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</guid>
       <description>Cactiに新規デバイスを登録するメモです。 SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo apt-get install snmpd snmp  snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。
+$ sudo apt-get install snmpd snmp snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。
 $ snmpconf -g basic_setup The following installed configuration files were found: 1: /etc/snmp/snmp.conf 2: /etc/snmp/snmpd.conf Would you like me to read them in? Their content will be merged with the output files created by this session. Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot; Read in which (default = all): 2 ************************************************ *** Beginning basic system information setup *** ************************************************ Do you want to configure the information returned in the system MIB group (contact info, etc)?</description>
     </item>
     
@@ -67,8 +63,8 @@ $ sudo apt-get install cacti cacti-spine ↓&amp;lt;了解&amp;gt;を選択し�
       <guid>https://www.shinayoshi.net/post/2016/08/16/security-setting-on-cowrie/</guid>
       <description>前回まででCowrieのインストールやKippo-Graphでの可視化を行った。 Cowrieを使用するにあたり追加でやっておきたいセキュリティ設定をメモする。
 IPv6の無効化 IPv6は使用しないため、IPv6を無効化する。
-$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 $ sudo sysctl -a | grep disable_ipv6  再起動後もIPv6が無効化するように設定する。
-$ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1  SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。
+$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 $ sudo sysctl -a | grep disable_ipv6 再起動後もIPv6が無効化するように設定する。
+$ sudo vi /etc/sysctl.d/10-disableipv6.conf net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 SELinuxの無効化 Raspbian(Jessie)ではデフォルトでSELinuxが使えないようなので、特にやることなし。
 iptablesの設定 iptablesでfirewallを設定する。
 #Cowrieポートのポートフォワード(別手順で設定済み) #$ sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222 ##INPUTチェーン #IPスプーフィング対策 $ sudo iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m state --state NEW -j REJECT --reject-with tcp-reset #セッションハイジャック対策 $ sudo iptables -A INPUT -p tcp !</description>
     </item>
@@ -82,7 +78,7 @@ iptablesの設定 iptablesでfirewallを設定する。
       <description>Kippo-Graphの公式(Kippo-Graph - BruteForce Lab&amp;rsquo;s Blog)を参考にKippo-Graphをインストールするまでのメモです。
 MySQLのインストールと初期設定 MySQLをインストールする。
 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
-$ sudo apt-get update $ sudo apt-get install mysql-server  MySQLのセキュア設定
+$ sudo apt-get update $ sudo apt-get install mysql-server MySQLのセキュア設定
 $ mysql_secure_installation NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MySQL SERVERS IN PRODUCTION USE! PLEASE READ EACH STEP CAREFULLY! In order to log into MySQL to secure it, we&#39;ll need the current password for the root user. If you&#39;ve just installed MySQL, and you haven&#39;t set the root password yet, the password will be blank, so you should just press enter here.</description>
     </item>
     
@@ -95,8 +91,9 @@ $ mysql_secure_installation NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDE
       <description>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。 はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。
 個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。
 Raspbianの初期設定 Raspbianの初期設定として以下を行いました。
-パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade  IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=  NTP設定 NTP同期先を設定する。
-$ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst  NTPサーバを再起動する。</description>
+パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= NTP設定 NTP同期先を設定する。
+$ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst NTPサーバを再起動する。
+$ sudo systemctl restart ntp 時刻同期の状態を確認する。</description>
     </item>
     
     <item>
@@ -108,9 +105,9 @@ $ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.m
       <description>Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。
 MIBファイルのアップロード FortiGateのプライベートMIB(FORTINET-CORE-MIB.mib、FORTINET-FORTIGATE-MIB.mib)を/home/pi直下にアップロードします。
 プライベートMIBの設定 プライベートMIBファイルを/usr/share/snmp/mibs/vendorに移動する。
-$ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*  プライベートMIBを使用するようにsnmp.confを設定する。
-$ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB  プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。
-$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29  以上</description>
+$ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-* プライベートMIBを使用するようにsnmp.confを設定する。
+$ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。
+$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29 以上</description>
     </item>
     
     <item>
@@ -122,15 +119,16 @@ $ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FOR
       <description>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。
 とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。
 パッケージの更新 Zabbix Serverのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
-$ sudo apt-get install snmp snmp-mibs-downloader  SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
-$ sudo vi /etc/snmp/snmp.conf #mibs :  メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
-${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp  Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
-$ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
+$ sudo apt-get install snmp snmp-mibs-downloader SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
+$ sudo vi /etc/snmp/snmp.conf #mibs : メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
+${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
+$ sudo systemctl restart zabbix-server Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホストの設定画面が表示されるので最低限以下を設定する。
-&amp;ldquo;ホスト&amp;rdquo;タブ
- ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;rdquo;タブ</description>
+&amp;ldquo;ホスト&amp;quot;タブ
+ ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;quot;タブ
+ テンプレートとのリンク：&amp;ldquo;Template SNMP Device&amp;quot;を追加。  &amp;ldquo;マクロ&amp;quot;タブ</description>
     </item>
     
     <item>
@@ -141,9 +139,9 @@ $ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設�
       <guid>https://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。
 パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Agentのインストール Zabbix Agentのインストール
-$ sudo apt-get install zabbix-agent  Zabbix Agentの設定 Zabbix Agentを設定する。
-$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent  Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール
+$ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。
+$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホスト名の設定やテンプレートの選択を行い、保存を選択する。
 以上</description>
@@ -157,9 +155,9 @@ $ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) Serve
       <guid>https://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。
  3 Installation from packages [Zabbix Documentation 2.2]  パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Serverのインストール Zabbix Serverのインストール
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール
 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
-$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese  MySQLの初期設定 MySQLのセキュア設定
+$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定
 $ mysql_secure_installation In order to log into MySQL to secure it, we&#39;ll need the current password for the root user. If you&#39;ve just installed MySQL, and you haven&#39;t set the root password yet, the password will be blank, so you should just press enter here.</description>
     </item>
     
@@ -169,11 +167,11 @@ $ mysql_secure_installation In order to log into MySQL to secure it, we&#39;ll n
       <pubDate>Tue, 12 Jul 2016 21:16:20 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</guid>
-      <description>Raspberry Pi 3のディスプレイとして「Official 7&amp;rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。
+      <description>Raspberry Pi 3のディスプレイとして「Official 7&amp;quot; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。
 接続 以下のWebサイトを参考に接続する。
  Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi  天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。
-$ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot   Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity  日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。
-$ sudo apt-get install task-japanese task-japanese-desktop  スクリーンキーボードのインストール Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</description>
+$ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot  Getting Started with the Raspberry Pi 7&amp;quot; Touchscreen LCD - Pimoroni Yarr-niversity  日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。
+$ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</description>
     </item>
     
     <item>
@@ -184,9 +182,9 @@ $ sudo apt-get install task-japanese task-japanese-desktop  スクリーンキ�
       <guid>https://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</guid>
       <description>こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。
 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。
-パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade   Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。
-$ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=   &amp;ldquo;man dhcpcd.conf&amp;rdquo;  USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。
-$ sudo vi /boot/config.txt #Add the following line max_usb_current=1   RPiconfig - eLinux.</description>
+パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade  Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。
+$ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=  &amp;ldquo;man dhcpcd.conf&amp;rdquo;  USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。
+$ sudo vi /boot/config.txt #Add the following line max_usb_current=1  RPiconfig - eLinux.org  NTP設定 NTP同期先を設定する。</description>
     </item>
     
     <item>
@@ -199,8 +197,8 @@ $ sudo vi /boot/config.txt #Add the following line max_usb_current=1   RPiconfig
 使用したもの  Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用)  Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。
  Download Raspbian for Raspberry Pi  Raspbian書き込み SDカードにRaspbianのイメージを書き込む。
 SDカードデバイスを確認する。
-$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1  SDカードデバイスをアンマウントする。
-$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful  SDカードにRaspbianのイメージを書き込む。</description>
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。</description>
     </item>
     
   </channel>

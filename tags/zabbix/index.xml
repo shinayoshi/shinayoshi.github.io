@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Zabbix on shinayoshi&#39;s note</title>
+    <title>zabbix on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/zabbix/</link>
-    <description>Recent content in Zabbix on shinayoshi&#39;s note</description>
+    <description>Recent content in zabbix on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Thu, 11 Aug 2016 15:51:09 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/zabbix/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 11 Aug 2016 15:51:09 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/zabbix/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ZabbixでSNMPデバイスの監視を行う</title>
       <link>https://www.shinayoshi.net/post/2016/08/11/monitoring-snmp-devices-on-zabbix/</link>
@@ -21,15 +17,16 @@
       <description>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。
 とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。
 パッケージの更新 Zabbix Serverのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
-$ sudo apt-get install snmp snmp-mibs-downloader  SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
-$ sudo vi /etc/snmp/snmp.conf #mibs :  メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
-${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp  Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
-$ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
+$ sudo apt-get install snmp snmp-mibs-downloader SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
+$ sudo vi /etc/snmp/snmp.conf #mibs : メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
+${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
+$ sudo systemctl restart zabbix-server Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホストの設定画面が表示されるので最低限以下を設定する。
-&amp;ldquo;ホスト&amp;rdquo;タブ
- ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;rdquo;タブ</description>
+&amp;ldquo;ホスト&amp;quot;タブ
+ ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;quot;タブ
+ テンプレートとのリンク：&amp;ldquo;Template SNMP Device&amp;quot;を追加。  &amp;ldquo;マクロ&amp;quot;タブ</description>
     </item>
     
     <item>
@@ -40,9 +37,9 @@ $ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設�
       <guid>https://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。
 パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Agentのインストール Zabbix Agentのインストール
-$ sudo apt-get install zabbix-agent  Zabbix Agentの設定 Zabbix Agentを設定する。
-$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent  Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール
+$ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。
+$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホスト名の設定やテンプレートの選択を行い、保存を選択する。
 以上</description>
@@ -56,9 +53,9 @@ $ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) Serve
       <guid>https://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。
  3 Installation from packages [Zabbix Documentation 2.2]  パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Serverのインストール Zabbix Serverのインストール
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール
 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
-$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese  MySQLの初期設定 MySQLのセキュア設定
+$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定
 $ mysql_secure_installation In order to log into MySQL to secure it, we&#39;ll need the current password for the root user. If you&#39;ve just installed MySQL, and you haven&#39;t set the root password yet, the password will be blank, so you should just press enter here.</description>
     </item>
     

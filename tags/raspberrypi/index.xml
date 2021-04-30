@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Raspberrypi on shinayoshi&#39;s note</title>
+    <title>raspberrypi on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/raspberrypi/</link>
-    <description>Recent content in Raspberrypi on shinayoshi&#39;s note</description>
+    <description>Recent content in raspberrypi on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2のイメージバックアップを行う</title>
       <link>https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</link>
@@ -32,7 +28,7 @@ gitのインストール $ sudo -E apt-get install git パッケージリスト�
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomenas1にrsnapshotを導入してファイルバックアップを行う設定を行います。
 なおバックアップ元は/mnt/nas/、バックアップ先は/mnt/backup/を想定しています。
-$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $  rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.</description>
+$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $ rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.</description>
     </item>
     
     <item>
@@ -44,7 +40,7 @@ $ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/na
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -79,7 +75,7 @@ $ sudo -E apt-get install zabbix-agent パッケージリストを読み込ん�
       <guid>https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomemon1、homemon2を構築していきます。 本環境の監視を行うためにZabbixを導入します。
-Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.</description>
+Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server mysql-server-5.</description>
     </item>
     
     <item>
@@ -103,7 +99,7 @@ $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 ro
       <guid>https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomemon1、homemon2を構築していきます。 まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。
-NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.</description>
+NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.168.10.0 mask 255.</description>
     </item>
     
     <item>
@@ -115,7 +111,7 @@ NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。
 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。
-$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $  再起動後もIPv6が無効化するように設定します。</description>
+$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。</description>
     </item>
     
     <item>
@@ -166,7 +162,7 @@ $ sudo apt-get install squid パッケージリストを読み込んでいます
 今回はhomepxy1を構築していきます。
 Raspberry Pi 2でキャッシュDNSサーバ構築 家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。 まずはキャッシュDNSサーバを構築していきます。
 bind9の設定 bind9のインストール
-$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.</description>
+$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.</description>
     </item>
     
     <item>
@@ -179,7 +175,7 @@ $ sudo apt-get install bind9 dnsutils パッケージリストを読み込んで
 前回に引き続きhomenas1を構築していきます。
 Raspberry Pi 2でファイルサーバ構築(NFS/Samba) 前回はUSB Storageを使用してRAIDデバイスを設定しました。 今回はNFSやSambaの設定を行っていきます。
 NFSの設定 NFSのインストール
-$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています.</description>
+$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています... systemd (215-17+deb8u5) のトリガを処理しています .</description>
     </item>
     
     <item>
@@ -204,8 +200,8 @@ Raspberry Pi 2でファイルサーバ構築(mdadm) 家庭内インターネッ�
       <guid>https://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</guid>
       <description>Raspberry Pi 2共通初期設定 家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。
 前提 Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。 セキュリティ関連の設定は個別に行いますので、ここでは省略します。
-パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade   Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 2のIPアドレスを固定する。
-$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= interface eth1 static ip_address=172.31.10.110/24 static routers= static domain_name_servers= #static domain_name= #static domain_search=   &amp;ldquo;man dhcpcd.</description>
+パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade  Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 2のIPアドレスを固定する。
+$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= interface eth1 static ip_address=172.31.10.110/24 static routers= static domain_name_servers= #static domain_name= #static domain_search=  &amp;ldquo;man dhcpcd.</description>
     </item>
     
     <item>
@@ -226,7 +222,7 @@ $ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org $ sudo vi /etc/dhcpcd.conf #A
       
       <guid>https://www.shinayoshi.net/post/2016/08/24/cache-dns-on-raspbian/</guid>
       <description>Raspbian(Jessie)でキャッシュDNSを構築するまでのメモです。 Raspbianの基本的な設定は完了している前提です。
-bind9のインストール $ sudo apt-get install bind9 dnsutils  bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。
+bind9のインストール $ sudo apt-get install bind9 dnsutils bind9の設定を行う。変更箇所が多かったので、変更箇所ではなく変更後のコンフィグを提示する。
 $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localhost; } keys { rndc-key; }; }; include &amp;quot;/etc/bind/rndc.key&amp;quot;; acl &amp;quot;internal-network&amp;quot; { localhost; 127.0.0.1/32; 192.168.10.0/24; 192.168.20.0/24; 192.168.30.0/24; 192.168.40.0/24; }; options { version &amp;quot;unknown&amp;quot;; directory &amp;quot;/var/cache/bind&amp;quot;; listen-on { internal-network; }; querylog yes; allow-query { internal-network; }; recursion yes; allow-recursion { internal-network; }; forwarders { 192.168.100.1; }; notify no; max-ncache-ttl	300; max-cache-ttl	3600; recursive-clients	300; cleaning-interval	60; lame-ttl	600; max-cache-size	256m; allow-transfer { none; }; allow-update { none; }; }; logging { channel &amp;quot;log_default&amp;quot; { file &amp;quot;/var/log/bind/named.</description>
     </item>
     
@@ -239,7 +235,7 @@ $ sudo cat /etc/bind/named.conf.options controls { inet 127.0.0.1 allow { localh
       <description>Raspbian(Jessie)にSquidをインストールして内部NW向けプロキシサーバを構築するまでのメモです。
 Raspbianの初期設定 過去のブログ記事を参考に初期設定を実施する。
  パッケージの最新化 パッケージのインストール &amp;ndash; chkconfig &amp;ndash; tcpdump &amp;ndash; telnet &amp;ndash; dnsutils IPアドレスの固定化 NTP設定 rpi-configの設定 &amp;ndash; ディスク拡張 &amp;ndash; 文字コード設定 &amp;ndash; タイムゾーン設定 &amp;ndash; Wifiの国設定 &amp;ndash; ホスト名変更 公開鍵認証方式の設定 IPv6の無効化 SELinuxの無効化 iptablesの設定 logwatchのインストール Zabbix Agentのインストール・監視登録 SNMPDのインストール・Cacti登録  Squidのインストール Squidをインストールする。
-$ sudo apt-get install squid  Squidを設定する。
+$ sudo apt-get install squid Squidを設定する。
 $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo diff /etc/squid/squid.conf.org /etc/squid/squid.conf 609,611c609,616 &amp;lt; acl localnet src 10.0.0.0/8	# RFC1918 possible internal network &amp;lt; acl localnet src 172.</description>
     </item>
     
@@ -251,7 +247,7 @@ $ sudo cp -p /etc/squid/squid.conf{,.org} $ sudo vi /etc/squid/squid.conf $ sudo
       <guid>https://www.shinayoshi.net/post/2016/08/21/to-register-the-device-in-cacti/</guid>
       <description>Cactiに新規デバイスを登録するメモです。 SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo apt-get install snmpd snmp  snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。
+$ sudo apt-get install snmpd snmp snmpconfツールを使用してsnmpd.confを作成する。 SNMPv3を使用する前提で質問に回答していきます。
 $ snmpconf -g basic_setup The following installed configuration files were found: 1: /etc/snmp/snmp.conf 2: /etc/snmp/snmpd.conf Would you like me to read them in? Their content will be merged with the output files created by this session. Valid answer examples: &amp;quot;all&amp;quot;, &amp;quot;none&amp;quot;,&amp;quot;3&amp;quot;,&amp;quot;1,2,5&amp;quot; Read in which (default = all): 2 ************************************************ *** Beginning basic system information setup *** ************************************************ Do you want to configure the information returned in the system MIB group (contact info, etc)?</description>
     </item>
     
@@ -275,8 +271,9 @@ $ sudo apt-get install cacti cacti-spine ↓&amp;lt;了解&amp;gt;を選択し�
       <description>Raspbian(jessie)にCowrieをインストールしてSSHハニーポットを構築するメモです。 はじめはKippoを使用する予定だったのですが、Kippoの改良版であるCowrieを使用することにしました。
 個人のメモですので、もし本メモを参考にハニーポットを構築する際は自己責任でお願いします。
 Raspbianの初期設定 Raspbianの初期設定として以下を行いました。
-パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade  IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=  NTP設定 NTP同期先を設定する。
-$ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst  NTPサーバを再起動する。</description>
+パッケージの最新化 $ sudo apt-get update $ sudo apt-get upgrade IPアドレスの固定化 $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.10.10/24 static routers=192.168.10.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= NTP設定 NTP同期先を設定する。
+$ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.mfeed.ad.jp iburst # comment out #server 0.debian.pool.ntp.org iburst #server 1.debian.pool.ntp.org iburst #server 2.debian.pool.ntp.org iburst #server 3.debian.pool.ntp.org iburst NTPサーバを再起動する。
+$ sudo systemctl restart ntp 時刻同期の状態を確認する。</description>
     </item>
     
     <item>
@@ -288,9 +285,9 @@ $ sudo vi /etc/ntp.conf #Add the line server ntp.nict.jp iburst server ntp.jst.m
       <description>Raspbian(Jessie)にFortiGateのプライベートMIBを追加するまでのメモです。
 MIBファイルのアップロード FortiGateのプライベートMIB(FORTINET-CORE-MIB.mib、FORTINET-FORTIGATE-MIB.mib)を/home/pi直下にアップロードします。
 プライベートMIBの設定 プライベートMIBファイルを/usr/share/snmp/mibs/vendorに移動する。
-$ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-*  プライベートMIBを使用するようにsnmp.confを設定する。
-$ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB  プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。
-$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29  以上</description>
+$ sudo mkdir /usr/share/snmp/mibs/vendor $ sudo mv FORTINET-* /usr/share/snmp/mibs/vendor/ $ sudo chown root:root /usr/share/snmp/mibs/vendor/FORTINET-* プライベートMIBを使用するようにsnmp.confを設定する。
+$ sudo vi /etc/snmp/snmp.conf mibdirs +/usr/share/snmp/mibs/vendor mibs +FORTINET-CORE-MIB:FORTINET-FORTIGATE-MIB プライベートMIBの設定確認 FortiGateのMIBフィールド名が表示されることを確認する。
+$ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FORTIGATE-MIB::fgSysMemUsage.0 = Gauge32: 29 以上</description>
     </item>
     
     <item>
@@ -302,15 +299,16 @@ $ snmpwalk -v 2c -c public 192.168.1.1 .1.3.6.1.4.1.12356.101.4.1.4 FORTINET-FOR
       <description>Raspbian(Jessie)にインストールしたZabbixでSNMPデバイスの監視を行うまでのメモです。
 とりあえずSNMP Deviceの監視ができるようになりましたが、なぜこの手順でよいのか理解できていない部分が多いです。
 パッケージの更新 Zabbix Serverのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
-$ sudo apt-get install snmp snmp-mibs-downloader  SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
-$ sudo vi /etc/snmp/snmp.conf #mibs :  メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
-${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp  Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
-$ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade SNMP関連パッケージのインストール Zabbix ServerにSNMP関連のパッケージをインストールする。
+$ sudo apt-get install snmp snmp-mibs-downloader SNMPの設定 /usr/bin/download-mibsでダウンロードしたMIBSを読み込めるように設定する。
+$ sudo vi /etc/snmp/snmp.conf #mibs : メモ：デフォルトでは以下のディレクトリを検索する。snmpstatus --helpの出力で確認。
+${HOME}/.snmp/mibs /usr/share/snmp/mibs /usr/share/snmp/mibs/iana /usr/share/snmp/mibs/ietf /usr/share/mibs/site /usr/share/snmp/mibs /usr/share/mibs/iana /usr/share/mibs/ietf /usr/share/mibs/netsnmp Zabbix Serverの再起動 Zabbix Serverを再起動してSNMPの設定を読み込む(本当に必要？)。
+$ sudo systemctl restart zabbix-server Zabbix ServerでのSNMP Device監視設定 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホストの設定画面が表示されるので最低限以下を設定する。
-&amp;ldquo;ホスト&amp;rdquo;タブ
- ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;rdquo;タブ</description>
+&amp;ldquo;ホスト&amp;quot;タブ
+ ホスト名：監視対象機器のホスト名。 グループ：所属するグループ。適切なグループがなければ新規作成。 エージェントのインターフェース：削除。 SNMPインターフェース：追加。監視対象機器のIPアドレスを設定。  &amp;ldquo;テンプレート&amp;quot;タブ
+ テンプレートとのリンク：&amp;ldquo;Template SNMP Device&amp;quot;を追加。  &amp;ldquo;マクロ&amp;quot;タブ</description>
     </item>
     
     <item>
@@ -321,9 +319,9 @@ $ sudo systemctl restart zabbix-server  Zabbix ServerでのSNMP Device監視設�
       <guid>https://www.shinayoshi.net/post/2016/08/11/install-zabbix-agent-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Agentをインストールしてサーバ監視を行うまでのメモです。 Zabbix Serverのインストールは別のメモになります。
 パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Agentのインストール Zabbix Agentのインストール
-$ sudo apt-get install zabbix-agent  Zabbix Agentの設定 Zabbix Agentを設定する。
-$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent  Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Agentのインストール Zabbix Agentのインストール
+$ sudo apt-get install zabbix-agent Zabbix Agentの設定 Zabbix Agentを設定する。
+$ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) ServerActive=(Zabbix server IP address) Hostname=(Hostname) $ sudo systemctl restart zabbix-agent Zabbix Serverでの監視登録 ブラウザからZabbix ServerのURL(http://IPアドレス/zabbix)にアクセスしてログインする。
 「設定」⇒「ホスト」⇒「ホストの作成」を選択する。
 ホスト名の設定やテンプレートの選択を行い、保存を選択する。
 以上</description>
@@ -337,9 +335,9 @@ $ sudo vi /etc/zabbix/zabbix_agentd.conf Server=(Zabbix server IP address) Serve
       <guid>https://www.shinayoshi.net/post/2016/08/10/install-zabbix-server-on-raspbian/</guid>
       <description>Raspbian(Jessie)にZabbix Serverをインストールするメモです。 Zabbix Agentのインストールは別のメモになります。
  3 Installation from packages [Zabbix Documentation 2.2]  パッケージの更新 Raspbianのパッケージを最新する。
-$ sudo apt-get update $ sudo apt-get upgrade  Zabbix Serverのインストール Zabbix Serverのインストール
+$ sudo apt-get update $ sudo apt-get upgrade Zabbix Serverのインストール Zabbix Serverのインストール
 インストール途中でMySQLのrootアカウントのパスワードを求められるので、適宜設定する。
-$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese  MySQLの初期設定 MySQLのセキュア設定
+$ sudo apt-get install zabbix-server-mysql zabbix-frontend-php $ sudo apt-get install php5-mysql $ sudo apt-get install task-japanese MySQLの初期設定 MySQLのセキュア設定
 $ mysql_secure_installation In order to log into MySQL to secure it, we&#39;ll need the current password for the root user. If you&#39;ve just installed MySQL, and you haven&#39;t set the root password yet, the password will be blank, so you should just press enter here.</description>
     </item>
     
@@ -351,10 +349,10 @@ $ mysql_secure_installation In order to log into MySQL to secure it, we&#39;ll n
       <guid>https://www.shinayoshi.net/post/2016/08/07/backup-raspbian/</guid>
       <description>RaspbianをSDカード丸ごとバックアップ・リストアするメモです。 今回はddコマンドを使ってディスクイメージを書き出す方法でバックアップ・リストアを行います。
 バックアップ SDカードデバイスを確認する。
-$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2  SDカードデバイスをアンマウントする。
-$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful  SDカードのディスクイメージをバックアップする。
-$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec)  SDカードデバイスを取り出す。
-$ diskutil eject /dev/disk1 Disk /dev/disk1 ejected  リストア SDカードデバイスを確認する。</description>
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 boot 66.1 MB disk1s1 2: Linux 32.2 GB disk1s2 SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードのディスクイメージをバックアップする。
+$ sudo dd bs=1m if=/dev/rdisk1 of=~/Desktop/raspi_backup.img Password: 30735+0 records in 30735+0 records out 32227983360 bytes transferred in 1610.088954 secs (20016275 bytes/sec) SDカードデバイスを取り出す。
+$ diskutil eject /dev/disk1 Disk /dev/disk1 ejected リストア SDカードデバイスを確認する。</description>
     </item>
     
     <item>
@@ -363,10 +361,10 @@ $ diskutil eject /dev/disk1 Disk /dev/disk1 ejected  リストア SDカードデ
       <pubDate>Sat, 16 Jul 2016 20:49:31 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2016/07/16/raspberrypi-kivy-setup/</guid>
-      <description>Raspberry Pi 7&amp;rdquo; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。
+      <description>Raspberry Pi 7&amp;quot; Touch Screen LCDに接続したRaspberry Pi 3 (Raspbian)にKivyをインストールしてデモを動かすまでのメモです。
 Kivyのインストール Kivyに必要なパッケージをインストールする。
-$ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot  Kivyをインストールする。
-$ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile $ source ~/.profile   Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation  Raspberry Pi 7&amp;rdquo; Touch Screen LCDの利用設定 $ vi ~/.</description>
+$ sudo apt-get update $ sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev pkg-config libgl1-mesa-dev libgles2-mesa-dev python-setuptools libgstreamer1.0-dev git-core gstreamer1.0-plugins-{bad,base,good,ugly} gstreamer1.0-{omx,alsa} python-dev cython $ sudo reboot Kivyをインストールする。
+$ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &amp;quot;export PYTHONPATH=$(pwd):\$PYTHONPATH&amp;quot; &amp;gt;&amp;gt; ~/.profile $ source ~/.profile  Installation on Raspberry Pi — Kivy 1.9.2-dev0 documentation  Raspberry Pi 7&amp;quot; Touch Screen LCDの利用設定 $ vi ~/.</description>
     </item>
     
     <item>
@@ -375,11 +373,11 @@ $ git clone https://github.com/kivy/kivy $ cd kivy $ make $ echo &amp;quot;expor
       <pubDate>Tue, 12 Jul 2016 21:16:20 +0900</pubDate>
       
       <guid>https://www.shinayoshi.net/post/2016/07/12/raspberrypi-touchscreen-setup/</guid>
-      <description>Raspberry Pi 3のディスプレイとして「Official 7&amp;rdquo; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。
+      <description>Raspberry Pi 3のディスプレイとして「Official 7&amp;quot; Touchscreen Display＋フレーム セット（青）」を購入した。 Raspberry Pi 3に接続して最低限使えるようにするまでをメモする。
 接続 以下のWebサイトを参考に接続する。
  Raspberry Pi 7インチ タッチ・スクリーン ディスプレイ 接続・取り付け方法 - Raspberry Pi Shop by KSY: The Eagerly Awaited Raspberry Pi Display - Raspberry Pi  天地逆転を直す 購入したフレームを使用すると天地が逆転した状態で起動する(製品仕様)。Raspberry Pi 3側で画面の回転を設定することで天地逆転を直す。
-$ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot   Getting Started with the Raspberry Pi 7&amp;rdquo; Touchscreen LCD - Pimoroni Yarr-niversity  日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。
-$ sudo apt-get install task-japanese task-japanese-desktop  スクリーンキーボードのインストール Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</description>
+$ sudo vi /boot/config.txt #Add the following line lcd_rotate=2 $ sudo reboot  Getting Started with the Raspberry Pi 7&amp;quot; Touchscreen LCD - Pimoroni Yarr-niversity  日本語環境の整備 日本語関連パッケージをインストールする。余計なパッケージもインストールされてしまいますが、楽な方法ではあります。
+$ sudo apt-get install task-japanese task-japanese-desktop スクリーンキーボードのインストール Touchscreen Displayだけで操作を行うために、On Screen Keyboardを導入する。</description>
     </item>
     
     <item>
@@ -390,10 +388,10 @@ $ sudo apt-get install task-japanese task-japanese-desktop  スクリーンキ�
       <guid>https://www.shinayoshi.net/post/2016/07/10/raspbian-wifi-setup/</guid>
       <description>Raspberry Pi 3には標準でWiFiモジュールが搭載されている。 今回はWiFi設定を行う。
 WiFiネットワークのスキャン 接続するWiFiネットワークを確認する。
-$ sudo iwlist wlan0 scan  アクセスポイントの設定 アクセスポイントを設定する。
-$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot; #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot; psk=暗号化されたパスワード }  WiFiの有効化 WiFiを有効化する。
-$ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0  IPアドレスの固定化 IPアドレスを固定化する。
-$ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.</description>
+$ sudo iwlist wlan0 scan アクセスポイントの設定 アクセスポイントを設定する。
+$ sudo cp -p /etc/wpa_supplicant/wpa_supplicant.conf{,.org} $ sudo sh -c &amp;quot;wpa_passphrase &#39;アクセスポイント名(ESSID)&#39; &#39;アクセスポイントのパスワード&#39; &amp;gt;&amp;gt; /etc/wpa_supplicant/wpa_supplicant.conf&amp;quot; $ sudo cat /etc/wpa_supplicant/wpa_supplicant.conf country=JP ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev update_config=1 network={ ssid=&amp;quot;アクセスポイント名(ESSID)&amp;quot; #psk=&amp;quot;先ほどのコマンドで入力したパスワード(不要であれば削除する)&amp;quot; psk=暗号化されたパスワード } WiFiの有効化 WiFiを有効化する。
+$ sudo ifdown wlan0 $ sudo ifup wlan0 $ ifconfig wlan0 IPアドレスの固定化 IPアドレスを固定化する。
+$ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_address=192.168.100.10⁄24 static routers=192.168.100.1 static domain_name_servers=192.</description>
     </item>
     
     <item>
@@ -404,9 +402,9 @@ $ sudo vi /etc/dhcpcd.conf #Add the following line interface wlan0 static ip_add
       <guid>https://www.shinayoshi.net/post/2016/07/09/raspbian-jessie-setup/</guid>
       <description>こちらも何番煎じかわかりませんが、Raspbianをインストールした後の初期設定メモです。
 前提 Raspberry Pi 3にRaspbian Jessie (2016-05-27版)をインストールした環境の初期設定を想定する。ただし、セキュリティ関連の設定は省略する(例えば、SSH接続の公開鍵認証設定やFirewall設定、不要サービスの停止など)。
-パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade   Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。
-$ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=   &amp;ldquo;man dhcpcd.conf&amp;rdquo;  USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。
-$ sudo vi /boot/config.txt #Add the following line max_usb_current=1   RPiconfig - eLinux.</description>
+パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade  Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 3のIPアドレスを固定する。
+$ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search=  &amp;ldquo;man dhcpcd.conf&amp;rdquo;  USBポートの電流供給増加 USBポートの電流供給を1.2A(4ポート合計)まで供給できるようにする。
+$ sudo vi /boot/config.txt #Add the following line max_usb_current=1  RPiconfig - eLinux.org  NTP設定 NTP同期先を設定する。</description>
     </item>
     
     <item>
@@ -419,8 +417,8 @@ $ sudo vi /boot/config.txt #Add the following line max_usb_current=1   RPiconfig
 使用したもの  Raspberry Pi 3 Model B micro SDカード(32GB) USB ACアダプタ(Raspberry Pi 3の電源用) USBケーブル(Raspberry Pi 3の電源用) LANケーブル(Raspberry Pi 3の有線LAN接続用) Mac(作業用)  Raspbianダウンロード 公式サイトからRaspbianをダウンロードする。 2016年7月9日時点の最新バージョンは「2016-05-27-raspbian-jessie.zip」でした。
  Download Raspbian for Raspberry Pi  Raspbian書き込み SDカードにRaspbianのイメージを書き込む。
 SDカードデバイスを確認する。
-$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1  SDカードデバイスをアンマウントする。
-$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful  SDカードにRaspbianのイメージを書き込む。</description>
+$ diskutil list /dev/disk1 #: TYPE NAME SIZE IDENTIFIER 0: FDisk_partition_scheme *32.2 GB disk1 1: Windows_FAT_32 NO NAME 32.2 GB disk1s1 SDカードデバイスをアンマウントする。
+$ diskutil unmountDisk /dev/disk1 Unmount of all volumes on disk1 was successful SDカードにRaspbianのイメージを書き込む。</description>
     </item>
     
   </channel>

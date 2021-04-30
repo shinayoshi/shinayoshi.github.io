@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Vim on shinayoshi&#39;s note</title>
+    <title>vim on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/vim/</link>
-    <description>Recent content in Vim on shinayoshi&#39;s note</description>
+    <description>Recent content in vim on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Wed, 17 May 2017 22:43:05 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/vim/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 17 May 2017 22:43:05 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/vim/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>LinuxでUTF-8のBOMを削除する</title>
       <link>https://www.shinayoshi.net/post/2017/05/17/remove-bom-code/</link>
@@ -21,8 +17,8 @@
       <description>Linux上でUTF-8のファイルに含まれるBOM(Byte Order Mark)を削除する方法です。Webで検索するとたくさん情報が出てきますが、今回はvimを使った方法を残しておきます。
 きっかけとしては、Windowsで作成したシェルスクリプト(UTF-8)をLinuxで実行した際に1行目でエラーが出力されたことです。なぜエラーが出るのか調べてみるとBOMが原因であることがわかりました。 Windowsのnotepadで保存するとBOM付きで保存されるようです。
 BOMの確認 ファイルをcatやemacsで表示しても通常はBOMを見ることはできません。これはプログラムがBOM付き、BOMなしに関わらずうまく解釈して表示してくれるからです。ですが、lessやmoreではBOMをそのまま表示してくれますので、BOM有無の判断に使用できます。&amp;lt;U+FEFF&amp;gt;がBOMです。
-$ less bom.txt &amp;lt;U+FEFF&amp;gt;#!/bin/sh echo hoge  BOMの削除 通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。
-$ vim -b bom.txt &amp;lt;feff\&amp;gt;#!/bin/sh echo hoge  あとはBOM(↑でいうところの&amp;lt;feff&amp;gt;)を削除して保存すれば、BOMなしファイルができます。
+$ less bom.txt &amp;lt;U+FEFF&amp;gt;#!/bin/sh echo hoge BOMの削除 通常vimでファイルを開くとBOM付き、BOMなしを意識せず開いてくれます。ここで「-b(バイナリモード)」オプションをつけてvimを起動するとBOMを表示することができます。
+$ vim -b bom.txt &amp;lt;feff\&amp;gt;#!/bin/sh echo hoge あとはBOM(↑でいうところの&amp;lt;feff&amp;gt;)を削除して保存すれば、BOMなしファイルができます。
 以上</description>
     </item>
     

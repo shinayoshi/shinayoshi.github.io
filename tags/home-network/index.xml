@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Home Network on shinayoshi&#39;s note</title>
+    <title>home-network on shinayoshi&#39;s note</title>
     <link>https://www.shinayoshi.net/tags/home-network/</link>
-    <description>Recent content in Home Network on shinayoshi&#39;s note</description>
+    <description>Recent content in home-network on shinayoshi&#39;s note</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright (c) 2019 shinayoshi</copyright>
-    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate>
-    
-	<atom:link href="https://www.shinayoshi.net/tags/home-network/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 15 Jan 2017 00:51:03 +0900</lastBuildDate><atom:link href="https://www.shinayoshi.net/tags/home-network/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raspberry Pi 2のイメージバックアップを行う</title>
       <link>https://www.shinayoshi.net/post/2017/01/15/backup-raspberrypi/</link>
@@ -32,7 +28,7 @@ gitのインストール $ sudo -E apt-get install git パッケージリスト�
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomenas1にrsnapshotを導入してファイルバックアップを行う設定を行います。
 なおバックアップ元は/mnt/nas/、バックアップ先は/mnt/backup/を想定しています。
-$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $  rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.</description>
+$ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/nas $ rsnapshotのインストール $ sudo -E apt-get install rsnapshot パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: liblchown-perl rsync 以下のパッケージが新たにインストールされます: liblchown-perl rsnapshot rsync アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 507 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,133 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main liblchown-perl armhf 1.01-2+b1 [8,828 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main rsync armhf 3.</description>
     </item>
     
     <item>
@@ -44,7 +40,7 @@ $ df -h /dev/sdc1 917G 72M 871G 1% /mnt/backup /dev/md0 394G 71M 374G 1% /mnt/na
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回はCactiを導入しました。 今回はCactiにhomenas1、homemon1、homemon2、homepxy1、homepot1を登録していきます。SNMPv3を使用してSNMPの値を取得します。
 snmpdのインストール 追加するデバイス(Server)にsnmpdをインストールする。
-$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.</description>
+$ sudo -E apt-get install snmpd snmp パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 提案パッケージ: lm-sensors snmp-mibs-downloader snmptrapd 以下のパッケージが新たにインストールされます: libperl5.20 libsensors4 libsnmp-base libsnmp30 snmp snmpd アップグレード: 0 個、新規インストール: 6 個、削除: 0 個、保留: 1 個。 3,836 kB のアーカイブを取得する必要があります。 この操作後に追加で 7,088 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main libperl5.20 armhf 5.20.2-3+deb8u6 [1,354 B] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main libsensors4 armhf 1:3.3.5-2 [48.9 kB] 取得:3 http://mirrordirector.</description>
     </item>
     
     <item>
@@ -79,7 +75,7 @@ $ sudo -E apt-get install zabbix-agent パッケージリストを読み込ん�
       <guid>https://www.shinayoshi.net/post/2017/01/08/setting-zabbix-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomemon1、homemon2を構築していきます。 本環境の監視を行うためにZabbixを導入します。
-Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.</description>
+Zabbix Serverのインストール $ sudo -E apt-get install zabbix-server-mysql zabbix-frontend-php php5-mysql task-japanese パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: apache2 apache2-bin apache2-data apache2-utils bdf2psf fbterm fontconfig-config fonts-dejavu-core fping libaio1 libapache2-mod-php5 libapr1 libaprutil1 libaprutil1-dbd-sqlite3 libaprutil1-ldap libcurl3-gnutls libdbd-mysql-perl libdbi-perl libfontconfig1 libfontenc1 libgd3 libhtml-template-perl libiksemel3 libjbig0 libltdl7 liblua5.1-0 libmysqlclient18 libodbc1 libonig2 libopenipmi0 libpci3 libperl4-corelibs-perl libperl5.20 libqdbm14 libsensors4 libsnmp-base libsnmp30 libterm-readkey-perl libtiff5 libvpx1 libxfont1 libxpm4 lsof lv manpages-ja manpages-ja-dev mysql-client-5.5 mysql-common mysql-server mysql-server-5.</description>
     </item>
     
     <item>
@@ -103,7 +99,7 @@ $ sudo cp -p /etc/rsyslog.conf{,.org} $ ls -l /etc/rsyslog.conf* -rw-r--r-- 1 ro
       <guid>https://www.shinayoshi.net/post/2017/01/07/setting-ntp-server/</guid>
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 今回はhomemon1、homemon2を構築していきます。 まずは本環境内の機器から時刻同期を行えるようにNTPサーバを構築します。
-NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.</description>
+NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/ntp.conf* -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf -rw-r--r-- 1 root root 2052 9月 23 13:25 /etc/ntp.conf.backup20170107 -rw-r--r-- 1 root root 1988 7月 26 07:36 /etc/ntp.conf.org $ $ sudo vi /etc/ntp.conf # Clients from this (example!) subnet have unlimited access, but only if # cryptographically authenticated. #restrict 192.168.123.0 mask 255.255.255.0 notrust restrict 192.168.10.0 mask 255.</description>
     </item>
     
     <item>
@@ -115,7 +111,7 @@ NTPサーバの構築 $ sudo cp -p /etc/ntp.conf{,.backup20170107} $ ls -l /etc/
       <description>FortiGate 60DとRaspberry Piを使用して家庭内インターネット接続環境を構築します。 最終的には以下のような構成を想定しています。
 前回に引き続きhomepot1を構築していきます。 Cowrieを使用するにあたりやっておきたいセキュリティ設定を行っていきます。
 IPv6の無効化 IPv6は使用しないため、IPv6を無効化します。
-$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $  再起動後もIPv6が無効化するように設定します。</description>
+$ sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.all.disable_ipv6 = 1 $ $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6 = 1 $ $ sudo sysctl -a | grep disable_ipv6 sysctl: reading key &amp;quot;net.ipv6.conf.all.stable_secret&amp;quot; net.ipv6.conf.all.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.default.stable_secret&amp;quot; net.ipv6.conf.default.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth0.stable_secret&amp;quot; net.ipv6.conf.eth0.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.eth1.stable_secret&amp;quot; net.ipv6.conf.eth1.disable_ipv6 = 1 sysctl: reading key &amp;quot;net.ipv6.conf.lo.stable_secret&amp;quot; net.ipv6.conf.lo.disable_ipv6 = 1 $ 再起動後もIPv6が無効化するように設定します。</description>
     </item>
     
     <item>
@@ -166,7 +162,7 @@ $ sudo apt-get install squid パッケージリストを読み込んでいます
 今回はhomepxy1を構築していきます。
 Raspberry Pi 2でキャッシュDNSサーバ構築 家庭内インターネット接続環境からインターネットに接続するためにキャッシュDNSサーバとプロキシサーバを構築します。 まずはキャッシュDNSサーバを構築していきます。
 bind9の設定 bind9のインストール
-$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.</description>
+$ sudo apt-get install bind9 dnsutils パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下の追加パッケージがインストールされます: bind9utils 提案パッケージ: bind9-doc ufw rblcheck 以下のパッケージが新たにインストールされます: bind9 bind9utils dnsutils アップグレード: 0 個、新規インストール: 3 個、削除: 0 個、保留: 1 個。 562 kB のアーカイブを取得する必要があります。 この操作後に追加で 1,620 kB のディスク容量が消費されます。 続行しますか? [Y/n] y 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main dnsutils armhf 1:9.9.5.dfsg-9+deb8u8 [113 kB] 取得:2 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9utils armhf 1:9.9.5.dfsg-9+deb8u8 [157 kB] 取得:3 http://mirrordirector.raspbian.org/raspbian/ jessie/main bind9 armhf 1:9.</description>
     </item>
     
     <item>
@@ -179,7 +175,7 @@ $ sudo apt-get install bind9 dnsutils パッケージリストを読み込んで
 前回に引き続きhomenas1を構築していきます。
 Raspberry Pi 2でファイルサーバ構築(NFS/Samba) 前回はUSB Storageを使用してRAIDデバイスを設定しました。 今回はNFSやSambaの設定を行っていきます。
 NFSの設定 NFSのインストール
-$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています.</description>
+$ sudo apt-get install nfs-kernel-server パッケージリストを読み込んでいます... 完了 依存関係ツリーを作成しています 状態情報を読み取っています... 完了 以下のパッケージが新たにインストールされます: nfs-kernel-server アップグレード: 0 個、新規インストール: 1 個、削除: 0 個、保留: 1 個。 101 kB のアーカイブを取得する必要があります。 この操作後に追加で 373 kB のディスク容量が消費されます。 取得:1 http://mirrordirector.raspbian.org/raspbian/ jessie/main nfs-kernel-server armhf 1:1.2.8-9 [101 kB] 101 kB を 1秒 で取得しました (66.7 kB/s) 以前に未選択のパッケージ nfs-kernel-server を選択しています。 (データベースを読み込んでいます ... 現在 31534 個のファイルとディレクトリがインストールされています。) .../nfs-kernel-server_1%3a1.2.8-9_armhf.deb を展開する準備をしています ... nfs-kernel-server (1:1.2.8-9) を展開しています... systemd (215-17+deb8u5) のトリガを処理しています .</description>
     </item>
     
     <item>
@@ -204,8 +200,8 @@ Raspberry Pi 2でファイルサーバ構築(mdadm) 家庭内インターネッ�
       <guid>https://www.shinayoshi.net/post/2016/10/22/raspberrypi-initial-setup/</guid>
       <description>Raspberry Pi 2共通初期設定 家庭内インターネット接続環境で使用するRaspberry Pi 2の初期設定を行います。
 前提 Raspberry Pi 2にRaspbian Jessie(2016-09-23-raspbian-jessie-lite.img)をインストールした環境の初期設定を想定します。 セキュリティ関連の設定は個別に行いますので、ここでは省略します。
-パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade   Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 2のIPアドレスを固定する。
-$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= interface eth1 static ip_address=172.31.10.110/24 static routers= static domain_name_servers= #static domain_name= #static domain_search=   &amp;ldquo;man dhcpcd.</description>
+パッケージ更新 $ sudo apt-get update $ sudo apt-get upgrade  Updating and Upgrading Raspbian - Raspberry Pi Documentation  IPアドレス固定化 Raspberry Pi 2のIPアドレスを固定する。
+$ sudo cp -p /etc/dhcpcd.conf /etc/dhcpcd.conf.org $ sudo vi /etc/dhcpcd.conf #Add the following line interface eth0 static ip_address=192.168.40.10/24 static routers=192.168.40.254 static domain_name_servers=192.168.100.1 #static domain_name= #static domain_search= interface eth1 static ip_address=172.31.10.110/24 static routers= static domain_name_servers= #static domain_name= #static domain_search=  &amp;ldquo;man dhcpcd.</description>
     </item>
     
     <item>
